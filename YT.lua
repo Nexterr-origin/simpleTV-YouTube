@@ -1,5 +1,5 @@
 -- видеоскрипт для сайта https://www.youtube.com (6/3/21)
--- https://gitlab.com/Nexterr-origin/simpleTV-YouTube
+-- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
