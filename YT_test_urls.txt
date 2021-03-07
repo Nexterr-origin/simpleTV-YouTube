@@ -1,0 +1,92 @@
+==================================================================
+Test urls
+==================================================================
+поиск (Ctrl+N):
+- 손나은 (видео)
+-- простоквашино (плейлисты)
+--- задорнов  (каналы)
+-+ вселенная (прямые трансляции)
+---------------------------------------------------
+cookies нужны:
+https://www.youtube.com/feed/channels - список подписок (каналы)
+https://www.youtube.com/feed/rss_channels - список подписок (ленты каналов - RSS feed)
+https://www.youtube.com/feed/subscriptions - подписки
+https://www.youtube.com/feed/history - история
+https://www.youtube.com/playlist?list=LL - понравившиеся
+https://www.youtube.com/playlist?list=LM - понравившиеся (музыка)
+https://www.youtube.com/playlist?list=WL - посмотреть позже
+https://www.youtube.com/watch?v=jwhq08k_uVo = предосмотр
+https://www.youtube.com/watch?v=kFW8kJ9Y1tM - видео
+---------------------------------------------------
+RSS feed:
+https://www.youtube.com/feeds/videos.xml?channel_id=UCba3hpU7EFBSk817y9qZkiA
+https://www.youtube.com/feeds/videos.xml?user=periodicvideos
+---------------------------------------------------
+hashtag #sayso
+https://www.youtube.com/hashtag/sayso
+в тренде
+https://www.youtube.com/feed/trending
+фильмы - предосмотр
+https://www.youtube.com/feed/storefront?bp=ogUCKAI%3D
+главы
+https://www.youtube.com/watch?v=EwHIH3jIwuM
+с рефером
+https://www.youtube.com/watch?v=zbT53Q_olkU$OPT:http-referrer=https://cinema.mosfilm.ru
+главная
+https://www.youtube.com
+авто выбор дефолтной аудио дорожки
+https://www.youtube.com/watch?v=jCsUXUW1AL8
+копировать и вставить
+https://www.youtube.com/c/ТелеканалНАШ
+видео в плейлисте с указаным временем
+https://youtu.be/C-u5WLJ9Yk4?list=PLpdRVFVH_vIMvkMVdJScNK3S2SeOv7k1d&t=111
+для сайта invidio.tube
+https://invidious.tube/watch?v=9q_FdvLjUCM
+для сайта hooktube.com
+https://hooktube.com/watch?v=KMvwfLQhA_Y
+мультикамеры live
+https://www.youtube.com/watch?v=AAQUGsUzWbE
+мультикамеры
+https://www.youtube.com/watch?v=K1c4iTBYUN8
+геоблок - заставка
+https://youtube.com/watch?v=sJL6WA-aGkQ
+видео недоступно - заглушка
+https://www.youtube.com/watch?v=arlev2tjDtk
+платно - предосмотр
+https://www.youtube.com/watch?v=COWtsRUxFJo
+встраиваемое видео
+https://www.youtube.com/embed/owsfdh4gxyc
+встроеный плейлист
+https://www.youtube.com/embed/playlist?list=PLcLrKCb6x5m2J2v9KoVw9JiWt2laXd0AR
+список роликов в ссылке
+https://www.youtube.com/watch_videos?video_ids=5VkG_QC7jMU,8tJPKSz6Gaw,XkU23m6yX04
+видео юзера
+https://www.youtube.com/c/12minuteathlete/videos
+плейлисты/видео юзера
+https://www.youtube.com/SlivkiChanel
+плейлисты/видео канала
+https://www.youtube.com/channel/UCORIeT1hk6tYBuntEXsguLg
+плейлисты канала - сначала старые
+https://www.youtube.com/channel/UCtetJiD_llxdGL4Uh5-Oe2w/playlists?flow=grid&sort=da&view=1
+плейлисты канала - сначала новые
+https://www.youtube.com/channel/UCtetJiD_llxdGL4Uh5-Oe2w/playlists?sort=dd&view=1&flow=list
+плейлисты канала - по дате обновления
+https://www.youtube.com/channel/UCtetJiD_llxdGL4Uh5-Oe2w/playlists?view=1&flow=list&sort=lad
+видео канала - самые популярные
+https://www.youtube.com/channel/UCtetJiD_llxdGL4Uh5-Oe2w/videos?view=0&flow=list&sort=p
+видео канала - сначала новые
+https://www.youtube.com/channel/UCtetJiD_llxdGL4Uh5-Oe2w/videos?flow=list&view=0&sort=dd
+видео канала - сначала старые
+https://www.youtube.com/channel/UCtetJiD_llxdGL4Uh5-Oe2w/videos?sort=da&flow=grid&view=0
+вертикальное видео
+https://www.youtube.com/watch?v=KRntP-q_R9s
+встроеная прямая трансляция канала
+https://www.youtube.com/embed/live_stream?channel=UCba3hpU7EFBSk817y9qZkiA
+прямая трансляция канала
+https://www.youtube.com/channel/UCba3hpU7EFBSk817y9qZkiA/live
+короткий URL сервиса y2u.be
+http://y2u.be/hY1tULEr4-4
+8k 60 FPS HDR главы
+https://www.youtube.com/watch?v=linlz7-Pnvw
+music - browse in url
+https://music.youtube.com/browse/MPREb_CESrEdafYU7
