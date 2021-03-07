@@ -10,7 +10,7 @@
 
 ---
 
-### Скрипт YouTube для IPTV плеера [simpleTV](http://iptv.gen12.net "перейти на сайт simpleTV")  <sup>`b12.7.6 (vlc 3.0.11)`<sup>
+### ✅ Скрипт YouTube для IPTV плеера [simpleTV](http://iptv.gen12.net "перейти на сайт simpleTV")  <sup>`b12.7.6 (vlc 3.0.11)`<sup>
 
 ---
 Установка
