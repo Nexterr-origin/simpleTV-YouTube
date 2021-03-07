@@ -8,10 +8,13 @@
 [![Lua][badge-lua]][Lua]
 [![License][badge-license]][License]
 
+---
+
 ### Скрипт YouTube для IPTV плеера [simpleTV](http://iptv.gen12.net "перейти на сайт simpleTV")  <sup>`b12.7.6 (vlc 3.0.11)`<sup>
 
 ---
-##### поместить **`YT.lua`** в папку _`..\luaScr\user\video`_
+Установка
+- поместить **`YT.lua`** в папку _`..\luaScr\user\video`_
  
 ---
 
