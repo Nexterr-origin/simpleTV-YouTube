@@ -20,19 +20,17 @@
 
 📌 **Авторизация**
 - файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_
-
-  использовать расширение браузера для [Firefox](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") или [Chrome](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
+- использовать расширение браузера для [Firefox](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") или [Chrome](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
 
 📌 **Поиск из окна "Открыть URL" _Ctrl+N_**
-
-- префиксы: 
+- префиксы:
 
   \- (видео)
- 
+
   -- (плейлисты)
- 
+
   --- (каналы)
- 
+  
   -+ (прямые трансляции)
 
 📌 **Показвть плейлист / выбор качества: _Ctrl+M_**
