@@ -14,19 +14,20 @@
 
 ---
 
-Установка
+
+➡ **Установка**
 - поместить **`YT.lua`** в папку _`..\luaScr\user\video`_
  
 ---
 
-Авторизация
+➡ **Авторизация**
 - файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_
 
 использовать расширение браузера для [Firefox](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") или [Chrome](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
 
 ---
 
-поиск из окна "Открыть URL" (Ctrl+N)
+➡ **Поиск из окна "Открыть URL" _Ctrl+N_**
 
 префиксы: 
 
@@ -40,11 +41,11 @@
 
 ---
 
-показать на OSD плейлист / выбор качества: Ctrl+M
+➡ **Показвть плейлист / выбор качества: _Ctrl+M_**
 
 ---
 
-⚠ если установлен _видео аддон_ [_**videotracks**_](http://iptv.gen12.net/bugtracker/view.php?id=1704 "удаляйте это поделее"), в его настройках внести в исключения адрес: `.*googlevideo.com.*`
+###### ⚠ если установлен _видео аддон_ [_**videotracks**_](http://iptv.gen12.net/bugtracker/view.php?id=1704 "удаляйте это поделее"), в его настройках внести в исключения адрес: `.*googlevideo.com.*`
 
 ---
 
