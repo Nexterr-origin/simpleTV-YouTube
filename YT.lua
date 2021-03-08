@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (6/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (8/3/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -185,10 +185,14 @@ local infoInFile = false
 		then
 			SetBackground()
 		else
-			SetBackground(m_simpleTV.User.YT.logoPicFromDisk, 3)
+			if not inAdr:match('&isPlstCh=true') then
+				SetBackground(m_simpleTV.User.YT.logoPicFromDisk, 3)
+			end
 		end
 	elseif inAdr:match('/videos') then
 		SetBackground(m_simpleTV.User.YT.logoPicFromDisk, 3)
+	elseif inAdr:match('/channel/') and inAdr:match('&isLogo=false') then
+		SetBackground()
 	end
 	if not (m_simpleTV.Control.GetState() == 3 and m_simpleTV.User.YT.isVideo == false) then
 		m_simpleTV.User.YT.isVideo = true
@@ -2620,7 +2624,11 @@ https://github.com/grafi-tt/lunaJson
 						selected = true
 						m_simpleTV.User.YT.plstPos = i
 					end
-					tab[i].Address = string.format('https://www.youtube.com/watch?v=%s&isPlst=true', adr)
+					adr = string.format('https://www.youtube.com/watch?v=%s&isPlst=true', adr)
+					if m_simpleTV.User.YT.isPlstCh == true then
+						adr = adr .. '&isPlstCh=true'
+					end
+					tab[i].Address = adr
 					tab[i].Name = name
 					if isInfoPanel == true then
 						tab[i].InfoPanelLogo = string.format('https://i.ytimg.com/vi/%s/default.jpg', adr)
@@ -2686,7 +2694,7 @@ https://github.com/grafi-tt/lunaJson
 		params.User.plstId = plstId
 		params.User.plstTotalResults = plstTotalResults
 		params.ProgressEnabled = true
-		if plstTotalResults < 201 then
+		if plstTotalResults < 301 then
 			params.delayedShow = 1500
 		end
 		asynPlsLoaderHelper.Work(session, t0, params)
