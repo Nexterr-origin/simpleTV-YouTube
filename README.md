@@ -13,9 +13,17 @@
 ### ✅ Скрипт YouTube для IPTV плеера [simpleTV](http://iptv.gen12.net "перейти на сайт simpleTV")  <sup>`b12.7.6 (vlc 3.0.11)`<sup>
 
 ---
+
 Установка
 - поместить **`YT.lua`** в папку _`..\luaScr\user\video`_
  
+---
+
+Авторизация
+- файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_
+
+использовать расширение браузера для [Firefox](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") или [Chrome](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
+
 ---
 
 ⚠ если установлен _видео аддон_ [_**videotracks**_](http://iptv.gen12.net/bugtracker/view.php?id=1704 "удаляйте это поделее"), в его настройках внести в исключения адрес: `.*googlevideo.com.*`
