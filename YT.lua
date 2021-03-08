@@ -2389,13 +2389,15 @@ https://github.com/grafi-tt/lunaJson
 			else
 				title = title .. '\n☐ ' .. m_simpleTV.User.YT.Lng.noAudio
 			end
-			local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
-			if visual == 'none'
-				or visual == ''
-			then
-				SetBackground(m_simpleTV.User.YT.pic or m_simpleTV.User.YT.logoPicFromDisk)
-			else
-				SetBackground()
+			if not m_simpleTV.User.YT.DelayedAddress then
+				local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
+				if visual == 'none'
+					or visual == ''
+				then
+					SetBackground(m_simpleTV.User.YT.pic or m_simpleTV.User.YT.logoPicFromDisk)
+				else
+					SetBackground()
+				end
 			end
 		elseif captions_title and not isInfoPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.sub .. captions_title
@@ -3764,6 +3766,16 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.DelayedAddress then
 			if m_simpleTV.Control.GetState() == 0 then
 				m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.User.YT.DelayedAddress})
+				if m_simpleTV.User.YT.qlty < 100 then
+					local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
+					if visual == 'none'
+						or visual == ''
+					then
+						SetBackground(m_simpleTV.User.YT.pic or m_simpleTV.User.YT.logoPicFromDisk)
+					else
+						SetBackground()
+					end
+				end
 			end
 			m_simpleTV.User.YT.DelayedAddress = nil
 		end
