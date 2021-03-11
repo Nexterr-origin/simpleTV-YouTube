@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (8/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (11/3/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -16,9 +16,9 @@
 -- поиск из окна "Открыть URL" (Ctrl+N), префиксы: - (видео), -- (плейлисты), --- (каналы), -+ (прямые трансляции)
 -- авторизаця: файл формата "Netscape HTTP Cookie File" - cookies.txt поместить в папку 'work'
 -- показать на OSD плейлист / выбор качества: Ctrl+M
---------------------------------------------------------------------
+=====================================================================
 local infoInFile = false
---------------------------------------------------------------------
+=====================================================================
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
 			and not m_simpleTV.Control.CurrentAddress:match('^https?://[%w.]*hooktube%.com')
@@ -394,6 +394,7 @@ local infoInFile = false
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
 				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID'}
+				local cookie_SAPISID
 				local t = {}
 					for line in fhandle:lines() do
 						local name, val = line:match('youtube%.com.+%s(%S+)%s+(%S+)')
@@ -401,8 +402,8 @@ local infoInFile = false
 							for i = 1, #YT_Cookies do
 								if name == YT_Cookies[i] then
 									t[#t + 1] = string.format('%s=%s', name, val)
-									if name == 'SAPISID' then
-										m_simpleTV.User.YT.cookies_SAPISID = val
+									if not cookie_SAPISID and name == 'SAPISID' then
+										cookie_SAPISID = val
 									end
 								 break
 								end
@@ -411,7 +412,7 @@ local infoInFile = false
 					end
 				fhandle:close()
 					if #t < 5 then return end
-				m_simpleTV.User.YT.isAuth = true
+				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return table.concat(t, ';')
 			end
 		m_simpleTV.User.YT.cookies = string.format('%s;PREF=hl=%s;', (cookiesFromFile() or ''), m_simpleTV.User.YT.Lng.hl)
@@ -1375,12 +1376,15 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return t, types, header
 	end
-	local function hash_SAPISID()
-		local ostime = os.time()
-		local origin = 'https://www.youtube.com'
-		local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.cookies_SAPISID, origin)
-		local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
-	 return string.format('%s_%s', ostime, hash)
+	local function header_Auth()
+		if m_simpleTV.User.YT.isAuth then
+			local ostime = os.time()
+			local origin = 'https://www.youtube.com'
+			local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.isAuth, origin)
+			local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
+		 return string.format('\nAuthorization: SAPISIDHASH %s_%s', ostime, hash)
+		end
+	 return ''
 	end
 	local function GetUrlWatchVideos(url)
 		local session = m_simpleTV.Http.New(userAgent, nil, true)
@@ -3188,10 +3192,7 @@ https://github.com/grafi-tt/lunaJson
 		if not url:match('/youtubei/') then
 			m_simpleTV.User.YT.PlstCh.visitorData = nil
 		end
-		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstCh.visitorData or '')
-		if m_simpleTV.User.YT.isAuth == true then
-			headers = headers .. '\nAuthorization: SAPISIDHASH ' .. hash_SAPISID()
-		end
+		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstCh.visitorData or '') .. header_Auth()
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&isRestart=true', ''), headers = headers})
 			if rc ~= 200 then
@@ -3429,6 +3430,203 @@ https://github.com/grafi-tt/lunaJson
 			 return
 			end
 	end
+	local function notPlst()
+		local t, title = GetStreamsTab(videoId)
+			if not t then
+				StopOnErr(12, title)
+			 return
+			end
+			if type(t) ~= 'table' then
+				PlayAddressT_YT(t)
+			 return
+			end
+		m_simpleTV.User.YT.QltyTab = t
+		local index = GetQltyIndex(t)
+		local retAdr, noItag22 = StreamCheck(t, index)
+		m_simpleTV.User.YT.QltyIndex = index
+		if m_simpleTV.User.YT.isVideo == true then
+			local name = title:gsub('%c.-$', '')
+			if not (m_simpleTV.User.YT.isLive
+				and m_simpleTV.Control.ChannelID ~= 268435455)
+			then
+				if m_simpleTV.Control.MainMode == 0 then
+					m_simpleTV.Control.ChangeChannelLogo('https://i.ytimg.com/vi/'
+													.. m_simpleTV.User.YT.vId .. '/hqdefault.jpg'
+													, m_simpleTV.Control.ChannelID
+													, 'CHANGE_IF_NOT_EQUAL')
+					m_simpleTV.Control.ChangeChannelName(name, m_simpleTV.Control.ChannelID, false)
+				end
+			end
+			m_simpleTV.Control.SetTitle(name)
+			m_simpleTV.Control.CurrentTitle_UTF8 = name
+			local header, name_header, ap_header, desc, panelDescName
+			local publishedAt = ''
+			if m_simpleTV.User.YT.author
+				and m_simpleTV.User.YT.isTrailer == false
+			then
+				name_header = m_simpleTV.User.YT.Lng.upLoadOnCh
+						.. ': '
+						.. m_simpleTV.User.YT.author
+			elseif m_simpleTV.User.YT.isTrailer == true then
+				name_header = m_simpleTV.User.YT.Lng.preview
+			else
+				name_header = ''
+			end
+			if m_simpleTV.User.YT.isLive == true then
+				if isInfoPanel == false then
+					ap_header = ' (' .. m_simpleTV.User.YT.Lng.live .. ')'
+				else
+					if m_simpleTV.User.YT.actualStartTime then
+						local timeSt = timeStamp(m_simpleTV.User.YT.actualStartTime)
+						timeSt = os.date('%y %d %m %H %M', tonumber(timeSt))
+						local year, day, month, hour, min = timeSt:match('(%d+) (%d+) (%d+) (%d+) (%d+)')
+						publishedAt = ' | ' .. m_simpleTV.User.YT.Lng.started .. ': '
+								.. string.format('%d:%02d (%d/%d/%02d)', hour, min, day, month, year)
+					end
+				end
+			else
+				if isInfoPanel == false then
+					if m_simpleTV.User.YT.duration and m_simpleTV.User.YT.duration > 2 then
+						ap_header = ' (' .. secondsToClock(m_simpleTV.User.YT.duration) .. ')'
+					end
+				end
+			end
+			local t1 = {}
+			t1[1] = {}
+			t1[1].Id = 1
+			t1[1].Address = 'https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId
+			t1[1].Name = name
+			if isInfoPanel == false then
+				header = name_header .. (ap_header or '')
+			else
+				if m_simpleTV.User.YT.isTrailer == true then
+					ap_header = m_simpleTV.User.YT.Lng.preview
+				elseif m_simpleTV.User.YT.isLive == true then
+					ap_header = m_simpleTV.User.YT.Lng.live
+				else
+					ap_header = m_simpleTV.User.YT.Lng.video
+				end
+				if m_simpleTV.User.YT.isLive == false then
+					if m_simpleTV.User.YT.duration and m_simpleTV.User.YT.duration > 2 then
+						publishedAt = ' | ' .. secondsToClock(m_simpleTV.User.YT.duration)
+					end
+				end
+				header = 'YouTube - ' .. ap_header
+				t1[1].InfoPanelLogo = 'https://i.ytimg.com/vi/' .. m_simpleTV.User.YT.vId .. '/default.jpg'
+				t1[1].InfoPanelName = name
+				t1[1].InfoPanelShowTime = 8000
+				desc = m_simpleTV.User.YT.desc
+				panelDescName = nil
+				if desc and desc ~= '' then
+					panelDescName = m_simpleTV.User.YT.Lng.desc .. ' | '
+				end
+				t1[1].InfoPanelDesc = desc_html(desc, t1[1].InfoPanelLogo, name, t1[1].Address)
+				t1[1].InfoPanelTitle = (panelDescName or '')
+									.. m_simpleTV.User.YT.Lng.channel .. ': '
+									.. title_clean(m_simpleTV.User.YT.author)
+									.. publishedAt
+			end
+			if m_simpleTV.User.YT.isLiveContent == false
+				and m_simpleTV.User.YT.isTrailer == false
+			then
+				t1[2] = {}
+				t1[2].Id = 2
+				t1[2].Name = '🔎 ' .. m_simpleTV.User.YT.Lng.search .. ': ' .. m_simpleTV.User.YT.Lng.relatedVideos
+				t1[2].Address = '-related=' .. m_simpleTV.User.YT.vId .. '&isLogo=false'
+				if m_simpleTV.User.YT.isMusic == true then
+					t1[3] = {}
+					t1[3].Id = 3
+					t1[3].Name = '🎵🔀 Music-Mix ' .. m_simpleTV.User.YT.Lng.plst
+					t1[3].Address = 'https://www.youtube.com/embed?listType=playlist&list=RD'
+									.. m_simpleTV.User.YT.vId
+									.. '&isLogo=false'
+					m_simpleTV.User.YT.PlstCh.chTitle = nil
+				end
+			end
+			t1.ExtParams = {FilterType = 2, LuaOnCancelFunName = 'OnMultiAddressCancel_YT'}
+			if m_simpleTV.User.paramScriptForSkin_buttonOptions then
+				t1.ExtButton0 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOptions, ButtonScript = 'Qlty_YT()'}
+			else
+				t1.ExtButton0 = {ButtonEnable = true, ButtonName = '⚙', ButtonScript = 'Qlty_YT()'}
+			end
+			local ButtonScript1 = [[
+						m_simpleTV.Control.ExecuteAction(37)
+						m_simpleTV.Control.ChangeAddress = 'No'
+						m_simpleTV.Control.CurrentAddress = 'https://www.youtube.com/channel/' .. m_simpleTV.User.YT.chId .. '&isRestart=true'
+						dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
+					]]
+			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
+				t1.ExtButton1 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonPlst, ButtonScript = ButtonScript1}
+			else
+				t1.ExtButton1 = {ButtonEnable = true, ButtonName = '📋', ButtonScript = ButtonScript1}
+			end
+			if m_simpleTV.User.paramScriptForSkin_buttonOk then
+				t1.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
+			end
+			m_simpleTV.OSD.ShowSelect_UTF8(header, 0, t1, 8000, 32 + 64 + 128)
+			retAdr = positionToContinue(retAdr)
+		else
+			if urlAdr:match('PARAMS=psevdotv') then
+				local t = m_simpleTV.Control.GetCurrentChannelInfo()
+				if t and t.MultiHeader then
+					title = t.MultiHeader .. ': ' .. title
+				end
+				local name = title:gsub('%c.-$', '')
+				m_simpleTV.Control.SetTitle(name)
+				retAdr = retAdr .. '$OPT:NO-SEEKABLE'
+			else
+				m_simpleTV.Control.CurrentTitle_UTF8 = ''
+			end
+			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+		end
+		MarkWatch_YT()
+		if isInfoPanel == false then
+			title = title_is_no_infoPanel(title, t[index].Name)
+			ShowMsg(title)
+		end
+		m_simpleTV.Http.Close(session)
+		m_simpleTV.Control.CurrentAddress = retAdr
+		if infoInFile then
+			local scr_time = string.format('%.3f', (os.clock() - infoInFile))
+			local calc = scr_time - inf0
+			local adr = m_simpleTV.Common.fromPercentEncoding(retAdr)
+			local string_rep = string.rep('–', 70) .. '\n'
+			index = noItag22 or index
+			local qlty = t[index].qlty
+			if qlty and qlty < 100 then
+				qlty = nil
+			end
+			infoInFile = string_rep
+						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
+						.. string_rep
+						.. 'qlty: ' .. tostring(qlty)
+						.. ' | video itag: ' .. tostring(t[index].itag)
+						.. ' | audio itag: ' .. tostring(t[index].aItag) .. '\n'
+						.. string_rep
+						.. 'cipher: ' .. tostring(t[index].isCipher)
+						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
+						.. string_rep
+						.. 'time: ' .. scr_time .. ' s.'
+						.. ' | request: ' .. inf0 .. ' s.'
+						.. ' | calc: ' .. calc .. ' s.\n'
+						.. string_rep
+						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
+						.. string_rep
+						.. 'description:\n\n'
+						.. m_simpleTV.User.YT.desc .. '\n'
+						.. string_rep
+						.. 'qlty table:\n\n'
+						.. (inf01 or '') .. '\n'
+						.. string_rep
+						.. 'cookies:\n\n'
+						.. m_simpleTV.User.YT.cookies:gsub('^[;]*(.-)[;]$', '%1'):gsub(';+', '\n') .. '\n'
+						.. string_rep
+						.. 'address:\n\n'
+						.. adr:gsub('%$', '\n\n$'):gsub('slave=', 'slave=\n\n'):gsub('%#', '\n\n#\n\n') .. '\n'
+			debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
+		end
+	 return
+	end
 	function AsynPlsCallb_Videos_YT(session, rc, answer, userstring, params)
 		local ret = {}
 			if rc ~= 200 then
@@ -3437,10 +3635,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		if params.User.First == true then
 			answer = answer:gsub('\\"', '%%22')
-			params.User.headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
-			if m_simpleTV.User.YT.isAuth == true then
-				params.User.headers = params.User.headers .. '\nAuthorization: SAPISIDHASH ' .. hash_SAPISID()
-			end
+			params.User.headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '') .. header_Auth()
 			params.User.First = false
 			local title
 			if params.User.typePlst == 'rss_videos'	then
@@ -3876,7 +4071,7 @@ https://github.com/grafi-tt/lunaJson
 		PlayAddressT_YT(t)
 	 return
 	end
-	if inAdr:match('&isPlst=') then
+	if inAdr:match('isPlst=') then
 		m_simpleTV.User.YT.isVideo = false
 	end
 	if inAdr:match('/user/[^/]+/videos')
@@ -3908,202 +4103,7 @@ https://github.com/grafi-tt/lunaJson
 		PlstCh(inAdr)
 	elseif inAdr:match('list=') then
 		PlstApi(inAdr)
-	 return
-	end
-	if not isPlst then
-		local t, title = GetStreamsTab(videoId)
-			if not t then
-				StopOnErr(12, title)
-			 return
-			end
-			if type(t) ~= 'table' then
-				PlayAddressT_YT(t)
-			 return
-			end
-		m_simpleTV.User.YT.QltyTab = t
-		local index = GetQltyIndex(t)
-		local retAdr, noItag22 = StreamCheck(t, index)
-		m_simpleTV.User.YT.QltyIndex = index
-		if m_simpleTV.User.YT.isVideo == true then
-			local name = title:gsub('%c.-$', '')
-			if not (m_simpleTV.User.YT.isLive
-				and m_simpleTV.Control.ChannelID ~= 268435455)
-			then
-				if m_simpleTV.Control.MainMode == 0 then
-					m_simpleTV.Control.ChangeChannelLogo('https://i.ytimg.com/vi/'
-													.. m_simpleTV.User.YT.vId .. '/hqdefault.jpg'
-													, m_simpleTV.Control.ChannelID
-													, 'CHANGE_IF_NOT_EQUAL')
-					m_simpleTV.Control.ChangeChannelName(name, m_simpleTV.Control.ChannelID, false)
-				end
-			end
-			m_simpleTV.Control.SetTitle(name)
-			m_simpleTV.Control.CurrentTitle_UTF8 = name
-			local header, name_header, ap_header, desc, panelDescName
-			local publishedAt = ''
-			if m_simpleTV.User.YT.author
-				and m_simpleTV.User.YT.isTrailer == false
-			then
-				name_header = m_simpleTV.User.YT.Lng.upLoadOnCh
-						.. ': '
-						.. m_simpleTV.User.YT.author
-			elseif m_simpleTV.User.YT.isTrailer == true then
-				name_header = m_simpleTV.User.YT.Lng.preview
-			else
-				name_header = ''
-			end
-			if m_simpleTV.User.YT.isLive == true then
-				if isInfoPanel == false then
-					ap_header = ' (' .. m_simpleTV.User.YT.Lng.live .. ')'
-				else
-					if m_simpleTV.User.YT.actualStartTime then
-						local timeSt = timeStamp(m_simpleTV.User.YT.actualStartTime)
-						timeSt = os.date('%y %d %m %H %M', tonumber(timeSt))
-						local year, day, month, hour, min = timeSt:match('(%d+) (%d+) (%d+) (%d+) (%d+)')
-						publishedAt = ' | ' .. m_simpleTV.User.YT.Lng.started .. ': '
-								.. string.format('%d:%02d (%d/%d/%02d)', hour, min, day, month, year)
-					end
-				end
-			else
-				if isInfoPanel == false then
-					if m_simpleTV.User.YT.duration and m_simpleTV.User.YT.duration > 2 then
-						ap_header = ' (' .. secondsToClock(m_simpleTV.User.YT.duration) .. ')'
-					end
-				end
-			end
-			local t1 = {}
-			t1[1] = {}
-			t1[1].Id = 1
-			t1[1].Address = 'https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId
-			t1[1].Name = name
-			if isInfoPanel == false then
-				header = name_header .. (ap_header or '')
-			else
-				if m_simpleTV.User.YT.isTrailer == true then
-					ap_header = m_simpleTV.User.YT.Lng.preview
-				elseif m_simpleTV.User.YT.isLive == true then
-					ap_header = m_simpleTV.User.YT.Lng.live
-				else
-					ap_header = m_simpleTV.User.YT.Lng.video
-				end
-				if m_simpleTV.User.YT.isLive == false then
-					if m_simpleTV.User.YT.duration and m_simpleTV.User.YT.duration > 2 then
-						publishedAt = ' | ' .. secondsToClock(m_simpleTV.User.YT.duration)
-					end
-				end
-				header = 'YouTube - ' .. ap_header
-				t1[1].InfoPanelLogo = 'https://i.ytimg.com/vi/' .. m_simpleTV.User.YT.vId .. '/default.jpg'
-				t1[1].InfoPanelName = name
-				t1[1].InfoPanelShowTime = 8000
-				desc = m_simpleTV.User.YT.desc
-				panelDescName = nil
-				if desc and desc ~= '' then
-					panelDescName = m_simpleTV.User.YT.Lng.desc .. ' | '
-				end
-				t1[1].InfoPanelDesc = desc_html(desc, t1[1].InfoPanelLogo, name, t1[1].Address)
-				t1[1].InfoPanelTitle = (panelDescName or '')
-									.. m_simpleTV.User.YT.Lng.channel .. ': '
-									.. title_clean(m_simpleTV.User.YT.author)
-									.. publishedAt
-			end
-			if m_simpleTV.User.YT.isLiveContent == false
-				and m_simpleTV.User.YT.isTrailer == false
-			then
-				t1[2] = {}
-				t1[2].Id = 2
-				t1[2].Name = '🔎 ' .. m_simpleTV.User.YT.Lng.search .. ': ' .. m_simpleTV.User.YT.Lng.relatedVideos
-				t1[2].Address = '-related=' .. m_simpleTV.User.YT.vId .. '&isLogo=false'
-				if m_simpleTV.User.YT.isMusic == true then
-					t1[3] = {}
-					t1[3].Id = 3
-					t1[3].Name = '🎵🔀 Music-Mix ' .. m_simpleTV.User.YT.Lng.plst
-					t1[3].Address = 'https://www.youtube.com/embed?listType=playlist&list=RD'
-									.. m_simpleTV.User.YT.vId
-									.. '&isLogo=false'
-					m_simpleTV.User.YT.PlstCh.chTitle = nil
-				end
-			end
-			t1.ExtParams = {FilterType = 2, LuaOnCancelFunName = 'OnMultiAddressCancel_YT'}
-			if m_simpleTV.User.paramScriptForSkin_buttonOptions then
-				t1.ExtButton0 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOptions, ButtonScript = 'Qlty_YT()'}
-			else
-				t1.ExtButton0 = {ButtonEnable = true, ButtonName = '⚙', ButtonScript = 'Qlty_YT()'}
-			end
-			local ButtonScript1 = [[
-						m_simpleTV.Control.ExecuteAction(37)
-						m_simpleTV.Control.ChangeAddress = 'No'
-						m_simpleTV.Control.CurrentAddress = 'https://www.youtube.com/channel/' .. m_simpleTV.User.YT.chId .. '&isRestart=true'
-						dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
-					]]
-			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
-				t1.ExtButton1 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonPlst, ButtonScript = ButtonScript1}
-			else
-				t1.ExtButton1 = {ButtonEnable = true, ButtonName = '📋', ButtonScript = ButtonScript1}
-			end
-			if m_simpleTV.User.paramScriptForSkin_buttonOk then
-				t1.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
-			end
-			m_simpleTV.OSD.ShowSelect_UTF8(header, 0, t1, 8000, 32 + 64 + 128)
-			retAdr = positionToContinue(retAdr)
-		else
-			if urlAdr:match('PARAMS=psevdotv') then
-				local t = m_simpleTV.Control.GetCurrentChannelInfo()
-				if t and t.MultiHeader then
-					title = t.MultiHeader .. ': ' .. title
-				end
-				local name = title:gsub('%c.-$', '')
-				m_simpleTV.Control.SetTitle(name)
-				retAdr = retAdr .. '$OPT:NO-SEEKABLE'
-			else
-				m_simpleTV.Control.CurrentTitle_UTF8 = ''
-			end
-			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
-		end
-		MarkWatch_YT()
-		if isInfoPanel == false then
-			title = title_is_no_infoPanel(title, t[index].Name)
-			ShowMsg(title)
-		end
-		m_simpleTV.Http.Close(session)
-		m_simpleTV.Control.CurrentAddress = retAdr
-		if infoInFile then
-			local scr_time = string.format('%.3f', (os.clock() - infoInFile))
-			local calc = scr_time - inf0
-			local adr = m_simpleTV.Common.fromPercentEncoding(retAdr)
-			local string_rep = string.rep('–', 70) .. '\n'
-			index = noItag22 or index
-			local qlty = t[index].qlty
-			if qlty and qlty < 100 then
-				qlty = nil
-			end
-			infoInFile = string_rep
-						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
-						.. string_rep
-						.. 'qlty: ' .. tostring(qlty)
-						.. ' | video itag: ' .. tostring(t[index].itag)
-						.. ' | audio itag: ' .. tostring(t[index].aItag) .. '\n'
-						.. string_rep
-						.. 'cipher: ' .. tostring(t[index].isCipher)
-						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
-						.. string_rep
-						.. 'time: ' .. scr_time .. ' s.'
-						.. ' | request: ' .. inf0 .. ' s.'
-						.. ' | calc: ' .. calc .. ' s.\n'
-						.. string_rep
-						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
-						.. string_rep
-						.. 'description:\n\n'
-						.. m_simpleTV.User.YT.desc .. '\n'
-						.. string_rep
-						.. 'qlty table:\n\n'
-						.. (inf01 or '') .. '\n'
-						.. string_rep
-						.. 'cookies:\n\n'
-						.. m_simpleTV.User.YT.cookies:gsub('^[;]*(.-)[;]$', '%1'):gsub(';+', '\n') .. '\n'
-						.. string_rep
-						.. 'address:\n\n'
-						.. adr:gsub('%$', '\n\n$'):gsub('slave=', 'slave=\n\n'):gsub('%#', '\n\n#\n\n') .. '\n'
-			debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
-		end
+	else
+		notPlst()
 	 return
 	end
