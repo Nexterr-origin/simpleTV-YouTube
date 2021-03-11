@@ -185,7 +185,7 @@ local infoInFile = false
 		then
 			SetBackground()
 		else
-			if not inAdr:match('&isPlstCh=true') then
+			if not inAdr:match('&isPlstsCh=true') then
 				SetBackground(m_simpleTV.User.YT.logoPicFromDisk, 3)
 			end
 		end
@@ -417,11 +417,11 @@ local infoInFile = false
 			end
 		m_simpleTV.User.YT.cookies = string.format('%s;PREF=hl=%s;', (cookiesFromFile() or ''), m_simpleTV.User.YT.Lng.hl)
 	end
-	if not m_simpleTV.User.YT.PlstCh then
-		m_simpleTV.User.YT.PlstCh = {}
+	if not m_simpleTV.User.YT.PlstsCh then
+		m_simpleTV.User.YT.PlstsCh = {}
 	end
-	if not m_simpleTV.User.YT.PlstCh.Urls then
-		m_simpleTV.User.YT.PlstCh.Urls = {}
+	if not m_simpleTV.User.YT.PlstsCh.Urls then
+		m_simpleTV.User.YT.PlstsCh.Urls = {}
 	end
 	if not m_simpleTV.User.YT.Plst then
 		m_simpleTV.User.YT.Plst = {}
@@ -432,8 +432,8 @@ local infoInFile = false
 	if not m_simpleTV.User.YT.qlty_live then
 		m_simpleTV.User.YT.qlty_live = tonumber(m_simpleTV.Config.GetValue('YT_qlty_live') or '10000')
 	end
-	if m_simpleTV.User.YT.isPlstCh then
-		m_simpleTV.User.YT.isPlstCh = nil
+	if m_simpleTV.User.YT.isPlstsCh then
+		m_simpleTV.User.YT.isPlstsCh = nil
 	end
 	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:86.0) Gecko/20100101 Firefox/86.0'
 	local session = m_simpleTV.Http.New(userAgent)
@@ -2425,7 +2425,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return t, title
 	end
-	local function Videos_channels(str, tab, typePlst, i)
+	local function plst_channels(str, tab, typePlst, i)
 		local ret = false
 		local desc, count, count2, subCount, logo, name, adr
 			for g in str:gmatch('"channelRenderer".-"subscribeButton"') do
@@ -2473,7 +2473,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return ret
 	end
-	local function Videos_rss_videos(str, tab, typePlst, i)
+	local function plst_rss(str, tab, typePlst, i)
 		local ret = false
 		local name, published, adr, desc, panelDescName
 			for g in str:gmatch('<entry>.-</entry>') do
@@ -2510,7 +2510,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return ret
 	end
-	local function Videos_plst(str, tab, typePlst, i)
+	local function plst_video(str, tab, typePlst, i)
 		local ret = false
 		local render
 		if typePlst == 'panel_videos' then
@@ -2601,18 +2601,18 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return ret
 	end
-	local function AddInPl_Videos_YT(str, tab, typePlst)
+	local function AddInPl_Plst_YT(str, tab, typePlst)
 		local i = #tab + 1
 		local ret = false
 		str = str:gsub('\\"', '%%22')
 		if typePlst == 'channels'
 			or typePlst == 'rss_channels'
 		then
-			ret = Videos_channels(str, tab, typePlst, i)
+			ret = plst_channels(str, tab, typePlst, i)
 		elseif typePlst == 'rss_videos'	then
-			ret = Videos_rss_videos(str, tab, typePlst, i)
+			ret = plst_rss(str, tab, typePlst, i)
 		else
-			ret = Videos_plst(str, tab, typePlst, i)
+			ret = plst_video(str, tab, typePlst, i)
 		end
 	 return ret
 	end
@@ -2631,8 +2631,8 @@ https://github.com/grafi-tt/lunaJson
 						m_simpleTV.User.YT.plstPos = i
 					end
 					adr = string.format('https://www.youtube.com/watch?v=%s&isPlst=true', adr)
-					if m_simpleTV.User.YT.isPlstCh == true then
-						adr = adr .. '&isPlstCh=true'
+					if m_simpleTV.User.YT.isPlstsCh == true then
+						adr = adr .. '&isPlstsCh=true'
 					end
 					tab[i].Address = adr
 					tab[i].Name = name
@@ -2658,8 +2658,8 @@ https://github.com/grafi-tt/lunaJson
 		local plstId = inAdr:match('list=([^&]*)')
 		m_simpleTV.User.YT.plstPos = nil
 		m_simpleTV.User.YT.isVideo = false
-		if not m_simpleTV.User.YT.isPlstCh then
-			m_simpleTV.User.YT.PlstCh.chTitle = nil
+		if not m_simpleTV.User.YT.isPlstsCh then
+			m_simpleTV.User.YT.PlstsCh.chTitle = nil
 		end
 		m_simpleTV.Control.ExecuteAction(37)
 		if not m_simpleTV.User.YT.apiKey then
@@ -2680,7 +2680,7 @@ https://github.com/grafi-tt/lunaJson
 			answer = ''
 		end
 		local plstTotalResults = tonumber(answer:match('"totalResults": (%d+)') or '1')
-		if m_simpleTV.User.YT.isPlstCh
+		if m_simpleTV.User.YT.isPlstsCh
 			and not m_simpleTV.User.YT.is_channel_banner
 		then
 			SetBackground((m_simpleTV.User.YT.channel_banner or m_simpleTV.User.YT.logoPicFromDisk), 3)
@@ -2733,10 +2733,10 @@ https://github.com/grafi-tt/lunaJson
 			end
 			if #tab == 0 and not rc then
 				StopOnErr(9, m_simpleTV.User.YT.Lng.videoNotAvail)
-				if m_simpleTV.User.YT.isPlstCh == true then
+				if m_simpleTV.User.YT.isPlstsCh == true then
 					m_simpleTV.Common.Sleep(2000)
 					m_simpleTV.Control.ChangeAddress = 'No'
-					m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.PlstCh.MainUrl .. '&isRestart=true'
+					m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.PlstsCh.MainUrl .. '&isRestart=true'
 					dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
 				end
 			 return
@@ -2783,12 +2783,12 @@ https://github.com/grafi-tt/lunaJson
 		else
 			tab.ExtButton0 = {ButtonEnable = true, ButtonName = '⚙', ButtonScript = 'Qlty_YT()'}
 		end
-		if m_simpleTV.User.YT.isPlstCh
+		if m_simpleTV.User.YT.isPlstsCh
 		then
 			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
-				tab.ExtButton1 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonPlst, ButtonScript = 'PlstCh_YT()'}
+				tab.ExtButton1 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonPlst, ButtonScript = 'PlstsCh_YT()'}
 			else
-				tab.ExtButton1 = {ButtonEnable = true, ButtonName = '📋', ButtonScript = 'PlstCh_YT()'}
+				tab.ExtButton1 = {ButtonEnable = true, ButtonName = '📋', ButtonScript = 'PlstsCh_YT()'}
 			end
 		else
 			local ButtonScript1 = [[
@@ -2818,7 +2818,7 @@ https://github.com/grafi-tt/lunaJson
 		local vId = tab[plstPos].Address:match('watch%?v=([^&]+)')
 		if (#tab > 1
 			and plstPos == 1)
-			or m_simpleTV.User.YT.isPlstCh
+			or m_simpleTV.User.YT.isPlstsCh
 		then
 			m_simpleTV.User.YT.DelayedAddress = tab[1].Address
 			m_simpleTV.OSD.ShowSelect_UTF8(header, 0, tab, 10000, 2)
@@ -2860,7 +2860,7 @@ https://github.com/grafi-tt/lunaJson
 			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
-		if m_simpleTV.User.YT.isPlstCh then
+		if m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.Control.CurrentAddress})
 			m_simpleTV.Control.CurrentTitle_UTF8 = ''
 		else
@@ -2883,15 +2883,15 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return
 	end
-	local function PlstVideos(inAdr)
+	local function Plst(inAdr)
 		isPlst = true
 		m_simpleTV.Control.ExecuteAction(37)
-		if not m_simpleTV.User.YT.isPlstCh then
-			m_simpleTV.User.YT.PlstCh.chTitle = nil
+		if not m_simpleTV.User.YT.isPlstsCh then
+			m_simpleTV.User.YT.PlstsCh.chTitle = nil
 		end
 		m_simpleTV.User.YT.isVideo = false
 		m_simpleTV.User.YT.plstPos = nil
-		if m_simpleTV.User.YT.isPlstCh
+		if m_simpleTV.User.YT.isPlstsCh
 			and not m_simpleTV.User.YT.is_channel_banner
 		then
 			SetBackground((m_simpleTV.User.YT.channel_banner or m_simpleTV.User.YT.logoPicFromDisk), 3)
@@ -2900,7 +2900,7 @@ https://github.com/grafi-tt/lunaJson
 		local url = inAdr:gsub('&is%a+=%a+', '')
 		local params = {}
 		params.Message = '⇩ ' .. m_simpleTV.User.YT.Lng.loading
-		params.Callback = AsynPlsCallb_Videos_YT
+		params.Callback = AsynPlsCallb_Plst_YT
 		params.ProgressColor = ARGB(128, 255, 0, 0)
 		params.User = {}
 		params.User.tab = {}
@@ -2908,7 +2908,7 @@ https://github.com/grafi-tt/lunaJson
 		params.User.Title = ''
 		params.User.First = true
 		params.User.setTitle = true
-		if inAdr:match('&isPlstCh=true')
+		if inAdr:match('&isPlstsCh=true')
 		then
 			params.User.setTitle = false
 			videoId = m_simpleTV.User.YT.vId
@@ -3029,19 +3029,19 @@ https://github.com/grafi-tt/lunaJson
 			pl = 32
 		end
 		if plstPos > 1
-			and inAdr:match('&isPlstCh=true')
+			and inAdr:match('&isPlstsCh=true')
 		then
 			pl = 0
 		end
 		local ButtonScript1
-		if m_simpleTV.User.YT.isPlstCh
+		if m_simpleTV.User.YT.isPlstsCh
 		then
 			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
-				tab.ExtButton1 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonPlst, ButtonScript = 'PlstCh_YT()'}
+				tab.ExtButton1 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonPlst, ButtonScript = 'PlstsCh_YT()'}
 			else
-				tab.ExtButton1 = {ButtonEnable = true, ButtonName = '📋', ButtonScript = 'PlstCh_YT()'}
+				tab.ExtButton1 = {ButtonEnable = true, ButtonName = '📋', ButtonScript = 'PlstsCh_YT()'}
 			end
-		elseif not inAdr:match('&isPlstCh=true') then
+		elseif not inAdr:match('&isPlstsCh=true') then
 			local ButtonScript1 = [[
 						m_simpleTV.Control.ExecuteAction(37)
 						m_simpleTV.Control.ChangeAddress = 'No'
@@ -3101,7 +3101,7 @@ https://github.com/grafi-tt/lunaJson
 			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
-		if m_simpleTV.User.YT.isPlstCh then
+		if m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.Control.CurrentAddress})
 		else
 			if m_simpleTV.Control.MainMode == 0 then
@@ -3114,11 +3114,11 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return
 	end
-	local function PlstCh(inAdr)
+	local function PlstsCh(inAdr)
 		isPlst = true
 			if (m_simpleTV.Control.Reason == 'Stopped' or m_simpleTV.Control.Reason == 'EndReached')
 				and
-				(inAdr:match('isPlstCh=true') or (inAdr:match('&isRestart=true') and not inAdr:match('/youtubei/') and not inAdr:match('&sort=.-&isRestart=true')))
+				(inAdr:match('isPlstsCh=true') or (inAdr:match('&isRestart=true') and not inAdr:match('/youtubei/') and not inAdr:match('&sort=.-&isRestart=true')))
 			then
 				m_simpleTV.Control.ExecuteAction(63)
 			 return
@@ -3153,34 +3153,34 @@ https://github.com/grafi-tt/lunaJson
 			url = url:gsub('^(.-/playlists).-$', '%1') .. '?view=1&sort=lad&shelf_id=0'
 		end
 		url = url:gsub('&is%a+=%a+', '') .. '&isRestart=true'
-		if not m_simpleTV.User.YT.PlstCh.MainUrl then
-			m_simpleTV.User.YT.PlstCh.MainUrl = url
+		if not m_simpleTV.User.YT.PlstsCh.MainUrl then
+			m_simpleTV.User.YT.PlstsCh.MainUrl = url
 		end
-		if #m_simpleTV.User.YT.PlstCh.Urls > 0 then
-			if m_simpleTV.User.YT.PlstCh.MainUrl == url then
-				m_simpleTV.User.YT.PlstCh.Urls = nil
-				m_simpleTV.User.YT.PlstCh.FirstUrl = nil
-				m_simpleTV.User.YT.PlstCh.Num = nil
+		if #m_simpleTV.User.YT.PlstsCh.Urls > 0 then
+			if m_simpleTV.User.YT.PlstsCh.MainUrl == url then
+				m_simpleTV.User.YT.PlstsCh.Urls = nil
+				m_simpleTV.User.YT.PlstsCh.FirstUrl = nil
+				m_simpleTV.User.YT.PlstsCh.Num = nil
 				m_simpleTV.User.YT.upLoadOnCh = false
 			end
 		end
-		if m_simpleTV.User.YT.PlstCh.MainUrl ~= url then
+		if m_simpleTV.User.YT.PlstsCh.MainUrl ~= url then
 			if not url:match('/youtubei/') then
-				m_simpleTV.User.YT.PlstCh.MainUrl = url
-				m_simpleTV.User.YT.PlstCh.Urls = nil
-				m_simpleTV.User.YT.PlstCh.FirstUrl = nil
-				m_simpleTV.User.YT.PlstCh.Num = nil
+				m_simpleTV.User.YT.PlstsCh.MainUrl = url
+				m_simpleTV.User.YT.PlstsCh.Urls = nil
+				m_simpleTV.User.YT.PlstsCh.FirstUrl = nil
+				m_simpleTV.User.YT.PlstsCh.Num = nil
 			end
 		end
-		if not m_simpleTV.User.YT.PlstCh.Urls then
-			m_simpleTV.User.YT.PlstCh.Urls = {}
+		if not m_simpleTV.User.YT.PlstsCh.Urls then
+			m_simpleTV.User.YT.PlstsCh.Urls = {}
 		end
 		local num = 0
 		local method = 'get'
 		local body = ''
 		if url:match('/youtubei/') then
 			method = 'post'
-			body = m_simpleTV.User.YT.PlstCh.body
+			body = m_simpleTV.User.YT.PlstsCh.body
 			url, num = url:match('^(.-)&numVideo=(%d+)')
 				if not url or not num then
 					StopOnErr(3.1)
@@ -3190,9 +3190,9 @@ https://github.com/grafi-tt/lunaJson
 			body = decode64(body)
 		end
 		if not url:match('/youtubei/') then
-			m_simpleTV.User.YT.PlstCh.visitorData = nil
+			m_simpleTV.User.YT.PlstsCh.visitorData = nil
 		end
-		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstCh.visitorData or '') .. header_Auth()
+		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '') .. header_Auth()
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&isRestart=true', ''), headers = headers})
 			if rc ~= 200 then
@@ -3202,7 +3202,7 @@ https://github.com/grafi-tt/lunaJson
 		answer = answer:gsub('\\"', '%%22')
 		answer = answer:gsub('\\/', '/')
 		if not url:match('/youtubei/') then
-			m_simpleTV.User.YT.PlstCh.visitorData = answer:match('"visitorData":"([^"]+)') or ''
+			m_simpleTV.User.YT.PlstsCh.visitorData = answer:match('"visitorData":"([^"]+)') or ''
 		end
 		local chTitle = answer:match('channelMetadataRenderer.-"title":%s*"([^"]+)')
 					or answer:match('"topicChannelDetailsRenderer":{"title":%s*{%s*"simpleText":"([^"]+)')
@@ -3255,7 +3255,7 @@ https://github.com/grafi-tt/lunaJson
 								local t = {}
 								t[1] = {}
 								t[1].Id = 1
-								t[1].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstCh=true', plstId)
+								t[1].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', plstId)
 								t[1].Name = string.format('🔺 %s (%s)', m_simpleTV.User.YT.Lng.upLoadOnCh, plstTotalResults)
 								t[1].count = plstTotalResults
 								if isInfoPanel == true then
@@ -3288,7 +3288,7 @@ https://github.com/grafi-tt/lunaJson
 				tab[i].count = count or '0'
 				name = title_clean(name)
 				tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
-				tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstCh=true', adr)
+				tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 				if isInfoPanel == true then
 					logo = logo:gsub('hqdefault', 'default')
 					logo = logo:gsub('^//', 'https://')
@@ -3314,7 +3314,7 @@ https://github.com/grafi-tt/lunaJson
 					tab[i].Id = i
 					name = title_clean(name)
 					tab[i].Name = j .. '. ' .. name
-					tab[i].Address = string.format('https://www.youtube.com%s&isPlstCh=true', adr)
+					tab[i].Address = string.format('https://www.youtube.com%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						logo = w:match('"thumbnails":%s*%[%s*"url":%s*"([^"]+)') or ''
 						logo = logo:gsub('hqdefault', 'default')
@@ -3333,18 +3333,18 @@ https://github.com/grafi-tt/lunaJson
 				buttonNext = false
 			end
 				if #tab == 0 and url:match('/youtubei/') then
-					PrevPlstCh_YT()
+					PrevPlstsCh_YT()
 				 return
 				elseif #tab == 0 then
-					inAdr = inAdr:gsub('/playlists.-$', '') .. '&isPlstCh=true'
-					PlstVideos(inAdr)
+					inAdr = inAdr:gsub('/playlists.-$', '') .. '&isPlstsCh=true'
+					Plst(inAdr)
 				 return
 				end
 		m_simpleTV.User.YT.ChTitle = chTitle
-		m_simpleTV.User.YT.PlstChTab = tab
-		m_simpleTV.User.YT.isPlstCh = true
+		m_simpleTV.User.YT.PlstsChTab = tab
+		m_simpleTV.User.YT.isPlstsCh = true
 		local buttonPrev = false
-		if #m_simpleTV.User.YT.PlstCh.Urls >= 1 then
+		if #m_simpleTV.User.YT.PlstsCh.Urls >= 1 then
 			buttonPrev = true
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonPrev then
@@ -3361,41 +3361,41 @@ https://github.com/grafi-tt/lunaJson
 			tab.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
 		end
 		num = #tab + tonumber(num)
-		local nom1PlstChTab = tonumber(tab[1].Name:match('^(%d+)') or '1')
-		if nom1PlstChTab == 1 then
-			m_simpleTV.User.YT.Nom1PlstChTab = 1
-			m_simpleTV.User.YT.pagePlstCh = 1
+		local nom1PlstsChTab = tonumber(tab[1].Name:match('^(%d+)') or '1')
+		if nom1PlstsChTab == 1 then
+			m_simpleTV.User.YT.Nom1PlstsChTab = 1
+			m_simpleTV.User.YT.pagePlstsCh = 1
 		end
-		if nom1PlstChTab > m_simpleTV.User.YT.Nom1PlstChTab then
-			m_simpleTV.User.YT.pagePlstCh = m_simpleTV.User.YT.pagePlstCh + 1
+		if nom1PlstsChTab > m_simpleTV.User.YT.Nom1PlstsChTab then
+			m_simpleTV.User.YT.pagePlstsCh = m_simpleTV.User.YT.pagePlstsCh + 1
 		end
-		if nom1PlstChTab < m_simpleTV.User.YT.Nom1PlstChTab then
-			m_simpleTV.User.YT.pagePlstCh = m_simpleTV.User.YT.pagePlstCh - 1
+		if nom1PlstsChTab < m_simpleTV.User.YT.Nom1PlstsChTab then
+			m_simpleTV.User.YT.pagePlstsCh = m_simpleTV.User.YT.pagePlstsCh - 1
 		end
-		m_simpleTV.User.YT.Nom1PlstChTab = nom1PlstChTab
-		if m_simpleTV.User.YT.pagePlstCh > 1 then
-			m_simpleTV.User.YT.ChTitle = m_simpleTV.User.YT.ChTitle .. ' (' .. m_simpleTV.User.YT.Lng.page .. ' ' .. m_simpleTV.User.YT.pagePlstCh .. ')'
+		m_simpleTV.User.YT.Nom1PlstsChTab = nom1PlstsChTab
+		if m_simpleTV.User.YT.pagePlstsCh > 1 then
+			m_simpleTV.User.YT.ChTitle = m_simpleTV.User.YT.ChTitle .. ' (' .. m_simpleTV.User.YT.Lng.page .. ' ' .. m_simpleTV.User.YT.pagePlstsCh .. ')'
 		end
 		url = url .. '&numVideo=' .. num
-		table.insert(m_simpleTV.User.YT.PlstCh.Urls, url)
-		if not m_simpleTV.User.YT.PlstCh.FirstUrl then
-			m_simpleTV.User.YT.PlstCh.FirstUrl = url
+		table.insert(m_simpleTV.User.YT.PlstsCh.Urls, url)
+		if not m_simpleTV.User.YT.PlstsCh.FirstUrl then
+			m_simpleTV.User.YT.PlstsCh.FirstUrl = url
 		end
-		if not m_simpleTV.User.YT.PlstCh.Num then
-			m_simpleTV.User.YT.PlstCh.Num = 0
+		if not m_simpleTV.User.YT.PlstsCh.Num then
+			m_simpleTV.User.YT.PlstsCh.Num = 0
 		end
 		local index = 0
-		if m_simpleTV.User.YT.PlstCh.Refresh then
+		if m_simpleTV.User.YT.PlstsCh.Refresh then
 			index = 0
 		end
-		num = m_simpleTV.User.YT.PlstCh.Num
+		num = m_simpleTV.User.YT.PlstsCh.Num
 			for k, v in ipairs(tab) do
 				if tonumber(num) == tonumber(v.Name:match('^(%d+)')) then
 					index = k
 				end
 			end
 		tab.ExtParams = {FilterType = 2, LuaOnCancelFunName = 'OnMultiAddressCancel_YT'}
-		m_simpleTV.User.YT.PlstCh.chTitle = chTitle
+		m_simpleTV.User.YT.PlstsCh.chTitle = chTitle
 		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('📋 ' .. m_simpleTV.User.YT.ChTitle, index - 1, tab, 30000, 1 + 4 + 8 + 2 + 128)
 		m_simpleTV.Control.CurrentTitle_UTF8 = chTitle
 		if m_simpleTV.Control.MainMode == 0 then
@@ -3415,22 +3415,22 @@ https://github.com/grafi-tt/lunaJson
 			 return
 			end
 			if ret == 1 then
-				m_simpleTV.User.YT.PlstCh.Num = tab[id].Name:match('^(%d+)') or tab[1].Name
-				m_simpleTV.User.YT.PlstCh.Header = tab[id].Name:match('^%d+%. (.+)') or tab[1].Name
-				m_simpleTV.User.YT.PlstCh.Refresh = false
+				m_simpleTV.User.YT.PlstsCh.Num = tab[id].Name:match('^(%d+)') or tab[1].Name
+				m_simpleTV.User.YT.PlstsCh.Header = tab[id].Name:match('^%d+%. (.+)') or tab[1].Name
+				m_simpleTV.User.YT.PlstsCh.Refresh = false
 				PlstApi(tab[id].Address)
 			 return
 			end
 			if ret == 2 then
-				PrevPlstCh_YT()
+				PrevPlstsCh_YT()
 			 return
 			end
 			if ret == 3 then
-				NextPlstCh_YT()
+				NextPlstsCh_YT()
 			 return
 			end
 	end
-	local function notPlst()
+	local function Video()
 		local t, title = GetStreamsTab(videoId)
 			if not t then
 				StopOnErr(12, title)
@@ -3540,7 +3540,7 @@ https://github.com/grafi-tt/lunaJson
 					t1[3].Address = 'https://www.youtube.com/embed?listType=playlist&list=RD'
 									.. m_simpleTV.User.YT.vId
 									.. '&isLogo=false'
-					m_simpleTV.User.YT.PlstCh.chTitle = nil
+					m_simpleTV.User.YT.PlstsCh.chTitle = nil
 				end
 			end
 			t1.ExtParams = {FilterType = 2, LuaOnCancelFunName = 'OnMultiAddressCancel_YT'}
@@ -3627,7 +3627,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return
 	end
-	function AsynPlsCallb_Videos_YT(session, rc, answer, userstring, params)
+	function AsynPlsCallb_Plst_YT(session, rc, answer, userstring, params)
 		local ret = {}
 			if rc ~= 200 then
 				ret.Cancel = true
@@ -3664,14 +3664,14 @@ https://github.com/grafi-tt/lunaJson
 				title = 'YouTube - ' .. title
 			end
 			if params.User.setTitle == true then
-				m_simpleTV.Control.SetTitle(m_simpleTV.User.YT.PlstCh.chTitle or title)
+				m_simpleTV.Control.SetTitle(m_simpleTV.User.YT.PlstsCh.chTitle or title)
 			end
 			params.User.Title = title
 			if params.ProgressEnabled == true then
 				params.User.plstTotalResults = answer:match('"stats":%[{"runs":%[{"text":"(%d+)')
 			end
 		end
-			if not AddInPl_Videos_YT(answer, params.User.tab, params.User.typePlst) then
+			if not AddInPl_Plst_YT(answer, params.User.tab, params.User.typePlst) then
 				ret.Done = true
 			 return ret
 			end
@@ -3767,9 +3767,9 @@ https://github.com/grafi-tt/lunaJson
 							.. name
 							.. '\n' .. adr .. '\n'
 				end
-			if m_simpleTV.User.YT.PlstCh.chTitle then
+			if m_simpleTV.User.YT.PlstsCh.chTitle then
 				header = header .. ' [' .. m_simpleTV.User.YT.Lng.channel
-								.. ' - ' .. m_simpleTV.User.YT.PlstCh.chTitle .. '] '
+								.. ' - ' .. m_simpleTV.User.YT.PlstsCh.chTitle .. '] '
 			end
 			header = m_simpleTV.Common.UTF8ToMultiByte(header)
 			header = header:gsub('%c', '')
@@ -3878,16 +3878,16 @@ https://github.com/grafi-tt/lunaJson
 			ShowInfo()
 		end
 	end
-	function PlstCh_YT()
+	function PlstsCh_YT()
 			if m_simpleTV.Control.Reason == 'Stopped'
 				or m_simpleTV.Control.Reason == 'EndReached'
 			then
 				m_simpleTV.Control.ExecuteAction(63)
 			 return
 			end
-		local tab = m_simpleTV.User.YT.PlstChTab
+		local tab = m_simpleTV.User.YT.PlstsChTab
 			if not tab then return end
-		local num = m_simpleTV.User.YT.PlstCh.Num
+		local num = m_simpleTV.User.YT.PlstsCh.Num
 		local index = 0
 			for k, v in ipairs(tab) do
 				if tonumber(num) == tonumber(v.Name:match('^(%d+)')) then
@@ -3906,44 +3906,44 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 			if ret == 1 then
-				m_simpleTV.User.YT.PlstCh.Refresh = true
-				m_simpleTV.User.YT.PlstCh.Num = tab[id].Name:match('^(%d+)') or tab[1].Name
-				m_simpleTV.User.YT.PlstCh.Header = tab[id].Name:match('^%d+%. (.+)') or tab[1].Name
+				m_simpleTV.User.YT.PlstsCh.Refresh = true
+				m_simpleTV.User.YT.PlstsCh.Num = tab[id].Name:match('^(%d+)') or tab[1].Name
+				m_simpleTV.User.YT.PlstsCh.Header = tab[id].Name:match('^%d+%. (.+)') or tab[1].Name
 				m_simpleTV.Control.SetNewAddressT({address = tab[id].Address})
 			 return
 			end
 			if ret == 2 then
-				PrevPlstCh_YT()
+				PrevPlstsCh_YT()
 			 return
 			end
 			if ret == 3 then
-				NextPlstCh_YT()
+				NextPlstsCh_YT()
 			 return
 			end
 	end
-	function NextPlstCh_YT()
-		m_simpleTV.User.YT.PlstCh.Refresh = true
-		local tab = table_reversa(m_simpleTV.User.YT.PlstCh.Urls)
+	function NextPlstsCh_YT()
+		m_simpleTV.User.YT.PlstsCh.Refresh = true
+		local tab = table_reversa(m_simpleTV.User.YT.PlstsCh.Urls)
 		if #tab == 0 then
-			tab[1] = m_simpleTV.User.YT.PlstCh.FirstUrl
+			tab[1] = m_simpleTV.User.YT.PlstsCh.FirstUrl
 		end
 		m_simpleTV.Control.ChangeAddress = 'No'
 		m_simpleTV.Control.CurrentAddress = tab[1] .. '&isRestart=true'
 		dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
 	end
-	function PrevPlstCh_YT()
-		m_simpleTV.User.YT.PlstCh.Refresh = false
-		local tab = m_simpleTV.User.YT.PlstCh.Urls
+	function PrevPlstsCh_YT()
+		m_simpleTV.User.YT.PlstsCh.Refresh = false
+		local tab = m_simpleTV.User.YT.PlstsCh.Urls
 		if #tab > 1 then
 			tab[#tab] = nil
 			tab[#tab] = nil
 		end
 		if #tab == 0 then
-			m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.PlstCh.MainUrl
+			m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.PlstsCh.MainUrl
 		else
 			m_simpleTV.Control.CurrentAddress = tab[#tab]
 		end
-		m_simpleTV.User.YT.PlstCh.Urls = tab
+		m_simpleTV.User.YT.PlstsCh.Urls = tab
 		m_simpleTV.Control.ChangeAddress = 'No'
 		dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
 	end
@@ -3988,8 +3988,8 @@ https://github.com/grafi-tt/lunaJson
 			StopOnErr(100, err)
 		 return
 		end
-	if inAdr:match('isPlstCh=true') then
-		m_simpleTV.User.YT.isPlstCh = true
+	if inAdr:match('isPlstsCh=true') then
+		m_simpleTV.User.YT.isPlstsCh = true
 	end
 	if inAdr:match('music%.youtube%.com/browse/')
 	then
@@ -4090,7 +4090,7 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('list=LL')
 		or inAdr:match('youtube%.com/[^/]+/videos')
 	then
-		PlstVideos(inAdr)
+		Plst(inAdr)
 	elseif inAdr:match('/user/')
 		or inAdr:match('/channel/')
 		or inAdr:match('/c/')
@@ -4100,9 +4100,9 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('/live$')
 		or inAdr:match('/embed/live_stream')
 	then
-		PlstCh(inAdr)
+		PlstsCh(inAdr)
 	elseif inAdr:match('list=') then
 		PlstApi(inAdr)
 	else
-		notPlst()
+		Video()
 	end
