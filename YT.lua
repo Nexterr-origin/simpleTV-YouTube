@@ -442,7 +442,6 @@ local infoInFile = false
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.isChapters = false
 	local inf0, inf01
-	local isPlst = false
 	local isInfoPanel = infoPanelCheck()
 	local videoId = inAdr:match('[?&/]v[=/](.+)')
 				or inAdr:match('/embed/(.+)')
@@ -2654,7 +2653,6 @@ https://github.com/grafi-tt/lunaJson
 	 return ret
 	end
 	local function PlstApi(inAdr)
-		isPlst = true
 		local plstId = inAdr:match('list=([^&]*)')
 		m_simpleTV.User.YT.plstPos = nil
 		m_simpleTV.User.YT.isVideo = false
@@ -2884,7 +2882,6 @@ https://github.com/grafi-tt/lunaJson
 	 return
 	end
 	local function Plst(inAdr)
-		isPlst = true
 		m_simpleTV.Control.ExecuteAction(37)
 		if not m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.User.YT.PlstsCh.chTitle = nil
@@ -3115,7 +3112,6 @@ https://github.com/grafi-tt/lunaJson
 	 return
 	end
 	local function PlstsCh(inAdr)
-		isPlst = true
 			if (m_simpleTV.Control.Reason == 'Stopped' or m_simpleTV.Control.Reason == 'EndReached')
 				and
 				(inAdr:match('isPlstsCh=true') or (inAdr:match('&isRestart=true') and not inAdr:match('/youtubei/') and not inAdr:match('&sort=.-&isRestart=true')))
