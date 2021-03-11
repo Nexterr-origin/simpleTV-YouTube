@@ -10,7 +10,7 @@
 
 ---
 
-### ★ Скрипт YouTube <sup>для версии simpleTV `b12.7.6 (vlc 3.0.11)`<sup>
+### ★ Скрипт YouTube <sup>_`для версии simpleTV b12.7.6 (vlc 3.0.11)`_<sup>
 
 ---
 
