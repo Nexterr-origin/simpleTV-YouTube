@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (11/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (12/3/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -40,14 +40,27 @@ local infoInFile = false
 	local urlAdr = inAdr
 	m_simpleTV.Control.ChangeAddress = 'Yes'
 	m_simpleTV.Control.CurrentAddress = 'error'
-		if m_simpleTV.Common.GetVersion() < 880
-			or m_simpleTV.Common.GetVlcVersion() < 3000
+	if not m_simpleTV.User then
+		m_simpleTV.User = {}
+	end
+	if not m_simpleTV.User.YT then
+		m_simpleTV.User.YT = {}
+	end
+	if not m_simpleTV.User.YT.VersionCheck then
+		local _, strVer = m_simpleTV.Common.GetVersion()
+		local vlcVer = m_simpleTV.Common.GetVlcVersion()
+		if not (strVer:match('b12%.7%.7 test')
+			or strVer:match('b12%.7%.6'))
+			or vlcVer < 3000
 		then
-			local msg = 'simpleTV version too old, need 0.5.0 b12.7.6 (vlc 3.0.11) or newer'
+			local msg = 'simpleTV need 0.5.0 b12.7.6 / b12.7.7 test (vlc 3.0.11)'
+			local link = 'https://mega.nz/folder/G74EBKDQ#77wUEcj-IfrmghM8QVti3w/folder/C2o21LZL'
 			m_simpleTV.Interface.MessageBox(msg, 'YouTube', 0x10)
-			m_simpleTV.Control.ExecuteAction(147)
+			m_simpleTV.Interface.OpenLink(link)
 		 return
 		end
+		m_simpleTV.User.YT.VersionCheck = true
+	end
 	htmlEntities = require 'htmlEntities'
 	require 'lfs'
 	require 'asynPlsLoaderHelper'
