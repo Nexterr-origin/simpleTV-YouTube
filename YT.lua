@@ -53,7 +53,7 @@ local infoInFile = false
 			or strVer:match('b12%.7%.6'))
 			or vlcVer < 3000
 		then
-			local msg = 'simpleTV need 0.5.0 b12.7.6 / b12.7.7 test (vlc 3.0.11)'
+			local msg = 'simpleTV need 0.5.0 b12.7.6 (vlc 3.0.11)'
 			local link = 'https://mega.nz/folder/G74EBKDQ#77wUEcj-IfrmghM8QVti3w/folder/C2o21LZL'
 			m_simpleTV.Interface.MessageBox(msg, 'YouTube', 0x10)
 			m_simpleTV.Interface.OpenLink(link)
