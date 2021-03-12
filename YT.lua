@@ -422,6 +422,7 @@ local infoInFile = false
 								end
 							end
 						end
+						if #t == 5 then break end
 					end
 				fhandle:close()
 					if #t < 5 then return end
