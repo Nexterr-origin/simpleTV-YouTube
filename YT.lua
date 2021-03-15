@@ -1286,6 +1286,46 @@ https://github.com/grafi-tt/lunaJson
 		ShowMsg(mes)
 		m_simpleTV.Control.SetTitle(m_simpleTV.User.YT.Lng.error .. ' [' .. n .. ']')
 	end
+	local function debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
+			if not infoInFile then return end
+		local scr_time = string.format('%.3f', (os.clock() - infoInFile))
+		local calc = scr_time - inf0
+		local adr = m_simpleTV.Common.fromPercentEncoding(retAdr)
+		local string_rep = string.rep('–', 70) .. '\n'
+		index = noItag22 or index
+		local qlty = t[index].qlty
+		if qlty and qlty < 100 then
+			qlty = nil
+		end
+		infoInFile = string_rep
+						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
+						.. string_rep
+						.. 'qlty: ' .. tostring(qlty)
+						.. ' | video itag: ' .. tostring(t[index].itag)
+						.. ' | audio itag: ' .. tostring(t[index].aItag) .. '\n'
+						.. string_rep
+						.. 'cipher: ' .. tostring(t[index].isCipher)
+						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
+						.. string_rep
+						.. 'time: ' .. scr_time .. ' s.'
+						.. ' | request: ' .. inf0 .. ' s.'
+						.. ' | calc: ' .. calc .. ' s.\n'
+						.. string_rep
+						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
+						.. string_rep
+						.. 'description:\n\n'
+						.. m_simpleTV.User.YT.desc .. '\n'
+						.. string_rep
+						.. 'qlty table:\n\n'
+						.. (inf01 or '') .. '\n'
+						.. string_rep
+						.. 'cookies:\n\n'
+						.. m_simpleTV.User.YT.cookies:gsub('^[;]*(.-)[;]$', '%1'):gsub(';+', '\n') .. '\n'
+						.. string_rep
+						.. 'address:\n\n'
+						.. adr:gsub('%$', '\n\n$'):gsub('slave=', 'slave=\n\n'):gsub('%#', '\n\n#\n\n') .. '\n'
+		debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
+	end
 	local function Search(sAdr)
 		local types, yt, header, url
 		local eventType = ''
@@ -2887,6 +2927,7 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Control.SetTitle(header .. ' (' .. title .. ')')
 			end
 		end
+		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
 	 return
 	end
 	local function Plst(inAdr)
@@ -3117,6 +3158,7 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
 			end
 		end
+		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
 	 return
 	end
 	local function PlstsCh(inAdr)
@@ -3590,45 +3632,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		m_simpleTV.Http.Close(session)
 		m_simpleTV.Control.CurrentAddress = retAdr
-		if infoInFile then
-			local scr_time = string.format('%.3f', (os.clock() - infoInFile))
-			local calc = scr_time - inf0
-			local adr = m_simpleTV.Common.fromPercentEncoding(retAdr)
-			local string_rep = string.rep('–', 70) .. '\n'
-			index = noItag22 or index
-			local qlty = t[index].qlty
-			if qlty and qlty < 100 then
-				qlty = nil
-			end
-			infoInFile = string_rep
-						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
-						.. string_rep
-						.. 'qlty: ' .. tostring(qlty)
-						.. ' | video itag: ' .. tostring(t[index].itag)
-						.. ' | audio itag: ' .. tostring(t[index].aItag) .. '\n'
-						.. string_rep
-						.. 'cipher: ' .. tostring(t[index].isCipher)
-						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
-						.. string_rep
-						.. 'time: ' .. scr_time .. ' s.'
-						.. ' | request: ' .. inf0 .. ' s.'
-						.. ' | calc: ' .. calc .. ' s.\n'
-						.. string_rep
-						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
-						.. string_rep
-						.. 'description:\n\n'
-						.. m_simpleTV.User.YT.desc .. '\n'
-						.. string_rep
-						.. 'qlty table:\n\n'
-						.. (inf01 or '') .. '\n'
-						.. string_rep
-						.. 'cookies:\n\n'
-						.. m_simpleTV.User.YT.cookies:gsub('^[;]*(.-)[;]$', '%1'):gsub(';+', '\n') .. '\n'
-						.. string_rep
-						.. 'address:\n\n'
-						.. adr:gsub('%$', '\n\n$'):gsub('slave=', 'slave=\n\n'):gsub('%#', '\n\n#\n\n') .. '\n'
-			debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
-		end
+		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
 	 return
 	end
 	function AsynPlsCallb_Plst_YT(session, rc, answer, userstring, params)
