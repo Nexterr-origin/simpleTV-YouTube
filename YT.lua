@@ -3311,6 +3311,7 @@ https://github.com/grafi-tt/lunaJson
 				j = j + 1
 				i = i + 1
 			end
+					debug_in_file(#tab .. '\n')
 			if #tab == 0 then
 				for w in answer:gmatch('"itemSectionRenderer":%s*".-"thumbnails":%s*%[%s*"url":%s*"[^"]+') do
 					name = w:match('"title":%s*"runs":%s*%[%s*"text":%s*"([^"]+)')
@@ -3338,7 +3339,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 				buttonNext = false
 			end
-				if #tab == 0 and url:match('/youtubei/') then
+				if #tab == 0 and inAdr:match('&numVideo=') then
 					PrevPlstsCh_YT()
 				 return
 				elseif #tab == 0 then
