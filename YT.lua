@@ -440,7 +440,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.qlty = tonumber(m_simpleTV.Config.GetValue('YT_qlty') or '1080')
 	end
 	if not m_simpleTV.User.YT.qlty_live then
-		m_simpleTV.User.YT.qlty_live = tonumber(m_simpleTV.Config.GetValue('YT_qlty_live') or '10000')
+		m_simpleTV.User.YT.qlty_live = tonumber(m_simpleTV.Config.GetValue('YT_qlty_live') or '1080')
 	end
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
@@ -1809,7 +1809,7 @@ https://github.com/grafi-tt/lunaJson
 			if rc ~= 200 then
 			 return nil, 'GetStreamsTab live Error 1'
 			end
-		local t, i = {}, 1
+		local t = {}
 			for name, fps, adr in answer:gmatch('RESOLUTION=(.-),.-RATE=(%d+).-\n(.-)\n') do
 				name = tonumber(name:match('x(%d+)') or '0')
 				local qlty
@@ -1821,12 +1821,11 @@ https://github.com/grafi-tt/lunaJson
 						qlty = name
 						fps = ''
 					end
-					t[i] = {}
-					t[i].Id = i
-					t[i].Name = name .. 'p' .. fps
-					t[i].Address = adr .. extOpt
-					t[i].qltyLive = qlty
-					i = i + 1
+					t[#t + 1] = {}
+					t[#t].Id = #t
+					t[#t].Name = name .. 'p' .. fps
+					t[#t].Address = adr .. extOpt
+					t[#t].qltyLive = qlty
 				end
 			end
 			if #t == 0 then
@@ -2044,15 +2043,14 @@ https://github.com/grafi-tt/lunaJson
 				and not inAdr:match('&isPlst=')
 				and not inAdr:match('list=')
 			then
-				local t, i = {}, 1
+				local t = {}
 				local metadataList = tab.multicamera.playerLegacyMulticameraRenderer.metadataList
 				metadataList = m_simpleTV.Common.fromPercentEncoding(metadataList)
 					for vId in metadataList:gmatch('/vi/([^/]+)') do
-						t[i] = {}
-						t[i] = vId
-						i = i + 1
+						t[#t + 1] = {}
+						t[#t] = vId
 					end
-					if i == 1 then
+					if #t == 0 then
 					 return nil, 'no list multicamers'
 					end
 				t = table.concat(t, ',')
