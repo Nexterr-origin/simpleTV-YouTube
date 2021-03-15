@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (15/3/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -151,9 +151,6 @@ local infoInFile = false
 		if not inAdr:match('^https://[%a.]*youtu[.combe]') and not inAdr:match('^https://y[2out]*u%.be/') then
 			inAdr = inAdr:gsub('^https://[^/]+(/.+)', 'https://www.youtube.com%1')
 		end
-		if not inAdr:match('music%.youtube%.com/browse') then
-			inAdr = inAdr:gsub('//music%.', '//www.')
-		end
 		inAdr = inAdr:gsub('//youtube%.', '//www.youtube.')
 		local id = inAdr:match('/playlist%?list=RD([^&]*)')
 		if id and #id == 11 then
@@ -189,7 +186,6 @@ local infoInFile = false
 		or inAdr:match('&isRestart=true')
 		or inAdr:match('/youtubei/')
 		or inAdr:match('/watch_videos')
-		or inAdr:match('music%.youtube%.com/browse')
 		)
 	then
 		if inAdr:match('&isPlst=')
@@ -4000,25 +3996,6 @@ https://github.com/grafi-tt/lunaJson
 		end
 	if inAdr:match('isPlstsCh=true') then
 		m_simpleTV.User.YT.isPlstsCh = true
-	end
-	if inAdr:match('music%.youtube%.com/browse/')
-	then
-		local rc, answer = m_simpleTV.Http.Request(session, {url = inAdr})
-		m_simpleTV.Http.Close(session)
-			if rc ~= 200 then
-				StopOnErr(0.4)
-			 return
-			end
-		local plst = answer:match('radioPlaylistMixPlaylistId\\x22:\\x22RDAMPL(.-)\\')
-			if not plst then
-				StopOnErr(0.5)
-			 return
-			end
-		plst = 'https://www.youtube.com/playlist?list=' .. plst .. '&isLogo=true'
-		m_simpleTV.Control.ChangeAddress = 'No'
-		m_simpleTV.Control.CurrentAddress = plst
-		dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
-	 return
 	end
 	if inAdr:match('/watch_videos')
 	then
