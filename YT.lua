@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (16/3/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2902,8 +2902,6 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if #tab == 1 then
 			retAdr = positionToContinue(retAdr)
-		else
-			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
 		if m_simpleTV.User.YT.isPlstsCh then
@@ -3143,8 +3141,6 @@ https://github.com/grafi-tt/lunaJson
 		retAdr = retAdr or StreamCheck(t, index)
 		if #tab == 1 then
 			retAdr = positionToContinue(retAdr)
-		else
-			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
 		if m_simpleTV.User.YT.isPlstsCh then
@@ -3968,7 +3964,7 @@ https://github.com/grafi-tt/lunaJson
 	function OnMultiAddressCancel_YT(Object)
 		if m_simpleTV.User.YT.DelayedAddress then
 			if m_simpleTV.Control.GetState() == 0 then
-				m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.User.YT.DelayedAddress})
+				m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.User.YT.DelayedAddress, position = 0})
 				if m_simpleTV.User.YT.qlty < 100 then
 					local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
 					if visual == 'none'
