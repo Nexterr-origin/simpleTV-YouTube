@@ -2,6 +2,7 @@
  <a title="english" href="./README-EN.md"><img src="../../../simpleTV-images/blob/main/gb.png?raw=true" alt="english" /> </a><strong><sup><sub>EN</sub></sup></strong>
 </p>
 
+[![discussions][badge-discussions]][discussions]
 [![scripts][badge-scripts]][scripts]
 [![script addons][badge-addons]][addons]
 
@@ -52,9 +53,9 @@
 [License]: ../../blob/master/LICENSE "Apache License 2.0"
 [simpleTV homepage]: http://iptv.gen12.net "домашняя страница"
 [simpleTV bugtracker]: http://iptv.gen12.net/bugtracker "багтрекер"
+[discussions]: https://github.com/Nexterr-origin/Nexterr-origin/discussions "discussions"
 
-
-
+[badge-discussions]: https://img.shields.io/badge/💬-Discussions-%232b2b2b?style=flat-squar&labelColor=%232c68a8 "Discussions"
 [badge-addons]: https://img.shields.io/badge/%D0%94%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F-%232b2b2b?style=flat-squar&labelColor=%232c68a8 "Дополнения"
 [badge-simpletvapi]: https://img.shields.io/badge/simpleTV-Lua%20API-%232b2b2b?style=flat-squar&labelColor=%23303f50 "simpleTV Lua API"
 [badge-lua]: https://img.shields.io/badge/Lua-5.1-%232b2b2b?style=flat-square&labelColor=%23303f50 "Lua 5.1"
