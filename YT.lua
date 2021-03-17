@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (17/3/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2668,23 +2668,22 @@ https://github.com/grafi-tt/lunaJson
 		local ret = false
 		local selected
 		str = str:gsub('\\"', '%%22')
-			for name, desc, adr in str:gmatch('"title": "([^"]+).-"description": "([^"]*).-"videoId": "([^"]+)') do
+			for name, desc, id in str:gmatch('"title": "([^"]+).-"description": "([^"]*).-"videoId": "([^"]+)') do
 				if name ~= 'Deleted video' and name ~= 'Private video' then
 					name = title_clean(name)
 					tab[i] = {}
 					tab[i].Id = i
-					if not selected and adr == videoId then
+					if not selected and id == videoId then
 						selected = true
 						m_simpleTV.User.YT.plstPos = i
 					end
-					adr = string.format('https://www.youtube.com/watch?v=%s&isPlst=true', adr)
+					tab[i].Address = string.format('https://www.youtube.com/watch?v=%s&isPlst=true', id)
 					if m_simpleTV.User.YT.isPlstsCh == true then
-						adr = adr .. '&isPlstsCh=true'
+						tab[i].Address = tab[i].Address .. '&isPlstsCh=true'
 					end
-					tab[i].Address = adr
 					tab[i].Name = name
 					if isInfoPanel == true then
-						tab[i].InfoPanelLogo = string.format('https://i.ytimg.com/vi/%s/default.jpg', adr)
+						tab[i].InfoPanelLogo = string.format('https://i.ytimg.com/vi/%s/default.jpg', id)
 						tab[i].InfoPanelName = name
 						local panelDescName
 						if desc and desc ~= '' then
