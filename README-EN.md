@@ -19,29 +19,29 @@
 
 ---
 
+
+📌 **Installation**
+- put **`YT.lua`** in _`..\luaScr\user\video`_
+
 <!---
-
-📌 **Установка**
-- поместить **`YT.lua`** в папку _`..\luaScr\user\video`_
-
 📌 **Авторизация**
 - файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_, получить файл можно в расширении браузера Firefox - [cookies.txt](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") или Chrome - [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
+--->
+📌 **Search from the "Open URL" window _Ctrl+N_**
+- prefixes:
 
-📌 **Поиск из окна "Открыть URL" _Ctrl+N_**
-- префиксы:
+  \- (single video)
 
-  \- (видео)
+  -- (playlists)
 
-  -- (плейлисты)
-
-  --- (каналы)
+  --- (channels)
   
-  -+ (прямые трансляции)
+  -+ (live broadcasts)
 
-📌 **Показвть плейлист / выбор качества: _Ctrl+M_**
+📌 **Show playlist / select quality: _Ctrl+M_**
 
 ---
-
+<!---
 ⚠ **Внимание!**
 ###### - если установлен _видео аддон_ [_**videotracks**_](http://iptv.gen12.net/bugtracker/view.php?id=1704 "удаляйте это поделее"), в его настройках внести в исключения адрес: `.*googlevideo.com.*`
 
