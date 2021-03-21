@@ -42,7 +42,8 @@
 ---
 
 ⚠ **Внимание!**
-###### - если установлен _видео аддон_ [_**videotracks**_](http://iptv.gen12.net/bugtracker/view.php?id=1704 "удаляйте это поделее"), в его настройках внести в исключения адрес: `.*googlevideo.com.*`
+###### - не совместимо со сборкой (скин, портал) от _**[west_side](http://iptv.gen12.net/bugtracker/view.php?id=1733), [M24](https://vk.com/m24lg)**_
+###### - если установлен _видео аддон_ [_**videotracks**_](http://iptv.gen12.net/bugtracker/view.php?id=1704 "не рекомендуется"), в его настройках внести в исключения адрес: `.*googlevideo.com.*`
 
 ---
 
