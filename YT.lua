@@ -17,7 +17,7 @@
 -- авторизаця: файл формата "Netscape HTTP Cookie File" - cookies.txt поместить в папку 'work'
 -- показать на OSD плейлист / выбор качества: Ctrl+M
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -2482,7 +2482,7 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					if typePlst == 'channels' then
-						tab[i].Address = 'https://www.youtube.com/channel/' .. adr .. '&isLogo=false'
+						tab[i].Address = 'https://www.youtube.com/channel/' .. adr .. '&isLogo=false&isButton=true'
 					else
 						tab[i].Address = 'https://www.youtube.com/feeds/videos.xml?channel_id=' .. adr .. '&isLogo=false&isRestart=true'
 					end
@@ -3193,8 +3193,6 @@ https://github.com/grafi-tt/lunaJson
 		url = url:gsub('&is%a+=%a+', '') .. '&isRestart=true'
 		if onButton then
 			url = url .. '&isButton=true'
-		end
-		if onButton then
 			url = url:gsub('%?view=1$', '?view=1&sort=dd&shelf_id=0')
 		end
 		if not youtubei and not url:match('/playlists') then
