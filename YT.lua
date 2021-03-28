@@ -4062,7 +4062,7 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Control.ExecuteAction(11)
 			 return
 			end
-		t = t[id].Address .. '&isSearch=true&isLogo=false'
+		t = t[id].Address .. '&isSearch=true&isLogo=false&isButton=true'
 		PlayAddressT_YT(t)
 	 return
 	end
