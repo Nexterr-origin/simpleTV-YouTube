@@ -47,16 +47,12 @@ local infoInFile = false
 		m_simpleTV.User.YT = {}
 	end
 	if not m_simpleTV.User.YT.VersionCheck then
-		local _, strVer = m_simpleTV.Common.GetVersion()
-		local vlcVer = m_simpleTV.Common.GetVlcVersion()
-		if not (strVer:match('b12%.7%.7 test')
-			or strVer:match('b12%.7%.6'))
-			or vlcVer < 3000
+		if m_simpleTV.Common.GetVersion() < 880
+			or m_simpleTV.Common.GetVlcVersion() < 3000
 		then
-			local msg = 'simpleTV need 0.5.0 b12.7.6 (vlc 3.0.11)'
-			local link = 'https://mega.nz/folder/G74EBKDQ#77wUEcj-IfrmghM8QVti3w/folder/C2o21LZL'
+			local msg = 'simpleTV version too old, need 0.5.0 b12.7.6 (vlc 3.0.11) or newer'
 			m_simpleTV.Interface.MessageBox(msg, 'YouTube', 0x10)
-			m_simpleTV.Interface.OpenLink(link)
+			m_simpleTV.Control.ExecuteAction(147)
 		 return
 		end
 		m_simpleTV.User.YT.VersionCheck = true
@@ -3194,20 +3190,25 @@ https://github.com/grafi-tt/lunaJson
 		local onButton = url:match('&isButton=true')
 		local youtubei = url:match('/youtubei/')
 		url = url:gsub('&is%a+=%a+', '') .. '&isRestart=true'
-		if onButton then
-			url = url:gsub('%?view=1$', '?view=1&sort=dd&shelf_id=0')
-			url = url .. '&isButton=true'
-		end
 		if not youtubei then
 			m_simpleTV.User.YT.PlstsCh.visitorData = nil
-			if not url:match('/playlists') then
+			if not url:match('/playlists')
+				and not onButton
+			then
+				url = url:gsub('/?$', '') .. '/playlists'
+				onButton = true
+			elseif not url:match('/playlists') then
 				url = url:gsub('/?$', '') .. '/playlists'
 			end
 			if not url:match('sort=') then
 				url = url:gsub('^(.-/playlists).-$', '%1')
 				if onButton then
-					url = url:gsub('&is%a+=%a+', '') .. '?view=1&sort=lad&shelf_id=0&isRestart=true&isButton=true'
+					url = url:gsub('&is%a+=%a+', '') .. '?view=1&sort=lad&shelf_id=0&isRestart=true'
 				end
+			end
+			if onButton then
+				url = url:gsub('%?view=1$', '?view=1&sort=dd&shelf_id=0')
+				url = url .. '&isButton=true'
 			end
 		end
 		if not m_simpleTV.User.YT.PlstsCh.MainUrl then
