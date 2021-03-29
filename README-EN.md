@@ -28,15 +28,13 @@
 - файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_, получить файл можно в расширении браузера Firefox - [cookies.txt](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") или Chrome - [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
 --->
 📌 **Search from the "Open URL" window _Ctrl+N_**
-- prefixes:
 
-  \- (single video)
-
-  -- (playlists)
-
-  --- (channels)
-  
-  -+ (live broadcasts)
+prefix | name
+------------ | -------------
+\- | video
+-- | playlist
+--- | channel
+-+ | live
 
 📌 **Show playlist / select quality: _Ctrl+M_**
 
