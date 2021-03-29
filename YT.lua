@@ -3055,8 +3055,12 @@ https://github.com/grafi-tt/lunaJson
 			tab.ExtButton0 = {ButtonEnable = true, ButtonName = '⚙', ButtonScript = 'Qlty_YT()'}
 		end
 		local FilterType, AutoNumberFormat, pl
-		if #tab > 1 then
+		if #tab > 10 then
 			FilterType = 1
+			AutoNumberFormat = '%1. %2'
+			pl = 0
+		elseif #tab > 1 then
+			FilterType = 2
 			AutoNumberFormat = '%1. %2'
 			pl = 0
 		else
@@ -3332,9 +3336,10 @@ https://github.com/grafi-tt/lunaJson
 					local count = w:match('"videoCount":%s*"(%d+)') or ''
 					name = title_clean(name)
 					if count ~= '' then
-						count = ' (' .. count .. ')'
+						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
+					else
+						tab[i].Name = j .. '. ' .. name
 					end
-					tab[i].Name = j .. '. ' .. name .. count
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
@@ -3364,9 +3369,10 @@ https://github.com/grafi-tt/lunaJson
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
 					name = title_clean(name)
 					if count ~= '' then
-						count = ' (' .. count .. ')'
+						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
+					else
+						tab[i].Name = j .. '. ' .. name
 					end
-					tab[i].Name = j .. '. ' .. name .. count
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
@@ -3397,9 +3403,10 @@ https://github.com/grafi-tt/lunaJson
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
 					name = title_clean(name)
 					if count ~= '' then
-						count = ' (' .. count .. ')'
+						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
+					else
+						tab[i].Name = j .. '. ' .. name
 					end
-					tab[i].Name = j .. '. ' .. name .. count
 					tab[i].Address = string.format('https://www.youtube.com%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
@@ -3429,7 +3436,6 @@ https://github.com/grafi-tt/lunaJson
 				Plst(inAdr)
 			 return
 			end
-		m_simpleTV.User.YT.ChTitle = chTitle
 		m_simpleTV.User.YT.PlstsChTab = tab
 		m_simpleTV.User.YT.isPlstsCh = true
 		local buttonPrev = false
@@ -3450,7 +3456,9 @@ https://github.com/grafi-tt/lunaJson
 			tab.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
 		end
 		if #m_simpleTV.User.YT.PlstsCh.Urls > 0 then
-			chTitle = chTitle .. ' (' .. m_simpleTV.User.YT.Lng.page .. ' ' .. (#m_simpleTV.User.YT.PlstsCh.Urls + 1) .. ')'
+			m_simpleTV.User.YT.PlstsCh.chTitlePage = chTitle .. ' (' .. m_simpleTV.User.YT.Lng.page .. ' ' .. (#m_simpleTV.User.YT.PlstsCh.Urls + 1) .. ')'
+		else
+			m_simpleTV.User.YT.PlstsCh.chTitlePage = chTitle
 		end
 		num = #tab + tonumber(num)
 		url = url .. '&numVideo=' .. num
@@ -3471,13 +3479,15 @@ https://github.com/grafi-tt/lunaJson
 					index = k
 				end
 			end
-		local filterType = 2
+		local filterType
 		if #tab > 35 then
 			filterType = 1
+		else
+			filterType = 2
 		end
 		tab.ExtParams = {FilterType = filterType, LuaOnCancelFunName = 'OnMultiAddressCancel_YT'}
 		m_simpleTV.User.YT.PlstsCh.chTitle = chTitle
-		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('📋 ' .. chTitle, index - 1, tab, 30000, 1 + 4 + 8 + 2 + 128)
+		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('📋 ' .. m_simpleTV.User.YT.PlstsCh.chTitlePage, index - 1, tab, 30000, 1 + 4 + 8 + 2 + 128)
 		m_simpleTV.Control.CurrentTitle_UTF8 = chTitle
 		if m_simpleTV.Control.MainMode == 0 then
 			if not (inAdr:match('&isRestart=true') or youtubei) then
@@ -3487,7 +3497,7 @@ https://github.com/grafi-tt/lunaJson
 										or m_simpleTV.User.YT.logoPicFromDisk
 										, m_simpleTV.Control.ChannelID
 										, 'CHANGE_IF_NOT_EQUAL')
-				m_simpleTV.Control.ChangeChannelName(m_simpleTV.User.YT.ChTitle, m_simpleTV.Control.ChannelID, false)
+				m_simpleTV.Control.ChangeChannelName(m_simpleTV.User.YT.PlstsCh.chTitlePage, m_simpleTV.Control.ChannelID, false)
 			end
 		end
 			if not id then
@@ -3936,11 +3946,17 @@ https://github.com/grafi-tt/lunaJson
 					index = k
 				end
 			end
-		tab.ExtParams = {FilterType = 2}
+		local filterType
+		if #tab > 35 then
+			filterType = 1
+		else
+			filterType = 2
+		end
+		tab.ExtParams = {FilterType = filterType}
 		if m_simpleTV.User.paramScriptForSkin_buttonOk then
 			tab.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
 		end
-		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('📋 ' .. m_simpleTV.User.YT.ChTitle, index - 1, tab, 30000, 1 + 4 + 2 + 128)
+		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('📋 ' .. m_simpleTV.User.YT.PlstsCh.chTitlePage, index - 1, tab, 30000, 1 + 4 + 2 + 128)
 		if not id then
 			m_simpleTV.Control.ExecuteAction(37)
 			if m_simpleTV.Control.GetState() == 0 then
