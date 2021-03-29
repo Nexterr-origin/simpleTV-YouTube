@@ -3264,15 +3264,15 @@ https://github.com/grafi-tt/lunaJson
 			if channel_avatar then
 				channel_avatar = channel_avatar:gsub('^//', 'https://')
 			end
+			channel_banner = answer:match('"tvBanner":{"thumbnails":%[.-:480},{"url":"(.-)%-fcrop')
+			if channel_banner then
+				channel_banner = channel_banner:gsub('^//', 'https://')
+			end
+			m_simpleTV.User.YT.channel_banner = channel_banner
 			if not inAdr:match('&isRestart=true') then
-				channel_banner = answer:match('"tvBanner":{"thumbnails":%[.-:480},{"url":"(.-)%-fcrop')
-				if channel_banner then
-					channel_banner = channel_banner:gsub('^//', 'https://')
-				end
 				SetBackground(channel_banner or m_simpleTV.User.YT.logoPicFromDisk)
 				m_simpleTV.Control.SetTitle(chTitle)
 				m_simpleTV.User.YT.is_channel_banner = true
-				m_simpleTV.User.YT.channel_banner = channel_banner
 			end
 		end
 		local buttonNext = false
