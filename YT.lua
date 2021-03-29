@@ -1101,7 +1101,7 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.isVideo == true and m_simpleTV.User.YT.isChapters then
 			link = string.format('%s<br><a href="simpleTVLua:m_simpleTV.Control.ExecuteAction(37) m_simpleTV.Control.ExecuteAction(116)" style="color:#436FAF; font-size: small; text-decoration:none">🕜 %s</a>', link, m_simpleTV.User.YT.Lng.chapter)
 		end
-		desc = string.format('<html><body bgcolor="#181818"><table width="99%%"><tr><td style="padding: 10px 10px 10px;"><a href="%s"><img src="%s"</a></td><td style="padding: 10px 10px 10px; color:#ebebeb; vertical-align:middle;"><h4><font color="#ebeb00">%s</h4><hr>%s%s</td></tr></table></body></html>', adr, logo, name, link, desc)
+		desc = string.format('<html><body bgcolor="#181818"><table width="99%%"><tr><td style="padding: 10px 10px 10px;"><a href="%s"><img src="%s" height="100" </a></td><td style="padding: 10px 10px 10px; color:#ebebeb; vertical-align:middle;"><h4><font color="#ebeb00">%s</h4><hr>%s%s</td></tr></table></body></html>', adr, logo, name, link, desc)
 	 return desc
 	end
 	local function ShowInfo(info, bcolor, txtparm, color)
@@ -3260,14 +3260,14 @@ https://github.com/grafi-tt/lunaJson
 		if not youtubei then
 			m_simpleTV.User.YT.PlstsCh.visitorData = answer:match('"visitorData":"([^"]+)') or ''
 			chId = inAdr:match('/channel/([^/]+)') or answer:match('"browseId":"([^"]+)')
+			channel_avatar = answer:match('"thumbnails":%[{"url":"[^%]]+"url":"([^"]+)') or answer:match('"avatar":{"thumbnails":%[{"url":"([^"]+)')
+			if channel_avatar then
+				channel_avatar = channel_avatar:gsub('^//', 'https://')
+			end
 			if not inAdr:match('&isRestart=true') then
 				channel_banner = answer:match('"tvBanner":{"thumbnails":%[.-:480},{"url":"(.-)%-fcrop')
-				channel_avatar = answer:match('"thumbnails":%[{"url":"[^%]]+"url":"([^"]+)') or answer:match('"avatar":{"thumbnails":%[{"url":"([^"]+)')
 				if channel_banner then
-				channel_banner = channel_banner:gsub('^//', 'https://')
-				end
-				if channel_avatar then
-					channel_avatar = channel_avatar:gsub('^//', 'https://')
+					channel_banner = channel_banner:gsub('^//', 'https://')
 				end
 				SetBackground(channel_banner or m_simpleTV.User.YT.logoPicFromDisk)
 				m_simpleTV.Control.SetTitle(chTitle)
