@@ -1054,6 +1054,7 @@ https://github.com/grafi-tt/lunaJson
 						then
 						 return
 						end
+					c = c .. '&isButton=true'
 				 return string.format('none">%s</a> <a href="simpleTVLua:PlayAddressT_YT(\'%s\')"><img src="' .. m_simpleTV.User.YT.playPicFromDisk ..'" height="32" valign="top"><', c, stringToHex(c))
 				end)
 			desc = string.gsub(desc, '#([^\'%s%c/#,:%-?)]+)',
@@ -2472,7 +2473,8 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return t, title
 	end
-	local function plst_channels(str, tab, typePlst, i)
+	local function plst_channels(str, tab, typePlst)
+		local i = #tab + 1
 		local ret = false
 		local desc, count, count2, subCount, logo, name, adr
 			for g in str:gmatch('"channelRenderer".-"subscribeButton"') do
@@ -2520,7 +2522,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return ret
 	end
-	local function plst_rss(str, tab, typePlst, i)
+	local function plst_rss(str, tab, typePlst)
+		local i = #tab + 1
 		local ret = false
 		local name, published, adr, desc, panelDescName
 			for g in str:gmatch('<entry>.-</entry>') do
@@ -2557,7 +2560,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return ret
 	end
-	local function plst_video(str, tab, typePlst, i)
+	local function plst_video(str, tab, typePlst)
+		local i = #tab + 1
 		local ret = false
 		local render
 		if typePlst == 'panel_videos' then
@@ -2649,17 +2653,16 @@ https://github.com/grafi-tt/lunaJson
 	 return ret
 	end
 	local function AddInPl_Plst_YT(str, tab, typePlst)
-		local i = #tab + 1
 		local ret = false
 		str = str:gsub('\\"', '%%22')
 		if typePlst == 'channels'
 			or typePlst == 'rss_channels'
 		then
-			ret = plst_channels(str, tab, typePlst, i)
+			ret = plst_channels(str, tab, typePlst)
 		elseif typePlst == 'rss_videos'	then
-			ret = plst_rss(str, tab, typePlst, i)
+			ret = plst_rss(str, tab, typePlst)
 		else
-			ret = plst_video(str, tab, typePlst, i)
+			ret = plst_video(str, tab, typePlst)
 		end
 	 return ret
 	end
