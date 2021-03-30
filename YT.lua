@@ -3349,12 +3349,12 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					local count = w:match('"videoCount":%s*"(%d+)') or ''
-					name = title_clean(name)
-					name = j .. '. ' .. name
+					name = j .. '. ' .. title_clean(name)
 					if count ~= '' then
-						name = name .. ' (' .. count .. ')'
+						tab[i].Name = name .. ' (' .. count .. ')'
+					else
+						tab[i].Name = name
 					end
-					tab[i].Name = name
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
@@ -3371,12 +3371,12 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
-					name = title_clean(name)
-					name = j .. '. ' .. name
+					name = j .. '. ' .. title_clean(name)
 					if count ~= '' then
-						name = name .. ' (' .. count .. ')'
+						tab[i].Name = name .. ' (' .. count .. ')'
+					else
+						tab[i].Name = name
 					end
-					tab[i].Name = name
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
@@ -3394,12 +3394,12 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
-					name = title_clean(name)
-					name = j .. '. ' .. name
+					name = j .. '. ' .. title_clean(name)
 					if count ~= '' then
-						name = name .. ' (' .. count .. ')'
+						tab[i].Name = name .. ' (' .. count .. ')'
+					else
+						tab[i].Name = name
 					end
-					tab[i].Name = name
 					tab[i].Address = string.format('https://www.youtube.com%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
