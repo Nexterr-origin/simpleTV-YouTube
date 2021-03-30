@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (31/3/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -3250,7 +3250,6 @@ https://github.com/grafi-tt/lunaJson
 		local body = ''
 		if youtubei then
 			method = 'post'
-			body = m_simpleTV.User.YT.PlstsCh.body
 			url, num = url:match('^(.-)&numVideo=(%d+)')
 				if not url or not num then
 					StopOnErr(3.1)
@@ -3420,8 +3419,11 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.PlstsChTab = tab
 		m_simpleTV.User.YT.isPlstsCh = true
 		local buttonPrev = false
-		if #m_simpleTV.User.YT.PlstsCh.Urls >= 1 then
+		if #m_simpleTV.User.YT.PlstsCh.Urls > 0 then
 			buttonPrev = true
+			m_simpleTV.User.YT.PlstsCh.chTitlePage = chTitle .. ' (' .. m_simpleTV.User.YT.Lng.page .. ' ' .. (#m_simpleTV.User.YT.PlstsCh.Urls + 1) .. ')'
+		else
+			m_simpleTV.User.YT.PlstsCh.chTitlePage = chTitle
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonPrev then
 			tab.ExtButton0 = {ButtonEnable = buttonPrev, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonPrev}
@@ -3435,11 +3437,6 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonOk then
 			tab.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
-		end
-		if #m_simpleTV.User.YT.PlstsCh.Urls > 0 then
-			m_simpleTV.User.YT.PlstsCh.chTitlePage = chTitle .. ' (' .. m_simpleTV.User.YT.Lng.page .. ' ' .. (#m_simpleTV.User.YT.PlstsCh.Urls + 1) .. ')'
-		else
-			m_simpleTV.User.YT.PlstsCh.chTitlePage = chTitle
 		end
 		num = #tab + tonumber(num)
 		url = url .. '&numVideo=' .. num
