@@ -1787,21 +1787,20 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return stream_tab_err, title_err
 	end
-	local function plstsCh_infoPanel(tab, logo, name, adr, count, chTitle)
-		local i = #tab
+	local function plstsCh_infoPanel(t, logo, name, count, chTitle)
 		logo = logo:gsub('^//', 'https://')
 		logo = logo:gsub('/vi_webp/', '/vi/')
 		logo = logo:gsub('movieposter%.webp', 'default.jpg')
 		logo = logo:gsub('hqdefault', 'default')
-		tab[i].InfoPanelLogo = logo
-		tab[i].InfoPanelShowTime = 10000
-		tab[i].InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
-		tab[i].InfoPanelDesc = desc_html(nil, logo, name, adr)
+		t.InfoPanelLogo = logo
+		t.InfoPanelShowTime = 10000
+		t.InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
+		t.InfoPanelDesc = desc_html(nil, logo, name, t.Address)
 		if count ~= '' then
 			count = ' (' .. count .. ' ' .. m_simpleTV.User.YT.Lng.video .. ')'
 		end
-		tab[i].InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
-	return tab[i]
+		t.InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
+	return t
 	end
 	local function DeCipherSign(adr)
 			local function table_swap(t, a)
@@ -3349,16 +3348,16 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					local count = w:match('"videoCount":%s*"(%d+)') or ''
-					name = j .. '. ' .. title_clean(name)
+					name = title_clean(name)
 					if count ~= '' then
-						tab[i].Name = name .. ' (' .. count .. ')'
+						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
 					else
-						tab[i].Name = name
+						tab[i].Name = j .. '. ' .. name
 					end
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab[i] = plstsCh_infoPanel(tab, logo, name, tab[i].Address, count, chTitle)
+						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
@@ -3371,16 +3370,16 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
-					name = j .. '. ' .. title_clean(name)
+					name = title_clean(name)
 					if count ~= '' then
-						tab[i].Name = name .. ' (' .. count .. ')'
+						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
 					else
-						tab[i].Name = name
+						tab[i].Name = j .. '. ' .. name
 					end
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab[i] = plstsCh_infoPanel(tab, logo, name, tab[i].Address, count, chTitle)
+						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
@@ -3394,16 +3393,16 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
-					name = j .. '. ' .. title_clean(name)
+					name = title_clean(name)
 					if count ~= '' then
-						tab[i].Name = name .. ' (' .. count .. ')'
+						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
 					else
-						tab[i].Name = name
+						tab[i].Name = j .. '. ' .. name
 					end
 					tab[i].Address = string.format('https://www.youtube.com%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab[i] = plstsCh_infoPanel(tab, logo, name, tab[i].Address, count, chTitle)
+						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
