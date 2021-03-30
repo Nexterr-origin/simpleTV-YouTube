@@ -1787,6 +1787,22 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return stream_tab_err, title_err
 	end
+	local function plstsCh_infoPanel(tab, logo, name, adr, count, chTitle)
+		local i = #tab
+		logo = logo:gsub('^//', 'https://')
+		logo = logo:gsub('/vi_webp/', '/vi/')
+		logo = logo:gsub('movieposter%.webp', 'default.jpg')
+		logo = logo:gsub('hqdefault', 'default')
+		tab[i].InfoPanelLogo = logo
+		tab[i].InfoPanelShowTime = 10000
+		tab[i].InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
+		tab[i].InfoPanelDesc = desc_html(nil, logo, name, adr)
+		if count ~= '' then
+			count = ' (' .. count .. ' ' .. m_simpleTV.User.YT.Lng.video .. ')'
+		end
+		tab[i].InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
+	return tab[i]
+	end
 	local function DeCipherSign(adr)
 			local function table_swap(t, a)
 					if a >= #t then return end
@@ -3200,7 +3216,6 @@ https://github.com/grafi-tt/lunaJson
 				isPlstCh = true
 			end
 			if not url:match('sort=') then
-				url = url:gsub('^(.-/playlists).-$', '%1')
 				if isPlstCh then
 					url = url:gsub('&is%a+=%a+', '') .. '?view=1&sort=lad&shelf_id=0&isRestart=true'
 				end
@@ -3335,26 +3350,15 @@ https://github.com/grafi-tt/lunaJson
 					tab[i].Id = i
 					local count = w:match('"videoCount":%s*"(%d+)') or ''
 					name = title_clean(name)
+					name = j .. '. ' .. name
 					if count ~= '' then
-						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
-					else
-						tab[i].Name = j .. '. ' .. name
+						name = name .. ' (' .. count .. ')'
 					end
+					tab[i].Name = name
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						logo = logo:gsub('^//', 'https://')
-						logo = logo:gsub('/vi_webp/', '/vi/')
-						logo = logo:gsub('movieposter%.webp', 'default.jpg')
-						logo = logo:gsub('hqdefault', 'default')
-						tab[i].InfoPanelLogo = logo
-						tab[i].InfoPanelShowTime = 10000
-						tab[i].InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
-						tab[i].InfoPanelDesc = desc_html(nil, logo, name, tab[i].Address)
-						if count ~= '' then
-							count = ' (' .. count .. ' ' .. m_simpleTV.User.YT.Lng.video .. ')'
-						end
-						tab[i].InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
+						tab[i] = plstsCh_infoPanel(tab, logo, name, tab[i].Address, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
@@ -3368,26 +3372,15 @@ https://github.com/grafi-tt/lunaJson
 					tab[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
 					name = title_clean(name)
+					name = j .. '. ' .. name
 					if count ~= '' then
-						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
-					else
-						tab[i].Name = j .. '. ' .. name
+						name = name .. ' (' .. count .. ')'
 					end
+					tab[i].Name = name
 					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						logo = logo:gsub('^//', 'https://')
-						logo = logo:gsub('/vi_webp/', '/vi/')
-						logo = logo:gsub('movieposter%.webp', 'default.jpg')
-						logo = logo:gsub('hqdefault', 'default')
-						tab[i].InfoPanelLogo = logo
-						tab[i].InfoPanelShowTime = 10000
-						tab[i].InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
-						tab[i].InfoPanelDesc = desc_html(nil, logo, name, tab[i].Address)
-						if count ~= '' then
-							count = ' (' .. count .. ' ' .. m_simpleTV.User.YT.Lng.video .. ')'
-						end
-						tab[i].InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
+						tab[i] = plstsCh_infoPanel(tab, logo, name, tab[i].Address, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
@@ -3402,26 +3395,15 @@ https://github.com/grafi-tt/lunaJson
 					tab[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
 					name = title_clean(name)
+					name = j .. '. ' .. name
 					if count ~= '' then
-						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
-					else
-						tab[i].Name = j .. '. ' .. name
+						name = name .. ' (' .. count .. ')'
 					end
+					tab[i].Name = name
 					tab[i].Address = string.format('https://www.youtube.com%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						logo = logo:gsub('^//', 'https://')
-						logo = logo:gsub('/vi_webp/', '/vi/')
-						logo = logo:gsub('movieposter%.webp', 'default.jpg')
-						logo = logo:gsub('hqdefault', 'default')
-						tab[i].InfoPanelLogo = logo
-						tab[i].InfoPanelShowTime = 10000
-						tab[i].InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
-						tab[i].InfoPanelDesc = desc_html(nil, logo, name, tab[i].Address)
-						if count ~= '' then
-							count = ' (' .. count .. ' ' .. m_simpleTV.User.YT.Lng.video .. ')'
-						end
-						tab[i].InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
+						tab[i] = plstsCh_infoPanel(tab, logo, name, tab[i].Address, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
