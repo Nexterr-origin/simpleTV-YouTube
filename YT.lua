@@ -398,7 +398,7 @@ local infoInFile = false
 				local f = string.format('%scookies.txt', m_simpleTV.Common.GetMainPath(1))
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID'}
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'CONSENT', 'PREF'}
 				local cookie_SAPISID
 				local t = {}
 					for line in fhandle:lines() do
@@ -414,14 +414,15 @@ local infoInFile = false
 								end
 							end
 						end
-						if #t == 5 then break end
+						if #t == 7 then break end
 					end
 				fhandle:close()
-					if #t < 5 then return end
+					if #t < 7 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
-			 return table.concat(t, ';')
+			 return table.concat(t, ';') .. ';'
 			end
-		m_simpleTV.User.YT.cookies = string.format('%s;PREF=hl=%s;CONSENT=YES+cb.20210328-17-p0.en+FX+%s;', (cookiesFromFile() or ''), m_simpleTV.User.YT.Lng.hl, math.random(100, 999))
+		m_simpleTV.User.YT.cookies = cookiesFromFile()
+						or string.format('CONSENT=YES+cb.20210328-17-p0.en+FX+%s;PREF=f6=40000000&hl=%s&gl=;', math.random(100, 999), m_simpleTV.User.YT.Lng.hl)
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
 		m_simpleTV.User.YT.PlstsCh = {}
@@ -2048,7 +2049,8 @@ https://github.com/grafi-tt/lunaJson
 				.. '&video_id=' .. m_simpleTV.User.YT.vId
 				.. '&hl=' .. m_simpleTV.User.YT.Lng.hl
 				.. '&sts=' .. (m_simpleTV.User.YT.sts or '')
-			m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies:gsub(';$', '&gl=US;'), '')
+			local cookies = m_simpleTV.User.YT.cookies:gsub('&gl=[%a%-_]+', '&gl=US'):gsub('&gl=;', '&gl=US;')
+			m_simpleTV.Http.SetCookies(session, url, cookies, '')
 			rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			answer = answer or ''
 		end
