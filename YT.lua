@@ -419,7 +419,7 @@ local infoInFile = false
 				fhandle:close()
 					if #t < 7 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
-			 return table.concat(t, ';') .. ';'
+			 return string.format('%s;', table.concat(t, ';'))
 			end
 		m_simpleTV.User.YT.cookies = cookiesFromFile()
 						or string.format('CONSENT=YES+cb.20210328-17-p0.en+FX+%s;PREF=f6=40000000&hl=%s&gl=;', math.random(100, 999), m_simpleTV.User.YT.Lng.hl)
