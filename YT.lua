@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (2/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -917,7 +917,6 @@ https://github.com/grafi-tt/lunaJson
 					if not session then return end
 				m_simpleTV.Http.SetTimeout(session, 14000)
 				local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2VfemRzLmVuX1VTLi1KcDN1bDRMbzBZLk8vYW09SW9BQVFnQUUvcnQ9ai9kPTEvZGc9MC9jdD16Z21zL3JzPUFOalJoVmtmazRsbnFhWXlZX05MTzV4QmhpTGdXYkYzMGcvbT1iYXNl')
-				m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 				local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 				m_simpleTV.Http.Close(session)
 					if rc ~= 200 then return end
@@ -1593,7 +1592,6 @@ https://github.com/grafi-tt/lunaJson
 			if not sessionGetSignScr then return end
 		m_simpleTV.Http.SetTimeout(sessionGetSignScr, 14000)
 		local url = string.format('https://www.youtube.com/embed/%s', m_simpleTV.User.YT.vId)
-		m_simpleTV.Http.SetCookies(sessionGetSignScr, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(sessionGetSignScr, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
