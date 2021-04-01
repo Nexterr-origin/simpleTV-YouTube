@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (31/3/21)
+-- видеоскрипт для сайта https://www.youtube.com (1/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -421,7 +421,7 @@ local infoInFile = false
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return table.concat(t, ';')
 			end
-		m_simpleTV.User.YT.cookies = string.format('%s;PREF=hl=%s;', (cookiesFromFile() or ''), m_simpleTV.User.YT.Lng.hl)
+		m_simpleTV.User.YT.cookies = string.format('%s;PREF=hl=%s;CONSENT=YES+cb.20210328-17-p0.en+FX+%s;', (cookiesFromFile() or ''), m_simpleTV.User.YT.Lng.hl, math.random(100, 999))
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
 		m_simpleTV.User.YT.PlstsCh = {}
