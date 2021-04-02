@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (2/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (3/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -422,7 +422,7 @@ local infoInFile = false
 			 return string.format('%s;', table.concat(t, ';'))
 			end
 		local cookies = cookiesFromFile() or string.format('CONSENT=YES+cb.20210328-17-p0.en+FX+%s;PREF=f6=40000000&hl=%s&gl=;', math.random(100, 999), m_simpleTV.User.YT.Lng.hl)
-		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%-_]+)') or m_simpleTV.User.YT.Lng.hl
+		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%d%-_]+)') or m_simpleTV.User.YT.Lng.hl
 		m_simpleTV.User.YT.cookies = cookies
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
@@ -1624,7 +1624,7 @@ https://github.com/grafi-tt/lunaJson
 		if subtList == 'none'
 			or subtList == ''
 		then
-			subt[1] = m_simpleTV.User.YT.Lng.hl_sub
+			subt[1] = m_simpleTV.User.YT.Lng.hl
 		else
 			subtList = subtList:gsub('%s', ',')
 			subtList = subtList:gsub('[^%d%a,%-_]', '')
@@ -1632,7 +1632,7 @@ https://github.com/grafi-tt/lunaJson
 			subtList = subtList:gsub(',+', ',')
 			subt = split_str(subtList, ',')
 			if #subt == 0 then
-				subt[1] = m_simpleTV.User.YT.Lng.hl_sub
+				subt[1] = m_simpleTV.User.YT.Lng.hl
 			end
 		end
 		local r = 1
@@ -1681,7 +1681,25 @@ https://github.com/grafi-tt/lunaJson
 				end
 				r = r + 1
 			end
-			if not lngCodeTr then return end
+		if not lngCodeTr then
+			lngCodeTr = m_simpleTV.User.YT.Lng.hl_sub
+			while true do
+					if not subt[r] or lngCodeTr then break end
+				q = 1
+				while true do
+						if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q] then break end
+					languageCode = tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q].languageCode
+						if languageCode
+							and languageCode == subt[r]
+						then
+							lngCodeTr = languageCode
+						 break
+						end
+					q = q + 1
+				end
+				r = r + 1
+			end
+		end
 		r = 1
 			while true do
 					if not tab.captions.playerCaptionsTracklistRenderer.captionTracks[r] then break end
@@ -2050,7 +2068,7 @@ https://github.com/grafi-tt/lunaJson
 				.. '&video_id=' .. m_simpleTV.User.YT.vId
 				.. '&hl=' .. m_simpleTV.User.YT.Lng.hl
 				.. '&sts=' .. (m_simpleTV.User.YT.sts or '')
-			local cookies = m_simpleTV.User.YT.cookies:gsub('&gl=[%a%-_]+', '&gl=US'):gsub('&gl=;', '&gl=US;')
+			local cookies = m_simpleTV.User.YT.cookies:gsub('&gl=[%a%d%-_]+', '&gl=US'):gsub('&gl=;', '&gl=US;')
 			m_simpleTV.Http.SetCookies(session, url, cookies, '')
 			rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			answer = answer or ''
