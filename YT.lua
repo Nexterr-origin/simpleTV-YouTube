@@ -421,8 +421,9 @@ local infoInFile = false
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return string.format('%s;', table.concat(t, ';'))
 			end
-		m_simpleTV.User.YT.cookies = cookiesFromFile()
-						or string.format('CONSENT=YES+cb.20210328-17-p0.en+FX+%s;PREF=f6=40000000&hl=%s&gl=;', math.random(100, 999), m_simpleTV.User.YT.Lng.hl)
+		local cookies = cookiesFromFile() or string.format('CONSENT=YES+cb.20210328-17-p0.en+FX+%s;PREF=f6=40000000&hl=%s&gl=;', math.random(100, 999), m_simpleTV.User.YT.Lng.hl)
+		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%-_]+)') or m_simpleTV.User.YT.Lng.hl
+		m_simpleTV.User.YT.cookies = cookies
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
 		m_simpleTV.User.YT.PlstsCh = {}
@@ -442,7 +443,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:87.0) Gecko/20100101 Firefox/87.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:86.0) Gecko/20100101 Firefox/86.0'
 	local session = m_simpleTV.Http.New(userAgent)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 14000)
