@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (3/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (4/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -47,12 +47,18 @@ local infoInFile = false
 		m_simpleTV.User.YT = {}
 	end
 	if not m_simpleTV.User.YT.VersionCheck then
-		if m_simpleTV.Common.GetVersion() < 880
+		local ver = m_simpleTV.Common.GetVersion()
+		if ver < 880
 			or m_simpleTV.Common.GetVlcVersion() < 3000
 		then
-			local msg = 'simpleTV version too old, need 0.5.0 b12.7.6 (vlc 3.0.11) or newer'
-			m_simpleTV.Interface.MessageBox(msg, 'YouTube', 0x10)
-			m_simpleTV.Control.ExecuteAction(147)
+			local msg = 'simpleTV version too old, need 0.5.0 b12.7.6 (vlc 3.0.11)'
+			local cpt = 'YouTube'
+			if ver < 870 then
+				m_simpleTV.Interface.MessageBox(msg, cpt, 0x10)
+			else
+				m_simpleTV.Interface.MessageBoxT({message = msg, caption = cpt})
+				m_simpleTV.Control.ExecuteAction(147)
+			end
 		 return
 		end
 		m_simpleTV.User.YT.VersionCheck = true
