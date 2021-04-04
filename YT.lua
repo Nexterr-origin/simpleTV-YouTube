@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (5/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1813,6 +1813,30 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return stream_tab_err, title_err
 	end
+	local function ItagTab()
+		local video = {
+							394, 160, 278, -- 144
+							395, 133, 242, -- 240
+							18, 134, 243, -- 360
+							135, 244, -- 480
+							136, 247, 22, -- 720
+							298, -- 720 (60 fps)
+							302, 334, -- 720 (60 fps, HDR)
+							137, 248, -- 1080
+							299, 335, -- 1080 (60 fps, HDR)
+							271, 308, 336, -- 1440 (60 fps, HDR)
+							313, 315, 337, -- 2160 (60 fps, HDR)
+							272 -- 4320 (60 fps)
+						}
+		local audio = {
+							258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
+							327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
+							141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
+							140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
+							251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
+						}
+	 return video, audio
+	end
 	local function plstsCh_infoPanel(t, logo, name, count, chTitle)
 		logo = logo:gsub('^//', 'https://')
 		logo = logo:gsub('/vi_webp/', '/vi/')
@@ -2339,26 +2363,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 			end
 		local aAdr, aItag, aAdr_isCipher, aItag_opus, aAdr_opus
-		local video_itags = {
-							394, 160, 278, -- 144
-							395, 133, 242, -- 240
-							18, 134, 243, -- 360
-							135, 244, -- 480
-							136, 247, 22, -- 720
-							298, -- 720 (60 fps)
-							302, 334, -- 720 (60 fps, HDR)
-							137, 248, -- 1080
-							299, 335, -- 1080 (60 fps, HDR)
-							271, 308, 336, -- 1440 (60 fps, HDR)
-							313, 315, 337, -- 2160 (60 fps, HDR)
-							272 -- 4320 (60 fps)
-							}
-		local audio_itags = {
-							258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
-							141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
-							140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
-							251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
-							}
+		local video_itags, audio_itags = ItagTab()
 		if (m_simpleTV.User.YT.isVideo == true and m_simpleTV.Control.ChannelID ~= 268435455)
 			or m_simpleTV.User.YT.isVideo == false
 		then
@@ -2440,6 +2445,8 @@ https://github.com/grafi-tt/lunaJson
 			local audioItag = tonumber(aAdr:match('itag=(%d+)') or 0)
 			if audioItag == 258 then
 				aAdr_opus = aAdr
+			elseif audioItag == 327 then
+				aAdr_opus = aAdr .. '$OPT:demux=avcodec,any'
 			end
 		end
 		local aAdrName, audioId, itag_a
