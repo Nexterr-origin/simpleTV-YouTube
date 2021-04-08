@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (5/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (8/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -134,7 +134,6 @@ local infoInFile = false
 		inAdr = inAdr:gsub('/videoseries', '/playlist')
 		inAdr = inAdr:gsub('list_id=', 'list=')
 		inAdr = inAdr:gsub('/feed%?', '?')
-		inAdr = inAdr:gsub('//gaming%.', '//www.')
 		inAdr = inAdr:gsub('/featured%?*', '')
 		inAdr = inAdr:gsub('&nohtml5=%w+', '')
 		inAdr = inAdr:gsub('&feature=[^&]*', '')
@@ -150,10 +149,14 @@ local infoInFile = false
 		inAdr = inAdr:gsub('[&?/]+$', '')
 		inAdr = inAdr:gsub('%s+', '')
 		inAdr = inAdr:gsub('/([?=&])', '%1')
-		if not inAdr:match('^https://[%a.]*youtu[.combe]') and not inAdr:match('^https://y[2out]*u%.be/') then
+		if not (inAdr:match('^https://[%a.]*youtu[.combe]')
+			or inAdr:match('^https://y[2out]*u%.be/'))
+			or inAdr:match('//gaming%.')
+			or inAdr:match('//music%.')
+			or inAdr:match('//youtube%.')
+		then
 			inAdr = inAdr:gsub('^https://[^/]+(/.+)', 'https://www.youtube.com%1')
 		end
-		inAdr = inAdr:gsub('//youtube%.', '//www.youtube.')
 		local id = inAdr:match('/playlist%?list=RD([^&]*)')
 		if id and #id == 11 then
 			inAdr = inAdr:gsub('/playlist%?list=RD[^&]*', '/watch?v='.. id .. '&list=RD' .. id)
