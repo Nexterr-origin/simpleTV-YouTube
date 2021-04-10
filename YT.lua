@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (8/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (10/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1845,6 +1845,7 @@ https://github.com/grafi-tt/lunaJson
 		logo = logo:gsub('/vi_webp/', '/vi/')
 		logo = logo:gsub('movieposter%.webp', 'default.jpg')
 		logo = logo:gsub('hqdefault', 'default')
+		logo = logo:gsub('\\u0026', '&')
 		t.InfoPanelLogo = logo
 		t.InfoPanelShowTime = 10000
 		t.InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
@@ -3406,6 +3407,28 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
+					name = title_clean(name)
+					if count ~= '' then
+						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
+					else
+						tab[i].Name = j .. '. ' .. name
+					end
+					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
+					if isInfoPanel == true then
+						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
+						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
+					end
+					j = j + 1
+					i = i + 1
+				end
+			end
+			for w in answer:gmatch('"gridShowRenderer":%s*{%s*"title":.-%s*}%s*%]%s*}%s*}%s*}%s*%]%s*}%s*}') do
+				local name = w:match('"title":%s*{%s*"simpleText":%s*"([^"]+)')
+				local adr = w:match('"webCommandMetadata":%s*{%s*"url":%s*"/playlist%?list=([^"]+)')
+				if name and adr then
+					tab[i] = {}
+					tab[i].Id = i
+					local count = w:match('text":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)') or ''
 					name = title_clean(name)
 					if count ~= '' then
 						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
