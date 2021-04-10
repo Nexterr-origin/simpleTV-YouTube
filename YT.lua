@@ -3444,13 +3444,18 @@ https://github.com/grafi-tt/lunaJson
 					i = i + 1
 				end
 			end
-		local hash, tab = {}, {}
-			for i = 1, #tab0 do
-				if not hash[tab0[i].Address] then
-					tab[#tab + 1] = tab0[i]
-					hash[tab0[i].Address] = true
+		local tab = {}
+		if not (isPlstCh or youtubei) then
+			local hash = {}
+				for i = 1, #tab0 do
+					if not hash[tab0[i].Address] then
+						tab[#tab + 1] = tab0[i]
+						hash[tab0[i].Address] = true
+					end
 				end
-			end
+		else
+			tab = tab0
+		end
 		if #tab == 0 then
 			for w in answer:gmatch('"shelfRenderer".-"accessibilityData"') do
 				local name = w:match('"title":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
