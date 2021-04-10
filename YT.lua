@@ -3334,7 +3334,7 @@ https://github.com/grafi-tt/lunaJson
 			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8			&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20201021.03.00","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'",}},"continuation":"' .. continuation .. '"}')
 			buttonNext = true
 		end
-		local tab, i = {}, 1
+		local tab0, i = {}, 1
 		local j = 1 + tonumber(num)
 		if chId and isPlstCh then
 			if not m_simpleTV.User.YT.apiKey then
@@ -3369,7 +3369,7 @@ https://github.com/grafi-tt/lunaJson
 					end
 				local plstTotalResults = PlstTotalResults()
 				if plstTotalResults then
-					tab = plstTotalResults
+					tab0 = plstTotalResults
 					i = 2
 					m_simpleTV.User.YT.upLoadOnCh = true
 				end
@@ -3382,19 +3382,19 @@ https://github.com/grafi-tt/lunaJson
 				local name = w:match('"title":%s*{%s*"simpleText":%s*"([^"]+)')
 				local adr = w:match('"playlistId":%s*"([^"]+)')
 				if name and adr then
-					tab[i] = {}
-					tab[i].Id = i
+					tab0[i] = {}
+					tab0[i].Id = i
 					local count = w:match('"videoCount":%s*"(%d+)') or ''
 					name = title_clean(name)
 					if count ~= '' then
-						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
+						tab0[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
 					else
-						tab[i].Name = j .. '. ' .. name
+						tab0[i].Name = j .. '. ' .. name
 					end
-					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
+					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
+						tab0[i] = plstsCh_infoPanel(tab0[i], logo, name, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
@@ -3404,19 +3404,19 @@ https://github.com/grafi-tt/lunaJson
 				local name = w:match('"title":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
 				local adr = w:match('"playlistId":%s*"([^"]+)')
 				if name and adr then
-					tab[i] = {}
-					tab[i].Id = i
+					tab0[i] = {}
+					tab0[i].Id = i
 					local count = w:match('"videoCountShortText":%s*{%s*"simpleText":%s*"([^"]+)') or ''
 					name = title_clean(name)
 					if count ~= '' then
-						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
+						tab0[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
 					else
-						tab[i].Name = j .. '. ' .. name
+						tab0[i].Name = j .. '. ' .. name
 					end
-					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
+					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
+						tab0[i] = plstsCh_infoPanel(tab0[i], logo, name, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
@@ -3426,22 +3426,29 @@ https://github.com/grafi-tt/lunaJson
 				local name = w:match('"title":%s*{%s*"simpleText":%s*"([^"]+)')
 				local adr = w:match('"webCommandMetadata":%s*{%s*"url":%s*"/playlist%?list=([^"]+)')
 				if name and adr then
-					tab[i] = {}
-					tab[i].Id = i
+					tab0[i] = {}
+					tab0[i].Id = i
 					local count = w:match('text":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)') or ''
 					name = title_clean(name)
 					if count ~= '' then
-						tab[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
+						tab0[i].Name = j .. '. ' .. name .. ' (' .. count .. ')'
 					else
-						tab[i].Name = j .. '. ' .. name
+						tab0[i].Name = j .. '. ' .. name
 					end
-					tab[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
+					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
+						tab0[i] = plstsCh_infoPanel(tab0[i], logo, name, count, chTitle)
 					end
 					j = j + 1
 					i = i + 1
+				end
+			end
+		local hash, tab = {}, {}
+			for i = 1, #tab0 do
+				if not hash[tab0[i].Address] then
+					tab[#tab + 1] = tab0[i]
+					hash[tab0[i].Address] = true
 				end
 			end
 		if #tab == 0 then
