@@ -3445,7 +3445,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 			end
 		local tab = {}
-		if not (isPlstCh or youtubei) then
+		if not (isPlstCh or youtubei or inAdr:match('shelf_id')) then
 			local hash = {}
 				for i = 1, #tab0 do
 					if not hash[tab0[i].Address] then
