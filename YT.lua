@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (10/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (11/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -16,6 +16,10 @@
 -- поиск из окна "Открыть URL" (Ctrl+N), префиксы: - (видео), -- (плейлисты), --- (каналы), -+ (прямые трансляции)
 -- авторизаця: файл формата "Netscape HTTP Cookie File" - cookies.txt поместить в папку 'work'
 -- показать на OSD плейлист / выбор качества: Ctrl+M
+-- Прокси ---------------------------------------------------------
+local proxy = ''
+-- '' - нет
+-- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
 local infoInFile = false
 --------------------------------------------------------------------
@@ -453,7 +457,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
 	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:86.0) Gecko/20100101 Firefox/86.0'
-	local session = m_simpleTV.Http.New(userAgent)
+	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 14000)
 	m_simpleTV.User.YT.DelayedAddress = nil
@@ -923,7 +927,7 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function GetApiKey()
 			local function webApiKey()
-				local session = m_simpleTV.Http.New(userAgent)
+				local session = m_simpleTV.Http.New(userAgent, proxy, false)
 					if not session then return end
 				m_simpleTV.Http.SetTimeout(session, 14000)
 				local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2VfemRzLmVuX1VTLi1KcDN1bDRMbzBZLk8vYW09SW9BQVFnQUUvcnQ9ai9kPTEvZGc9MC9jdD16Z21zL3JzPUFOalJoVmtmazRsbnFhWXlZX05MTzV4QmhpTGdXYkYzMGcvbT1iYXNl')
@@ -1443,7 +1447,7 @@ https://github.com/grafi-tt/lunaJson
 	 return ''
 	end
 	local function GetUrlWatchVideos(url)
-		local session = m_simpleTV.Http.New(userAgent, nil, true)
+		local session = m_simpleTV.Http.New(userAgent, proxy, true)
 			if not session then return end
 		m_simpleTV.Http.SetTimeout(session, 14000)
 		m_simpleTV.Http.SetRedirectAllow(session, false)
@@ -1568,7 +1572,7 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function MarkWatch_YT()
 		if m_simpleTV.User.YT.videostats and not inAdr:match('&isPlst=history') then
-			local sessionMarkWatch = m_simpleTV.Http.New(userAgent)
+			local sessionMarkWatch = m_simpleTV.Http.New(userAgent, proxy, false)
 				if not sessionMarkWatch then return end
 			m_simpleTV.Http.SetTimeout(sessionMarkWatch, 14000)
 			local cpn_alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
@@ -1598,7 +1602,7 @@ https://github.com/grafi-tt/lunaJson
 	 return url
 	end
 	local function GetSignScr()
-		local sessionGetSignScr = m_simpleTV.Http.New(userAgent)
+		local sessionGetSignScr = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not sessionGetSignScr then return end
 		m_simpleTV.Http.SetTimeout(sessionGetSignScr, 14000)
 		local url = string.format('https://www.youtube.com/embed/%s', m_simpleTV.User.YT.vId)
@@ -1905,7 +1909,7 @@ https://github.com/grafi-tt/lunaJson
 	 return adr
 	end
 	local function StreamLive(hls, isLive, title)
-		local session = m_simpleTV.Http.New(userAgent)
+		local session = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session then return end
 		m_simpleTV.Http.SetTimeout(session, 14000)
 		local extOpt = '$OPT:adaptive-use-access'
@@ -1986,7 +1990,7 @@ https://github.com/grafi-tt/lunaJson
 			then
 			 return url
 			end
-		local session = m_simpleTV.Http.New(userAgent, nil, true)
+		local session = m_simpleTV.Http.New(userAgent, proxy, true)
 			if not session then
 			 return url
 			end
@@ -2013,7 +2017,7 @@ https://github.com/grafi-tt/lunaJson
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
 			.. (adrStart or '')
-			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
+			.. '$OPT:http-proxy='.. proxy .. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
@@ -2056,7 +2060,7 @@ https://github.com/grafi-tt/lunaJson
 		else
 			adrStart = nil
 		end
-		local session = m_simpleTV.Http.New(userAgent)
+		local session = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session then
 			 return nil, 'GetStreamsTab session error 1'
 			end
@@ -2089,7 +2093,7 @@ https://github.com/grafi-tt/lunaJson
 		if not answer:match('status%%22%%3A%%22OK') then
 			if m_simpleTV.User.YT.isAuth then
 				m_simpleTV.Http.Close(session)
-				session = m_simpleTV.Http.New(userAgent)
+				session = m_simpleTV.Http.New(userAgent, proxy, false)
 					if not session then
 					 return nil, 'GetStreamsTab session error 2'
 					end
@@ -2455,7 +2459,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		local aAdrName, audioId, itag_a
 		if aAdr_opus or aAdr then
-			aAdr = (aAdr_opus or aAdr) .. (adrStart or '') .. '$OPT:NO-STIMESHIFT'
+			aAdr = (aAdr_opus or aAdr) .. (adrStart or '') .. '$OPT:NO-STIMESHIFT$OPT:http-proxy=' .. proxy
 			aAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
 			if infoInFile then
