@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (11/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (12/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -462,7 +462,7 @@ local infoInFile = false
 	m_simpleTV.Http.SetTimeout(session, 14000)
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.isChapters = false
-	local inf0, inf01
+	local inf0, inf0_qlty, inf0_geo
 	local isInfoPanel = infoPanelCheck()
 	local videoId = inAdr:match('[?&/]v[=/](.+)')
 				or inAdr:match('/embed/(.+)')
@@ -1297,7 +1297,7 @@ https://github.com/grafi-tt/lunaJson
 		ShowMsg(mes)
 		m_simpleTV.Control.SetTitle(m_simpleTV.User.YT.Lng.error .. ' [' .. n .. ']')
 	end
-	local function debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
+	local function debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
 			if not infoInFile then return end
 		local scr_time = string.format('%.3f', (os.clock() - infoInFile))
 		local calc = scr_time - inf0
@@ -1328,10 +1328,13 @@ https://github.com/grafi-tt/lunaJson
 						.. m_simpleTV.User.YT.desc .. '\n'
 						.. string_rep
 						.. 'qlty table:\n\n'
-						.. (inf01 or '') .. '\n'
+						.. (inf0_qlty or '') .. '\n'
 						.. string_rep
 						.. 'cookies:\n\n'
 						.. m_simpleTV.User.YT.cookies:gsub('^[;]*(.-)[;]$', '%1'):gsub(';+', '\n') .. '\n'
+						.. string_rep
+						.. 'available countries:\n\n'
+						.. (inf0_geo or '') .. '\n'
 						.. string_rep
 						.. 'address:\n\n'
 						.. adr:gsub('%$', '\n\n$'):gsub('slave=', 'slave=\n\n'):gsub('%#', '\n\n#\n\n') .. '\n'
@@ -2229,6 +2232,15 @@ https://github.com/grafi-tt/lunaJson
 			then
 				m_simpleTV.User.YT.title = tab.microformat.playerMicroformatRenderer.title.simpleText
 			end
+			if infoInFile then
+				if tab.microformat.playerMicroformatRenderer.availableCountries then
+					inf0_geo = {}
+					for i = 1, #tab.microformat.playerMicroformatRenderer.availableCountries do
+						inf0_geo[i] = tab.microformat.playerMicroformatRenderer.availableCountries[i]
+					end
+					inf0_geo = table.concat(inf0_geo, ' ')
+				end
+			end
 		end
 		if tab.videoDetails then
 			if m_simpleTV.User.YT.desc == ''
@@ -2472,20 +2484,22 @@ https://github.com/grafi-tt/lunaJson
 		end
 		t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, isCipher = aAdr_isCipher, aItag = itag_a}
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
-		inf01 = {}
+		if infoInFile then
+			inf0_qlty = {}
+		end
 			for i = 1, #t do
 				t[i].Id = i
 				if infoInFile then
 					if i == 1 then
-						inf01[1] = '[1] audio itag = ' .. tostring(t[1].aItag )
+						inf0_qlty[1] = '[1] audio itag = ' .. tostring(t[1].aItag)
 					else
-						inf01[i] = '[' .. i .. '] qlty: ' .. tostring(t[i].qlty)
+						inf0_qlty[i] = '[' .. i .. '] qlty: ' .. tostring(t[i].qlty)
 								.. ' | video itag: ' .. tostring(t[i].itag) .. ' | audio itag: ' .. tostring(t[i].aItag)
 					end
 				end
 			end
 			if infoInFile then
-				inf01 = table.concat(inf01, '\n')
+				inf0_qlty = table.concat(inf0_qlty, '\n')
 			end
 		if m_simpleTV.User.YT.qlty < 100 then
 			if audioId == 99 and not isInfoPanel then
@@ -2981,7 +2995,7 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Control.SetTitle(header .. ' (' .. title .. ')')
 			end
 		end
-		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
+		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
 	end
 	local function Plst(inAdr)
 		m_simpleTV.Control.ExecuteAction(37)
@@ -3215,7 +3229,7 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
 			end
 		end
-		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
+		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
 	end
 	local function PlstsCh(inAdr)
 			if (m_simpleTV.Control.Reason == 'Stopped' or m_simpleTV.Control.Reason == 'EndReached')
@@ -3731,7 +3745,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		m_simpleTV.Http.Close(session)
 		m_simpleTV.Control.CurrentAddress = retAdr
-		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf01, inf0, title)
+		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
 	end
 	function AsynPlsCallb_Plst_YT(session, rc, answer, userstring, params)
 		local ret = {}
