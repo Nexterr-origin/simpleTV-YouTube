@@ -15,7 +15,7 @@
 
 ---
 
-### ★ YouTube Script <sup>_`for simpleTV ver. b12.7.6 (vlc 3.0.11)`_<sup>
+### ★ YouTube Script
 
 ---
 
