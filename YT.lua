@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (27/4/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2020,7 +2020,7 @@ https://github.com/grafi-tt/lunaJson
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
 			.. (adrStart or '')
-			.. '$OPT:http-proxy='.. proxy .. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
+			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
@@ -2038,6 +2038,9 @@ https://github.com/grafi-tt/lunaJson
 			v.Address = adr .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
 		else
 			v.Address = adr .. (captions or '')
+		end
+		if proxy ~= '' then
+			v.Address = v.Address .. '$OPT:http-proxy=' .. proxy
 		end
 	 return v
 	end
