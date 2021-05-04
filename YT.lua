@@ -2635,7 +2635,7 @@ https://github.com/grafi-tt/lunaJson
 		local i = #tab + 1
 		local ret = false
 		local render
-		if typePlst == 'panel_videos' then
+		if typePlst == 'panelVideos' then
 			if str:match('"twoColumnBrowseResultsRenderer"') then
 				render = 'playlistVideo'
 			else
@@ -2719,7 +2719,7 @@ https://github.com/grafi-tt/lunaJson
 						tab[i].InfoPanelLogo = string.format('https://i.ytimg.com/vi/%s/default.jpg', adr)
 						tab[i].InfoPanelName = name
 						tab[i].InfoPanelDesc = desc_html(desc, tab[i].InfoPanelLogo, name, tab[i].Address)
-						if typePlst ~= 'panel_videos' then
+						if typePlst ~= 'panelVideos' then
 							tab[i].InfoPanelTitle = string.format('%s%s%s | %s', panelDescName, count, channel, times)
 						else
 							tab[i].InfoPanelTitle = string.format('| %s', times)
@@ -2745,10 +2745,10 @@ https://github.com/grafi-tt/lunaJson
 			str = str:gsub('\\"', '%%22')
 		end
 		if typePlst == 'channels'
-			or typePlst == 'rss_channels'
+			or typePlst == 'rssChannels'
 		then
 			ret = plst_channels(str, tab, typePlst)
-		elseif typePlst == 'rss_videos'	then
+		elseif typePlst == 'rssVideos'	then
 			ret = plst_rss(str, tab, typePlst)
 		else
 			ret = plst_video(str, tab, typePlst)
@@ -3054,16 +3054,16 @@ https://github.com/grafi-tt/lunaJson
 		elseif url:match('/feed/channels') then
 			params.User.typePlst = 'channels'
 		elseif url:match('/feed/rss_channels') then
-			params.User.typePlst = 'rss_channels'
+			params.User.typePlst = 'rssChannels'
 		elseif url:match('/feeds/videos%.xml') then
-			params.User.typePlst = 'rss_videos'
+			params.User.typePlst = 'rssVideos'
 		elseif url:match('list=')
 			and not ((url:match('list=WL')
 					or url:match('list=LL')
 					or url:match('list=LM'))
 						and not url:match('index='))
 		then
-			params.User.typePlst = 'panel_videos'
+			params.User.typePlst = 'panelVideos'
 		elseif url:match('youtube%.com$') then
 			params.User.typePlst = 'main'
 		elseif url:match('/feed/subscriptions') then
@@ -3104,7 +3104,7 @@ https://github.com/grafi-tt/lunaJson
 			 return
 			end
 			if params.User.typePlst == 'channels'
-				or params.User.typePlst == 'rss_channels'
+				or params.User.typePlst == 'rssChannels'
 			then
 				local FilterType, SortOrder, AutoNumberFormat
 				if #tab > 1 then
@@ -3801,7 +3801,7 @@ https://github.com/grafi-tt/lunaJson
 			params.User.headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '') .. header_Auth()
 			params.User.First = false
 			local title
-			if params.User.typePlst == 'rss_videos'	then
+			if params.User.typePlst == 'rssVideos'	then
 				title = (answer:match('<title>([^<]+)') or '')
 			else
 				title = answer:match('MetadataRenderer":{"title":"([^"]+)')
@@ -3820,7 +3820,7 @@ https://github.com/grafi-tt/lunaJson
 				title = title .. ' 🎵'
 			end
 			if params.User.typePlst ~= 'true'
-				and params.User.typePlst ~= 'panel_videos'
+				and params.User.typePlst ~= 'panelVideos'
 			then
 				if params.User.typePlst:match('rss_') then
 					title = '[RSS Feed] ' .. title
