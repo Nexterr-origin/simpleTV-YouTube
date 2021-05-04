@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/4/21)
+-- видеоскрипт для сайта https://www.youtube.com (4/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1012,9 +1012,11 @@ https://github.com/grafi-tt/lunaJson
 	local function title_clean(s)
 		s = s:gsub('%c', ' ')
 		s = s:gsub('%%22', '"')
+		s = s:gsub('\\\\u', '\\u')
 		s = s:gsub('\\u0026', '&')
 		s = s:gsub('\\u2060', '')
 		s = s:gsub('\\u200%a', '')
+		s = s:gsub('\\u0027', '`')
 		s = unescape_html(s)
 		s = s:gsub('%s+', ' ')
 		s = s:gsub('\\', '\\')
@@ -2640,19 +2642,29 @@ https://github.com/grafi-tt/lunaJson
 				render = 'playlistPanelVideo'
 			end
 		else
-			if str:match('"gridVideoRenderer"') and str:match('"videoRenderer"') then
+			if (str:match('"gridVideoRenderer"') and str:match('"videoRenderer"'))
+				or typePlst == 'main'
+			then
 				render = '"video'
 			else
 				render = '[eod]'
 			end
 		end
-		if typePlst == 'main' then
-			render = '"video'
+		local embed, matchEnd
+		if str:match('"embeddedPlayerOverlayVideoDetailsRenderer"') then
+			embed = true
+			matchEnd = "trackingParams"
+		else
+			matchEnd = "thumbnailOverlayNowPlayingRenderer"
 		end
 		local times, count, publis, channel, name, adr, desc, panelDescName, selected
-			for g in str:gmatch(render .. 'Renderer".-"thumbnailOverlayNowPlayingRenderer"') do
+			for g in str:gmatch(render .. 'Renderer".-' .. matchEnd) do
 				if render == 'playlistPanelVideo' then
-					name = g:match('"title".-"simpleText":"([^"]+)')
+					if embed then
+						name = g:match('"title":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
+					else
+						name = g:match('"title".-"simpleText":"([^"]+)')
+					end
 				else
 					name = g:match('"title":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)') or g:match('"simpleText":%s*"([^"]+)')
 				end
@@ -2663,6 +2675,9 @@ https://github.com/grafi-tt/lunaJson
 					tab[i] = {}
 					tab[i].Id = i
 					tab[i].Address = string.format('https://www.youtube.com/watch?v=%s&isPlst=' .. typePlst, adr)
+					if embed then
+						times = ''
+					end
 					if isInfoPanel == false then
 						if not times then
 							times = m_simpleTV.User.YT.Lng.live
@@ -2723,7 +2738,12 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function AddInPl_Plst_YT(str, tab, typePlst)
 		local ret = false
-		str = str:gsub('\\"', '%%22')
+		if str:match('\\"text\\"') then
+			str = str:gsub('\\\\\\"', '%%22')
+			str = str:gsub('\\"', '"')
+		else
+			str = str:gsub('\\"', '%%22')
+		end
 		if typePlst == 'channels'
 			or typePlst == 'rss_channels'
 		then
@@ -3153,7 +3173,7 @@ https://github.com/grafi-tt/lunaJson
 		then
 			pl = 0
 		end
-		local ButtonScript1
+		local ButtonScript1, Random, PlayMode
 		if m_simpleTV.User.YT.isPlstsCh
 		then
 			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
@@ -3177,10 +3197,23 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.paramScriptForSkin_buttonOk then
 			tab.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
 		end
+		if inAdr:match('list=RD') and inAdr:match('isLogo=false') then
+			if #tab > 2 then
+				plstPos = math.random(3, #tab)
+			end
+			pl = 32
+			Random = 1
+			PlayMode = 1
+		else
+			Random = - 1
+			PlayMode = - 1
+		end
 		local retAdr
 		tab.ExtParams = {}
 		tab.ExtParams.FilterType = FilterType
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
+		tab.ExtParams.Random = Random
+		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
@@ -3229,7 +3262,9 @@ https://github.com/grafi-tt/lunaJson
 						or logo
 						or 'https://i.ytimg.com/vi/' .. vId .. '/hqdefault.jpg'
 				m_simpleTV.Control.ChangeChannelLogo(logo, m_simpleTV.Control.ChannelID, 'CHANGE_IF_NOT_EQUAL')
-				m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
+				if not inAdr:match('isLogo=false') then
+					m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
+				end
 			end
 		end
 		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
@@ -3757,7 +3792,12 @@ https://github.com/grafi-tt/lunaJson
 			 return ret
 			end
 		if params.User.First == true then
-			answer = answer:gsub('\\"', '%%22')
+			if answer:match('\\"text\\"') then
+				answer = answer:gsub('\\\\\\"', '%%22')
+				answer = answer:gsub('\\"', '"')
+			else
+				answer = answer:gsub('\\"', '%%22')
+			end
 			params.User.headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '') .. header_Auth()
 			params.User.First = false
 			local title
@@ -3772,6 +3812,7 @@ https://github.com/grafi-tt/lunaJson
 								or answer:match('HeaderRenderer":{"title":{"runs":%[{"text":"([^"]+)')
 								or answer:match('HeaderRenderer":{"title":"([^"]+)')
 								or answer:match('"topicChannelDetailsRenderer":{"title":{"simpleText":"([^"]+)')
+								or answer:match('"trackingParams":[^,]+,"titleText":{"runs":%[{"text":"([^"]+)')
 								or 'not found title'
 			end
 			title = title_clean(title)
@@ -4191,9 +4232,8 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('/feed/')
 		or inAdr:match('/hashtag/')
 		or inAdr:match('youtube%.com$')
-		or ((inAdr:match('list=RD')
-			or inAdr:match('list=TL'))
-			and not inAdr:match('/embed'))
+		or inAdr:match('list=TL')
+		or inAdr:match('list=RD')
 		or inAdr:match('list=WL')
 		or inAdr:match('list=OL')
 		or inAdr:match('list=LM')
