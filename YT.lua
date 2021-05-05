@@ -2962,8 +2962,9 @@ https://github.com/grafi-tt/lunaJson
 		end
 		m_simpleTV.User.YT.QltyIndex = index
 		retAdr = retAdr or StreamCheck(t, index)
+		local plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
 		m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
-		m_simpleTV.User.YT.AddToBaseVideoIdPlst = tab[1].Address:match('watch%?v=([^&]+)')
+		m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
 		if #tab == 1 then
 			retAdr = positionToContinue(retAdr)
 		else
