@@ -3796,7 +3796,7 @@ https://github.com/grafi-tt/lunaJson
 			if params.User.typePlst ~= 'true'
 				and params.User.typePlst ~= 'panelVideos'
 			then
-				if params.User.typePlst:match('rss_') then
+				if params.User.typePlst:match('^rss') then
 					title = '[RSS Feed] ' .. title
 				end
 				title = 'YouTube - ' .. title
