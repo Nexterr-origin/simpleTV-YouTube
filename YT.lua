@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (5/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2849,12 +2849,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 			if #tab == 0 and rc then
 				if rc == 404 and not inAdr:match('&isRestart=true') then
-					if plstId:match('^RD') then
-						inAdr = 'https://www.youtube.com/watch?v='
-							.. plstId:gsub('^RD', '') ..'&list=' .. plstId
-					else
-						inAdr = inAdr .. '&index=1'
-					end
+					inAdr = inAdr .. '&index=1'
 				elseif (rc == 404 or rc == 403) and inAdr:match('&isRestart=true') then
 					inAdr = inAdr:gsub('[?&]list=[%w_%-]+', '')
 				end
@@ -2892,7 +2887,7 @@ https://github.com/grafi-tt/lunaJson
 		if plstPos > 1 or inAdr:match('[?&]t=') or #tab == 1 then
 			pl = 32
 		end
-		local FilterType, AutoNumberFormat, Random, PlayMode
+		local FilterType, AutoNumberFormat
 		if #tab > 2 then
 			if #tab < 15 then
 				FilterType = 2
@@ -2903,17 +2898,6 @@ https://github.com/grafi-tt/lunaJson
 		else
 			FilterType = 2
 			AutoNumberFormat = ''
-		end
-		if plstId:match('^RD') and urlAdr:match('isLogo=false') then
-			if #tab > 2 then
-				plstPos = math.random(3, #tab)
-			end
-			pl = 32
-			Random = 1
-			PlayMode = 1
-		else
-			Random = - 1
-			PlayMode = - 1
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonOptions then
 			tab.ExtButton0 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOptions, ButtonScript = 'Qlty_YT()'}
@@ -2946,8 +2930,6 @@ https://github.com/grafi-tt/lunaJson
 		local retAdr
 		tab.ExtParams = {}
 		tab.ExtParams.FilterType = FilterType
-		tab.ExtParams.Random = Random
-		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
@@ -2980,17 +2962,8 @@ https://github.com/grafi-tt/lunaJson
 		end
 		m_simpleTV.User.YT.QltyIndex = index
 		retAdr = retAdr or StreamCheck(t, index)
-		local plstPicId
-		if plstId:match('^RD') then
-			local plstPicIdRD = plstId:gsub('^RD', '')
-			m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/embed?listType=playlist&list=' .. plstId
-			plstPicId = plstPicIdRD
-			m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicIdRD
-		else
-			m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
-			plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
-			m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
-		end
+		m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
+		m_simpleTV.User.YT.AddToBaseVideoIdPlst = tab[1].Address:match('watch%?v=([^&]+)')
 		if #tab == 1 then
 			retAdr = positionToContinue(retAdr)
 		else
