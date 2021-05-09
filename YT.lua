@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (5/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (10/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -987,8 +987,8 @@ https://github.com/grafi-tt/lunaJson
 		local pattern = '(%d+)%-(%d+)%-(%d+)T(%d+):(%d+)'
 		local xyear, xmonth, xday, xhour, xminute = isodt:match(pattern)
 			if not (xyear or xmonth or xday or xhour or xminute) then
-				 return ''
-				end
+			 return ''
+			end
 		local currenttime = os.time()
 		local datetime = os.date('!*t', currenttime)
 		datetime.isdst = true
@@ -3232,11 +3232,11 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.Control.CurrentAddress})
 		else
 			if m_simpleTV.Control.MainMode == 0 then
-				logo = m_simpleTV.User.paramScriptForSkin_logoYT
+				if not inAdr:match('isLogo=false') then
+					logo = m_simpleTV.User.paramScriptForSkin_logoYT
 						or logo
 						or 'https://i.ytimg.com/vi/' .. vId .. '/hqdefault.jpg'
-				m_simpleTV.Control.ChangeChannelLogo(logo, m_simpleTV.Control.ChannelID, 'CHANGE_IF_NOT_EQUAL')
-				if not inAdr:match('isLogo=false') then
+					m_simpleTV.Control.ChangeChannelLogo(logo, m_simpleTV.Control.ChannelID, 'CHANGE_IF_NOT_EQUAL')
 					m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
 				end
 			end
