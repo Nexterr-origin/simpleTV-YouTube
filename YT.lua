@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (10/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (11/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2657,7 +2657,7 @@ https://github.com/grafi-tt/lunaJson
 		else
 			matchEnd = "thumbnailOverlayNowPlayingRenderer"
 		end
-		local times, count, publis, channel, name, adr, desc, panelDescName, selected
+		local times, count, publis, channel, name, adr, desc, panelDescName, selected, livenow
 			for g in str:gmatch(render .. 'Renderer".-' .. matchEnd) do
 				if render == 'playlistPanelVideo' then
 					if embed then
@@ -2670,6 +2670,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 				adr = g:match('"videoId":%s*"([^"]+)')
 				if name and adr then
+					livenow = g:match('BADGE_STYLE_TYPE_LIVE_NOW')
 					times = g:match('"thumbnailOverlayTimeStatusRenderer".-"simpleText":%s*"([^"]+)')
 					name = title_clean(name)
 					tab[i] = {}
@@ -2678,18 +2679,22 @@ https://github.com/grafi-tt/lunaJson
 					if embed then
 						times = ''
 					end
+					if livenow then
+						livenow = m_simpleTV.User.YT.Lng.live
+					end
 					if isInfoPanel == false then
-						if not times then
-							times = m_simpleTV.User.YT.Lng.live
-						end
-						tab[i].Name = string.format('%s [%s]', name, times)
-					else
-						if times then
-							tab[i].Name = name
+						if (times or livenow) and not embed then
+							tab[i].Name = string.format('%s [%s]', name, times or livenow)
 						else
-							times = m_simpleTV.User.YT.Lng.live
-							tab[i].Name = string.format('%s [%s]', name, times)
+							tab[i].Name = name
 						end
+					else
+						if livenow then
+							tab[i].Name = string.format('%s [%s]', name, livenow)
+						else
+							tab[i].Name = name
+						end
+						times = times or livenow or ''
 						count = g:match('"shortViewCountText":%s*{%s*"simpleText":%s*"([^"]+)')
 								or g:match('iewCountText":%s*{%s*"simpleText":%s*"([^"]+)')
 						publis = g:match('"publishedTimeText":%s*{%s*"simpleText":%s*"([^"]+)')
