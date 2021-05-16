@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (11/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (16/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1275,29 +1275,15 @@ https://github.com/grafi-tt/lunaJson
 			end
 		elementsRemove()
 	end
-	local function StopOnErr(n, txt)
+	local function StopOnErr(n, msg)
 			if urlAdr:match('PARAMS=psevdotv') then return end
 		if session then
 			m_simpleTV.Http.Close(session)
 		end
 		m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.logoPicFromDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
-		local mes
-		if m_simpleTV.User.YT.isAuth
-			and (inAdr:match('list=WL')
-			or inAdr:match('list=LL')
-			or inAdr:match('list=LM')
-			or (inAdr:match('/feed/')
-			and not inAdr:match('/feed/storefront')
-			and not inAdr:match('/feed/trending')))
-		then
-			mes = '\n' .. m_simpleTV.User.YT.Lng.noCookies
-			m_simpleTV.Control.ExecuteAction(11)
-		else
-			mes = ' [' .. n .. ']\n' .. (txt or '')
-		end
-		mes = m_simpleTV.User.YT.Lng.error .. mes
-		ShowMsg(mes)
-		m_simpleTV.Control.SetTitle(m_simpleTV.User.YT.Lng.error .. ' [' .. n .. ']')
+		msg = m_simpleTV.User.YT.Lng.error .. ' [' .. n .. ']\n⚠️ ' .. (msg or '')
+		ShowMsg(msg)
+		m_simpleTV.Control.SetTitle(msg:gsub('\n', ' '))
 	end
 	local function debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
 			if not infoInFile then return end
@@ -1769,7 +1755,7 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function StreamError(tab, title)
 			if not tab.playabilityStatus then
-			 return nil, '⚠️ ' .. m_simpleTV.User.YT.Lng.videoNotExst
+			 return nil, m_simpleTV.User.YT.Lng.videoNotExst
 			end
 		local title_err, stream_tab_err
 		if tab.playabilityStatus.status == 'LOGIN_REQUIRED'
@@ -2130,7 +2116,7 @@ https://github.com/grafi-tt/lunaJson
 				if infoInFile then
 					debug_in_file(answer, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
 				end
-			 return nil, '⚠️ ' .. (httpErr or m_simpleTV.User.YT.Lng.videoNotExst)
+			 return nil, (httpErr or m_simpleTV.User.YT.Lng.videoNotExst)
 			end
 		if infoInFile then
 			local response = player_response
@@ -2142,7 +2128,7 @@ https://github.com/grafi-tt/lunaJson
 			debug_in_file(response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
 		end
 			if player_response:match('drmFamilies') then
-			 return nil, '⚠️ DRM'
+			 return nil, 'DRM'
 			end
 		player_response = player_response:gsub('++', ' ')
 		player_response = m_simpleTV.Common.fromPercentEncoding(player_response)
@@ -4133,8 +4119,7 @@ https://github.com/grafi-tt/lunaJson
 				and not inAdr:match('/feed/storefront')
 				and not inAdr:match('/feed/trending')))
 		then
-			local err = '⚠️ ' .. m_simpleTV.User.YT.Lng.noCookies
-			StopOnErr(100, err)
+			StopOnErr(100, m_simpleTV.User.YT.Lng.noCookies)
 		 return
 		end
 	if inAdr:match('isPlstsCh=true') then
