@@ -1286,7 +1286,7 @@ https://github.com/grafi-tt/lunaJson
 		else
 			msg = ''
 		end
-		msg = m_simpleTV.User.YT.Lng.error .. ' [' .. n .. ']\n' .. msg
+		msg = string.format('%s [%s]\n%s', m_simpleTV.User.YT.Lng.error, n, msg)
 		ShowMsg(msg)
 		m_simpleTV.Control.SetTitle(msg:gsub('\n', ' '))
 	end
