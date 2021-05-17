@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (16/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (17/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1281,7 +1281,12 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Http.Close(session)
 		end
 		m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.logoPicFromDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
-		msg = m_simpleTV.User.YT.Lng.error .. ' [' .. n .. ']\n⚠️ ' .. (msg or '')
+		if msg then
+			msg = '⚠️ ' .. msg
+		else
+			msg = ''
+		end
+		msg = m_simpleTV.User.YT.Lng.error .. ' [' .. n .. ']\n' .. msg
 		ShowMsg(msg)
 		m_simpleTV.Control.SetTitle(msg:gsub('\n', ' '))
 	end
