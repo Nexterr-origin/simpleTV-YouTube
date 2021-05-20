@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (17/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (20/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2069,7 +2069,8 @@ https://github.com/grafi-tt/lunaJson
 		end
 		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://music.youtube.com/'
 		local url = 'https://www.youtube.com/get_video_info?'
-				.. 'eurl=' .. referer
+				.. 'html5=1'
+				.. '&eurl=' .. referer
 				.. '&hl=' .. m_simpleTV.User.YT.Lng.hl
 				.. '&sts=' .. (m_simpleTV.User.YT.sts or '')
 				.. '&video_id='
@@ -2098,13 +2099,7 @@ https://github.com/grafi-tt/lunaJson
 					end
 				m_simpleTV.Http.SetTimeout(session, 14000)
 			end
-			url = 'https://www.youtube.com/get_video_info?'
-				.. 'el=detailpage'
-				.. '&cco=1'
-				.. '&eurl=' .. referer
-				.. '&video_id=' .. m_simpleTV.User.YT.vId
-				.. '&hl=' .. m_simpleTV.User.YT.Lng.hl
-				.. '&sts=' .. (m_simpleTV.User.YT.sts or '')
+			url = url .. m_simpleTV.User.YT.vId .. '&el=detailpage' .. '&cco=1'
 			local cookies = m_simpleTV.User.YT.cookies:gsub('&gl=[%a%d%-_]+', '&gl=US'):gsub('&gl=;', '&gl=US;')
 			m_simpleTV.Http.SetCookies(session, url, cookies, '')
 			rc, answer = m_simpleTV.Http.Request(session, {url = url})
