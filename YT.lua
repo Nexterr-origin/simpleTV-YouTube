@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (22/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -456,7 +456,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:86.0) Gecko/20100101 Firefox/86.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:89.0) Gecko/20100101 Firefox/89.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 14000)
@@ -2066,7 +2066,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://music.youtube.com/'
 		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
-		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"referer": "' .. referer .. '","signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
+		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"referer": "' .. referer .. '","signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, player_response = m_simpleTV.Http.Request(session, {url = url, method = 'post', body = body, headers = headers})
@@ -2087,18 +2087,10 @@ https://github.com/grafi-tt/lunaJson
 		if infoInFile then
 			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
 		end
+		player_response = player_response:match('"ypcTrailerRenderer".-"unserializedPlayerResponse":(.+)') or player_response
 			if player_response:match('drmFamilies') then
 			 return nil, 'DRM'
 			end
-		player_response = player_response:match('"ypcTrailerRenderer".-"unserializedPlayerResponse":(.+)') or player_response
-		if not player_response:match('status":%s*"OK') then
-			-- url = url .. '&el=detailpage' .. '&cco=1'
-			body = body:gsub('"gl":""', '"gl":"US"')
-			rc, player_response = m_simpleTV.Http.Request(session, {url = url, method = 'post', body = body, headers = headers})
-				if rc ~= 200 then
-				 return nil, 'no player response'
-				end
-		end
 		local err, tab = pcall(lunaJson_decode, player_response)
 			if err == false then
 				if infoInFile then
