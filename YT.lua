@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (23/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -927,12 +927,12 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function GetApiKey()
 			local function webApiKey()
-				local session = m_simpleTV.Http.New(userAgent, proxy, false)
-					if not session then return end
-				m_simpleTV.Http.SetTimeout(session, 14000)
+				local session_getKey = m_simpleTV.Http.New(userAgent, proxy, false)
+					if not session_getKey then return end
+				m_simpleTV.Http.SetTimeout(session_getKey, 14000)
 				local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2VfemRzLmVuX1VTLi1KcDN1bDRMbzBZLk8vYW09SW9BQVFnQUUvcnQ9ai9kPTEvZGc9MC9jdD16Z21zL3JzPUFOalJoVmtmazRsbnFhWXlZX05MTzV4QmhpTGdXYkYzMGcvbT1iYXNl')
-				local rc, answer = m_simpleTV.Http.Request(session, {url = url})
-				m_simpleTV.Http.Close(session)
+				local rc, answer = m_simpleTV.Http.Request(session_getKey, {url = url})
+				m_simpleTV.Http.Close(session_getKey)
 					if rc ~= 200 then return end
 		 	 return answer:match('ya%("INNERTUBE_API_KEY","([^"]+)')
 			end
@@ -1443,14 +1443,14 @@ https://github.com/grafi-tt/lunaJson
 	 return ''
 	end
 	local function GetUrlWatchVideos(url)
-		local session = m_simpleTV.Http.New(userAgent, proxy, true)
-			if not session then return end
-		m_simpleTV.Http.SetTimeout(session, 14000)
-		m_simpleTV.Http.SetRedirectAllow(session, false)
-		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
-		m_simpleTV.Http.Request(session, {url = url})
-		local raw = m_simpleTV.Http.GetRawHeader(session)
-		m_simpleTV.Http.Close(session)
+		local session_watchVideos = m_simpleTV.Http.New(userAgent, proxy, true)
+			if not session_watchVideos then return end
+		m_simpleTV.Http.SetTimeout(session_watchVideos, 14000)
+		m_simpleTV.Http.SetRedirectAllow(session_watchVideos, false)
+		m_simpleTV.Http.SetCookies(session_watchVideos, url, m_simpleTV.User.YT.cookies, '')
+		m_simpleTV.Http.Request(session_watchVideos, {url = url})
+		local raw = m_simpleTV.Http.GetRawHeader(session_watchVideos)
+		m_simpleTV.Http.Close(session_watchVideos)
 			if not raw then return end
 	 return raw:match('Location: (.-)\n')
 	end
@@ -1568,9 +1568,9 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function MarkWatch_YT()
 		if m_simpleTV.User.YT.videostats and not inAdr:match('&isPlst=history') then
-			local sessionMarkWatch = m_simpleTV.Http.New(userAgent, proxy, false)
-				if not sessionMarkWatch then return end
-			m_simpleTV.Http.SetTimeout(sessionMarkWatch, 14000)
+			local session_markWatch = m_simpleTV.Http.New(userAgent, proxy, false)
+				if not session_markWatch then return end
+			m_simpleTV.Http.SetTimeout(session_markWatch, 14000)
 			local cpn_alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
 			local t = {}
 			local math_random = math.random
@@ -1583,8 +1583,8 @@ https://github.com/grafi-tt/lunaJson
 			local url = m_simpleTV.User.YT.videostats
 				.. '&ver=2&fs=0&volume=100&muted=0&cpn='
 				.. table.concat(t)
-			m_simpleTV.Http.SetCookies(sessionMarkWatch, url, m_simpleTV.User.YT.cookies, '')
-			m_simpleTV.Http.RequestA(sessionMarkWatch, {callback = 'MarkWatched_YT', url = url})
+			m_simpleTV.Http.SetCookies(session_markWatch, url, m_simpleTV.User.YT.cookies, '')
+			m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
 	local function StreamFormat(url, isCipher)
@@ -1598,17 +1598,17 @@ https://github.com/grafi-tt/lunaJson
 	 return url
 	end
 	local function GetSignScr()
-		local sessionGetSignScr = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not sessionGetSignScr then return end
-		m_simpleTV.Http.SetTimeout(sessionGetSignScr, 14000)
+		local session_signScr = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_signScr then return end
+		m_simpleTV.Http.SetTimeout(session_signScr, 14000)
 		local url = string.format('https://www.youtube.com/embed/%s', m_simpleTV.User.YT.vId)
-		local rc, answer = m_simpleTV.Http.Request(sessionGetSignScr, {url = url})
+		local rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
 			if not url then return end
 		url = string.format('https://www.youtube.com%s', url)
-		rc, answer = m_simpleTV.Http.Request(sessionGetSignScr, {url = url})
-		m_simpleTV.Http.Close(sessionGetSignScr)
+		rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
+		m_simpleTV.Http.Close(session_signScr)
 			if rc ~= 200 then return end
 		local f, var = answer:match('split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
@@ -1903,12 +1903,12 @@ https://github.com/grafi-tt/lunaJson
 	 return adr
 	end
 	local function StreamLive(hls, isLive, title)
-		local session = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session then return end
-		m_simpleTV.Http.SetTimeout(session, 14000)
+		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_live then return end
+		m_simpleTV.Http.SetTimeout(session_live, 14000)
 		local extOpt = '$OPT:adaptive-use-access'
-		local rc, answer = m_simpleTV.Http.Request(session, {url = hls})
-		m_simpleTV.Http.Close(session)
+		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
+		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
 			 return nil, 'GetStreamsTab live Error 1'
 			end
@@ -1984,14 +1984,14 @@ https://github.com/grafi-tt/lunaJson
 			then
 			 return url
 			end
-		local session = m_simpleTV.Http.New(userAgent, proxy, true)
-			if not session then
+		local session_check = m_simpleTV.Http.New(userAgent, proxy, true)
+			if not session_check then
 			 return url
 			end
-		m_simpleTV.Http.SetTimeout(session, 14000)
-		m_simpleTV.Http.Request(session, {url = url:gsub('$.+',''), method = 'head'})
-		local raw = m_simpleTV.Http.GetRawHeader(session)
-		m_simpleTV.Http.Close(session)
+		m_simpleTV.Http.SetTimeout(session_check, 14000)
+		m_simpleTV.Http.Request(session_check, {url = url:gsub('$.+',''), method = 'head'})
+		local raw = m_simpleTV.Http.GetRawHeader(session_check)
+		m_simpleTV.Http.Close(session_check)
 			if raw:match('Content%-Length: 0') then
 				if index > 2 then
 					index = index - 1
@@ -2036,6 +2036,9 @@ https://github.com/grafi-tt/lunaJson
 	 return v
 	end
 	local function GetStreamsTab(vId)
+		m_simpleTV.Http.Close(session)
+		local session_response = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_response then return end
 		m_simpleTV.User.YT.ThumbsInfo = nil
 		m_simpleTV.User.YT.vId = vId
 		m_simpleTV.User.YT.chId = ''
@@ -2059,14 +2062,14 @@ https://github.com/grafi-tt/lunaJson
 		if not m_simpleTV.User.YT.signScr then
 			pcall(GetSignScr)
 		end
-		if infoInFile then
-			inf0 = os.clock()
-		end
 		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
 		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
-		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
-		local rc, player_response = m_simpleTV.Http.Request(session, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.SetCookies(session_response, url, m_simpleTV.User.YT.cookies, '')
+		if infoInFile then
+			inf0 = os.clock()
+		end
+		local rc, player_response = m_simpleTV.Http.Request(session_response, {url = url, method = 'post', body = body, headers = headers})
 		if infoInFile then
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
@@ -2116,13 +2119,14 @@ https://github.com/grafi-tt/lunaJson
 				t = table.concat(t, ',')
 				inAdr = 'https://www.youtube.com/watch_videos?video_ids=' .. t .. '&title=' .. m_simpleTV.User.YT.Lng.camera_plst_title:gsub('%s', '%+')
 				inAdr = GetUrlWatchVideos(inAdr)
-				m_simpleTV.Http.Close(session)
+				m_simpleTV.Http.Close(session_response)
 					if not inAdr then
 					 return nil, 'not get adrs multicamers'
 					end
 				inAdr = inAdr .. '&isLogo=false'
 			 return inAdr
 			end
+		m_simpleTV.Http.Close(session_response)
 		if tab.videoDetails then
 			if tab.videoDetails.author then
 				m_simpleTV.User.YT.author = tab.videoDetails.author
@@ -2216,7 +2220,6 @@ https://github.com/grafi-tt/lunaJson
 			if tab.streamingData and tab.streamingData.hlsManifestUrl
 				and (tab.videoDetails.isLiveContent == true or tab.videoDetails.isLive == true)
 			then
-				m_simpleTV.Http.Close(session)
 			 return StreamLive(tab.streamingData.hlsManifestUrl, tab.videoDetails.isLive, title)
 			end
 		if tab.streamingData and tab.streamingData.formats then
@@ -2267,7 +2270,6 @@ https://github.com/grafi-tt/lunaJson
 			if #t == 0 then
 					if urlAdr:match('PARAMS=psevdotv') then return end
 				isInfoPanel = false
-				m_simpleTV.Http.Close(session)
 			 return StreamError(tab, title)
 			end
 		local captions, captions_title
@@ -2405,8 +2407,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 			if #t == 0 then
-				m_simpleTV.Http.Close(session)
-			 return nil, 'GetStreamsTab Error 2'
+			 return nil, 'GetStreamsTab Error'
 			end
 		if aAdr then
 			local audioItag = tonumber(aAdr:match('itag=(%d+)') or 0)
@@ -2476,7 +2477,6 @@ https://github.com/grafi-tt/lunaJson
 		then
 			m_simpleTV.User.YT.videostats = tab.playbackTracking.videostatsPlaybackUrl.baseUrl
 		end
-		m_simpleTV.Http.Close(session)
 		if m_simpleTV.User.YT.duration
 			and m_simpleTV.User.YT.duration > 120
 			and m_simpleTV.User.YT.desc ~= ''
@@ -4038,8 +4038,8 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.Control.ChangeAddress = 'No'
 		dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
 	end
-	function MarkWatched_YT(sessionMarkWatch)
-		m_simpleTV.Http.Close(sessionMarkWatch)
+	function MarkWatched_YT(session_markWatch)
+		m_simpleTV.Http.Close(session_markWatch)
 	end
 	function OnMultiAddressOk_YT(Object, id)
 		if id == 0 then
