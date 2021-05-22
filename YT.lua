@@ -411,7 +411,7 @@ local infoInFile = false
 				local f = string.format('%scookies.txt', m_simpleTV.Common.GetMainPath(1))
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'CONSENT', 'PREF'}
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF'}
 				local cookie_SAPISID
 				local t = {}
 					for line in fhandle:lines() do
@@ -427,16 +427,16 @@ local infoInFile = false
 								end
 							end
 						end
-						if #t == 7 then break end
+						if #t == 6 then break end
 					end
 				fhandle:close()
-					if #t < 7 then return end
+					if #t < 6 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return string.format('%s;', table.concat(t, ';'))
 			end
-		local cookies = cookiesFromFile() or string.format('CONSENT=YES+cb.20210328-17-p0.en+FX+%s;PREF=f6=40000000&hl=%s&gl=;', math.random(100, 999), m_simpleTV.User.YT.Lng.hl)
+		local cookies = cookiesFromFile() or ''
+		m_simpleTV.User.YT.cookies = string.format('%sYES+cb.20210328-17-p0.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%d%-_]+)') or m_simpleTV.User.YT.Lng.hl
-		m_simpleTV.User.YT.cookies = cookies
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
 		m_simpleTV.User.YT.PlstsCh = {}
@@ -1805,9 +1805,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if title_err then
 			if title ~= '' then
-				title_err = '\nℹ️ ' .. title_err
-			else
-				title_err = 'ℹ️ ' .. title_err
+				title_err = '\n⚠️ ' .. title_err
 			end
 		end
 		title_err = title .. (title_err or '')
@@ -2064,9 +2062,8 @@ https://github.com/grafi-tt/lunaJson
 		if infoInFile then
 			inf0 = os.clock()
 		end
-		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://music.youtube.com/'
 		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
-		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"referer": "' .. referer .. '","signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
+		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, player_response = m_simpleTV.Http.Request(session, {url = url, method = 'post', body = body, headers = headers})
