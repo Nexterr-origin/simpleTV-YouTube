@@ -435,7 +435,7 @@ local infoInFile = false
 			 return string.format('%s;', table.concat(t, ';'))
 			end
 		local cookies = cookiesFromFile() or ''
-		m_simpleTV.User.YT.cookies = string.format('%sYES+cb.20210328-17-p0.ru+FX+%s;', cookies, math.random(100, 999))
+		m_simpleTV.User.YT.cookies = string.format('%sCONSENT=YES+cb.20210328-17-p0.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%d%-_]+)') or m_simpleTV.User.YT.Lng.hl
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
