@@ -2036,23 +2036,34 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return v
 	end
-	local function NoStatusOK()
-		local session_nostatusok = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_nostatusok then return end
-		m_simpleTV.Http.SetTimeout(session_nostatusok, 14000)
+	local function GetVideoInfo_2()
+		local session_videoInfo2 = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_videoInfo2 then return end
+		m_simpleTV.Http.SetTimeout(session_videoInfo2, 14000)
 		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://music.youtube.com/'
 		local url = 'https://www.youtube.com/get_video_info?html5=1'
 				.. '&eurl=' .. referer
 				.. '&hl=' .. m_simpleTV.User.YT.Lng.hl
 				.. '&sts=' .. (m_simpleTV.User.YT.sts or '')
 				.. '&video_id=' .. m_simpleTV.User.YT.vId
-		m_simpleTV.Http.SetCookies(session_nostatusok, url, m_simpleTV.User.YT.cookies, '')
-		local rc, player_response = m_simpleTV.Http.Request(session_nostatusok, {url = url})
-		m_simpleTV.Http.Close(session_nostatusok)
+		m_simpleTV.Http.SetCookies(session_videoInfo2, url, m_simpleTV.User.YT.cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(session_videoInfo2, {url = url})
+		m_simpleTV.Http.Close(session_videoInfo2)
 			if rc ~= 200 then return end
-		player_response = player_response:gsub('++', ' ')
-		player_response = m_simpleTV.Common.fromPercentEncoding(player_response)
-	 return player_response:match('player_response=([^&]*)')
+		answer = answer:gsub('++', ' ')
+		answer = m_simpleTV.Common.fromPercentEncoding(answer)
+	 return answer:match('player_response=([^&]*)')
+	end
+	local function GetVideoInfo()
+		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_videoInfo then return end
+		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
+		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
+		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.Close(session_videoInfo)
+	 return rc, answer
 	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
@@ -2079,17 +2090,10 @@ https://github.com/grafi-tt/lunaJson
 		if not m_simpleTV.User.YT.signScr then
 			pcall(GetSignScr)
 		end
-		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
-		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
-		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
-		local session_response = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_response then return end
-		m_simpleTV.Http.SetCookies(session_response, url, m_simpleTV.User.YT.cookies, '')
 		if infoInFile then
 			inf0 = os.clock()
 		end
-		local rc, player_response = m_simpleTV.Http.Request(session_response, {url = url, method = 'post', body = body, headers = headers})
-		m_simpleTV.Http.Close(session_response)
+		local rc, player_response = GetVideoInfo()
 		if infoInFile then
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
@@ -2104,21 +2108,22 @@ https://github.com/grafi-tt/lunaJson
 				end
 			 return nil, (httpErr or m_simpleTV.User.YT.Lng.videoNotExst)
 			end
-		if infoInFile then
-			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
-		end
 		local trailer = player_response:match('"trailerVideoId":%s*"([^"]+)')
 		if trailer then
 			m_simpleTV.User.YT.vId = trailer
 			m_simpleTV.User.YT.isTrailer = true
-			player_response = player_response:match('"unserializedPlayerResponse":(.+)') or player_response
+			local rc, answer = GetVideoInfo()
+			player_response = answer or player_response
 		end
 		if not player_response:match('"status":%s*"OK"') then
-			player_response = NoStatusOK() or player_response
+			player_response = GetVideoInfo_2() or player_response
 		end
 			if player_response:match('drmFamilies') then
 			 return nil, 'DRM'
 			end
+		if infoInFile then
+			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
+		end
 		local err, tab = pcall(lunaJson_decode, player_response)
 			if err == false then
 				if infoInFile then
