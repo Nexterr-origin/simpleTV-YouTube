@@ -1807,6 +1807,7 @@ https://github.com/grafi-tt/lunaJson
 			if title ~= '' then
 				title_err = '\n⚠️ ' .. title_err
 			end
+			title_err = title_err:gsub('<a href.-</a>', '')
 		end
 		title_err = title .. (title_err or '')
 		if m_simpleTV.User.YT.pic then
@@ -2035,10 +2036,26 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return v
 	end
+	local function NoStatusOK()
+		local session_nostatusok = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_nostatusok then return end
+		m_simpleTV.Http.SetTimeout(session_nostatusok, 14000)
+		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://music.youtube.com/'
+		local url = 'https://www.youtube.com/get_video_info?html5=1'
+				.. '&eurl=' .. referer
+				.. '&hl=' .. m_simpleTV.User.YT.Lng.hl
+				.. '&sts=' .. (m_simpleTV.User.YT.sts or '')
+				.. '&video_id=' .. m_simpleTV.User.YT.vId
+		m_simpleTV.Http.SetCookies(session_nostatusok, url, m_simpleTV.User.YT.cookies, '')
+		local rc, player_response = m_simpleTV.Http.Request(session_nostatusok, {url = url})
+		m_simpleTV.Http.Close(session_nostatusok)
+			if rc ~= 200 then return end
+		player_response = player_response:gsub('++', ' ')
+		player_response = m_simpleTV.Common.fromPercentEncoding(player_response)
+	 return player_response:match('player_response=([^&]*)')
+	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
-		local session_response = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_response then return end
 		m_simpleTV.User.YT.ThumbsInfo = nil
 		m_simpleTV.User.YT.vId = vId
 		m_simpleTV.User.YT.chId = ''
@@ -2065,15 +2082,18 @@ https://github.com/grafi-tt/lunaJson
 		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
 		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		local session_response = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_response then return end
 		m_simpleTV.Http.SetCookies(session_response, url, m_simpleTV.User.YT.cookies, '')
 		if infoInFile then
 			inf0 = os.clock()
 		end
 		local rc, player_response = m_simpleTV.Http.Request(session_response, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.Close(session_response)
 		if infoInFile then
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
-			if not player_response then
+			if rc ~= 200 then
 				local httpErr
 				if rc == 429 then
 					httpErr = 'HTTP Error 429: Too Many Requests\n\n' .. m_simpleTV.User.YT.Lng.noCookies
@@ -2087,7 +2107,15 @@ https://github.com/grafi-tt/lunaJson
 		if infoInFile then
 			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
 		end
-		player_response = player_response:match('"ypcTrailerRenderer".-"unserializedPlayerResponse":(.+)') or player_response
+		local trailer = player_response:match('"trailerVideoId":%s*"([^"]+)')
+		if trailer then
+			m_simpleTV.User.YT.vId = trailer
+			m_simpleTV.User.YT.isTrailer = true
+			player_response = player_response:match('"unserializedPlayerResponse":(.+)') or player_response
+		end
+		if not player_response:match('"status":%s*"OK"') then
+			player_response = NoStatusOK() or player_response
+		end
 			if player_response:match('drmFamilies') then
 			 return nil, 'DRM'
 			end
@@ -2119,14 +2147,12 @@ https://github.com/grafi-tt/lunaJson
 				t = table.concat(t, ',')
 				inAdr = 'https://www.youtube.com/watch_videos?video_ids=' .. t .. '&title=' .. m_simpleTV.User.YT.Lng.camera_plst_title:gsub('%s', '%+')
 				inAdr = GetUrlWatchVideos(inAdr)
-				m_simpleTV.Http.Close(session_response)
 					if not inAdr then
 					 return nil, 'not get adrs multicamers'
 					end
 				inAdr = inAdr .. '&isLogo=false'
 			 return inAdr
 			end
-		m_simpleTV.Http.Close(session_response)
 		if tab.videoDetails then
 			if tab.videoDetails.author then
 				m_simpleTV.User.YT.author = tab.videoDetails.author
