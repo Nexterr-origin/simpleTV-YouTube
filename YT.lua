@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (25/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2097,6 +2097,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if not player_response:match('status":%s*"OK') then
 			rc, player_response = GetVideoInfo('&el=detailpage&cco=1')
+			player_response = player_response or ''
 		end
 			if player_response:match('drmFamilies') then
 			 return nil, 'DRM'
