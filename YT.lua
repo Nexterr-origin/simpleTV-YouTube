@@ -432,10 +432,10 @@ local infoInFile = false
 				fhandle:close()
 					if #t < 6 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
-			 return string.format('%s;', table.concat(t, ';'))
+			 return table.concat(t, ';')
 			end
-		local cookies = cookiesFromFile() or ''
-		m_simpleTV.User.YT.cookies = string.format('%sCONSENT=YES+cb.20210328-17-p0.ru+FX+%s;', cookies, math.random(100, 999))
+		local cookies = cookiesFromFile() or 'PREF=f6=40000000&hl=' .. m_simpleTV.User.YT.Lng.hl
+		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+cb.20210328-17-p0.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%d%-_]+)') or m_simpleTV.User.YT.Lng.hl
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
@@ -459,7 +459,7 @@ local infoInFile = false
 	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:89.0) Gecko/20100101 Firefox/89.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
-	m_simpleTV.Http.SetTimeout(session, 14000)
+	m_simpleTV.Http.SetTimeout(session, 16000)
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.isChapters = false
 	local inf0, inf0_qlty, inf0_geo
@@ -2036,34 +2036,24 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return v
 	end
-	local function GetVideoInfo_2()
-		local session_videoInfo2 = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_videoInfo2 then return end
-		m_simpleTV.Http.SetTimeout(session_videoInfo2, 14000)
-		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://music.youtube.com/'
-		local url = 'https://www.youtube.com/get_video_info?html5=1'
+	local function GetVideoInfo(param)
+		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_videoInfo then return end
+		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
+		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://www.youtube.com'
+		local url = 'https://www.youtube.com/get_video_info?html5=1&&gl=US'
 				.. '&eurl=' .. referer
 				.. '&hl=' .. m_simpleTV.User.YT.Lng.hl
 				.. '&sts=' .. (m_simpleTV.User.YT.sts or '')
 				.. '&video_id=' .. m_simpleTV.User.YT.vId
-		m_simpleTV.Http.SetCookies(session_videoInfo2, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session_videoInfo2, {url = url})
-		m_simpleTV.Http.Close(session_videoInfo2)
+				.. (param or '')
+		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url})
+		m_simpleTV.Http.Close(session_videoInfo)
 			if rc ~= 200 then return end
 		answer = answer:gsub('++', ' ')
 		answer = m_simpleTV.Common.fromPercentEncoding(answer)
-	 return answer:match('player_response=([^&]*)')
-	end
-	local function GetVideoInfo()
-		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_videoInfo then return end
-		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
-		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
-		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
-		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
-		m_simpleTV.Http.Close(session_videoInfo)
-	 return rc, answer
+	 return rc, answer:match('player_response=([^&]*)')
 	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
@@ -2097,7 +2087,21 @@ https://github.com/grafi-tt/lunaJson
 		if infoInFile then
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
-			if rc ~= 200 then
+		player_response = player_response or ''
+		local trailer = player_response:match('"trailerVideoId":%s*"([^"]+)')
+		if trailer then
+			m_simpleTV.User.YT.vId = trailer
+			m_simpleTV.User.YT.isTrailer = true
+			rc, player_response = GetVideoInfo()
+			player_response = player_response or ''
+		end
+		if not player_response:match('status":%s*"OK') then
+			rc, player_response = GetVideoInfo('&el=detailpage&cco=1')
+		end
+			if player_response:match('drmFamilies') then
+			 return nil, 'DRM'
+			end
+			if rc ~= 200 or player_response == '' then
 				local httpErr
 				if rc == 429 then
 					httpErr = 'HTTP Error 429: Too Many Requests\n\n' .. m_simpleTV.User.YT.Lng.noCookies
@@ -2107,19 +2111,6 @@ https://github.com/grafi-tt/lunaJson
 					debug_in_file(answer, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
 				end
 			 return nil, (httpErr or m_simpleTV.User.YT.Lng.videoNotExst)
-			end
-		local trailer = player_response:match('"trailerVideoId":%s*"([^"]+)')
-		if trailer then
-			m_simpleTV.User.YT.vId = trailer
-			m_simpleTV.User.YT.isTrailer = true
-			local rc, answer = GetVideoInfo()
-			player_response = answer or player_response
-		end
-		if not player_response:match('"status":%s*"OK"') then
-			player_response = GetVideoInfo_2() or player_response
-		end
-			if player_response:match('drmFamilies') then
-			 return nil, 'DRM'
 			end
 		if infoInFile then
 			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
