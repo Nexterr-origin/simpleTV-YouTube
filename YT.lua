@@ -2603,17 +2603,17 @@ https://github.com/grafi-tt/lunaJson
 		local render
 		if typePlst == 'panelVideos' then
 			if str:match('"twoColumnBrowseResultsRenderer"') then
-				render = 'playlistVideo'
+				render = 'playlistVideoRenderer'
 			else
-				render = 'playlistPanelVideo'
+				render = 'playlistPanelVideoRenderer":%s*{%s*"title"'
 			end
 		else
 			if (str:match('"gridVideoRenderer"') and str:match('"videoRenderer"'))
 				or typePlst == 'main'
 			then
-				render = '"video'
+				render = '"videoRenderer'
 			else
-				render = '[eod]'
+				render = '[eod]Renderer'
 			end
 		end
 		local embed, matchEnd
@@ -2621,10 +2621,14 @@ https://github.com/grafi-tt/lunaJson
 			embed = true
 			matchEnd = "trackingParams"
 		else
-			matchEnd = "thumbnailOverlayNowPlayingRenderer"
+			matchEnd = '"thumbnailOverlayNowPlayingRenderer"'
+		end
+		if typePlst == 'search' then
+			matchEnd = '"maxOneLine"'
+			render = '"videoRenderer"'
 		end
 		local times, count, publis, channel, name, adr, desc, panelDescName, selected, livenow
-			for g in str:gmatch(render .. 'Renderer".-' .. matchEnd) do
+			for g in str:gmatch(render .. '.-' .. matchEnd) do
 				if render == 'playlistPanelVideo' then
 					if embed then
 						name = g:match('"title":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
@@ -2632,7 +2636,8 @@ https://github.com/grafi-tt/lunaJson
 						name = g:match('"title".-"simpleText":"([^"]+)')
 					end
 				else
-					name = g:match('"title":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)') or g:match('"simpleText":%s*"([^"]+)')
+					name = g:match('"title":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
+						or g:match('"simpleText":%s*"([^"]+)')
 				end
 				adr = g:match('"videoId":%s*"([^"]+)')
 				if name and adr then
@@ -2682,6 +2687,7 @@ https://github.com/grafi-tt/lunaJson
 						end
 						desc = g:match('"descriptionSnippet":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
 								or g:match('"descriptionSnippet":%s*{%s*"simpleText":%s*"([^"]+)')
+								or g:match('"detailedMetadataSnippets":%s*%[%s*{%s*"snippetText":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
 						if desc and desc ~= '' then
 							panelDescName = m_simpleTV.User.YT.Lng.desc
 						else
@@ -3013,6 +3019,8 @@ https://github.com/grafi-tt/lunaJson
 			params.User.typePlst = 'main'
 		elseif url:match('/feed/subscriptions') then
 			params.User.typePlst = 'subscriptions'
+		elseif url:match('search_query') then
+			params.User.typePlst = 'search'
 		else
 			params.User.typePlst = 'true'
 		end
@@ -3790,7 +3798,11 @@ https://github.com/grafi-tt/lunaJson
 			 return ret
 			end
 		ret.request = {}
-		ret.request.url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		if params.User.typePlst == 'search' then
+			ret.request.url = 'https://www.youtube.com/youtubei/v1/search?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		else
+			ret.request.url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		end
 		ret.request.method = 'post'
 		ret.request.body = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210302.07.01","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'",}},"continuation":"' .. continuation .. '"}'
 		ret.request.headers = params.User.headers
@@ -4097,7 +4109,9 @@ https://github.com/grafi-tt/lunaJson
 			or inAdr:match('list=LM')
 			or (inAdr:match('/feed/')
 				and not inAdr:match('/feed/storefront')
-				and not inAdr:match('/feed/trending')))
+				and not inAdr:match('/feed/trending')
+				and not inAdr:match('/feed/explore')
+				))
 		then
 			StopOnErr(100, m_simpleTV.User.YT.Lng.noCookies)
 		 return
@@ -4183,6 +4197,7 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('list=LM')
 		or inAdr:match('list=LL')
 		or inAdr:match('youtube%.com/[^/]+/videos')
+		or inAdr:match('search_query')
 	then
 		Plst(inAdr)
 	elseif inAdr:match('/user/')
