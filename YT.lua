@@ -2054,7 +2054,7 @@ https://github.com/grafi-tt/lunaJson
 			if rc ~= 200 then return end
 		answer = answer:gsub('++', ' ')
 		answer = m_simpleTV.Common.fromPercentEncoding(answer)
-	 return rc, (answer:match('player_response=([^&]*)') or '')
+	 return rc, answer:match('player_response=([^&]*)')
 	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
@@ -2088,16 +2088,19 @@ https://github.com/grafi-tt/lunaJson
 		if infoInFile then
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
+		player_response = player_response or ''
 		local trailer = player_response:match('"trailerVideoId":%s*"([^"]+)')
 		if trailer then
 			m_simpleTV.User.YT.vId = trailer
 			m_simpleTV.User.YT.isTrailer = true
 			rc, player_response = GetVideoInfo()
+			player_response = player_response or ''
 		end
 		if not player_response:match('status":%s*"OK')
 			and not player_response:match('status":%s*"ERROR')
 		then
 			rc, player_response = GetVideoInfo('&el=detailpage&cco=1')
+			player_response = player_response or ''
 		end
 		if infoInFile then
 			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
