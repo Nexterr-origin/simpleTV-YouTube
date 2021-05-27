@@ -2051,7 +2051,7 @@ https://github.com/grafi-tt/lunaJson
 			if rc ~= 200 then return end
 		answer = answer:gsub('++', ' ')
 		answer = m_simpleTV.Common.fromPercentEncoding(answer)
-	 return rc, answer:match('player_response=([^&]*)')
+	 return rc, answer:match('player_response=([^&]+)')
 	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
@@ -2105,9 +2105,7 @@ https://github.com/grafi-tt/lunaJson
 			if rc == 429 then
 			 return nil, 'HTTP Error 429: Too Many Requests\n\n' .. m_simpleTV.User.YT.Lng.noCookies
 			end
-			if rc ~= 200
-				or player_response == ''
-			then
+			if rc ~= 200 or player_response == '' then
 			 return nil, m_simpleTV.User.YT.Lng.videoNotExst
 			end
 			if player_response:match('drmFamilies') then
