@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (30/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1592,9 +1592,6 @@ https://github.com/grafi-tt/lunaJson
 		if isCipher then
 			url = m_simpleTV.Common.fromPercentEncoding(url)
 			url = url:gsub('(.-)url=(.+)', '%2&%1')
-		end
-		if not url:match('ratebypass=') then
-			url = url:gsub('&', '&ratebypass=yes&', 1)
 		end
 	 return url
 	end
