@@ -1974,7 +1974,7 @@ https://github.com/grafi-tt/lunaJson
 	 return index or 1
 	end
 	local function StreamCheck(t, index)
-		local videoLogo = '$OPT:sub-source=logo:marq$OPT:marq-timeout=4000$OPT:marq-opacity=50$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=SimpleTV'
+		local videoLogo = '$OPT:sub-source=logo:marq$OPT:marq-timeout=4000$OPT:marq-opacity=40$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=SimpleTV'
 		local url = t[index].Address
 		if t[index].isCipher then
 			url = DeCipherSign(url)
@@ -2011,7 +2011,7 @@ https://github.com/grafi-tt/lunaJson
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
 			.. (adrStart or '')
-			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
+			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT'
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
@@ -2026,9 +2026,12 @@ https://github.com/grafi-tt/lunaJson
 				extOpt_demux = '$OPT:demux=avcodec,any'
 			end
 			v.aItag = itag_audio
-			v.Address = adr .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
+			v.Address = adr .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
 		else
-			v.Address = adr .. (captions or '')
+			if captions then
+				adr = adr .. '$OPT:input-slave=' .. captions
+			end
+			v.Address = adr
 		end
 		if proxy ~= '' then
 			v.Address = v.Address .. '$OPT:http-proxy=' .. proxy
