@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (30/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (31/5/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1974,6 +1974,7 @@ https://github.com/grafi-tt/lunaJson
 	 return index or 1
 	end
 	local function StreamCheck(t, index)
+		local videoLogo = '$OPT:sub-source=logo:marq$OPT:marq-timeout=4000$OPT:marq-opacity=50$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=SimpleTV'
 		local url = t[index].Address
 		if t[index].isCipher then
 			url = DeCipherSign(url)
@@ -1981,11 +1982,11 @@ https://github.com/grafi-tt/lunaJson
 			if index == 1
 				or (t[index].itag and t[index].itag ~= 22)
 			then
-			 return url
+			 return url .. videoLogo
 			end
 		local session_check = m_simpleTV.Http.New(userAgent, proxy, true)
 			if not session_check then
-			 return url
+			 return url .. videoLogo
 			end
 		m_simpleTV.Http.SetTimeout(session_check, 14000)
 		m_simpleTV.Http.Request(session_check, {url = url:gsub('$.+',''), method = 'head'})
@@ -2003,9 +2004,9 @@ https://github.com/grafi-tt/lunaJson
 				if t[index].isCipher then
 					url = DeCipherSign(url)
 				end
-			 return url, index
+			 return url .. videoLogo, index
 			end
-	 return url
+	 return url .. videoLogo
 	end
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
