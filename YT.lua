@@ -1974,7 +1974,7 @@ https://github.com/grafi-tt/lunaJson
 	 return index or 1
 	end
 	local function StreamCheck(t, index)
-		local videoLogo = '$OPT:sub-source=logo:marq$OPT:marq-timeout=4000$OPT:marq-opacity=40$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=SimpleTV'
+		local videoLogo = '$OPT:sub-source=logo:marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 		local url = t[index].Address
 		if t[index].isCipher then
 			url = DeCipherSign(url)
