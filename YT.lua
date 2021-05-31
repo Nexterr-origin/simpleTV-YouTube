@@ -2010,7 +2010,7 @@ https://github.com/grafi-tt/lunaJson
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
 			.. (adrStart or '')
-			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:sub-source=logo:marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
+			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
