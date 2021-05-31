@@ -1974,7 +1974,6 @@ https://github.com/grafi-tt/lunaJson
 	 return index or 1
 	end
 	local function StreamCheck(t, index)
-		local videoLogo = '$OPT:sub-source=logo:marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 		local url = t[index].Address
 		if t[index].isCipher then
 			url = DeCipherSign(url)
@@ -1982,11 +1981,11 @@ https://github.com/grafi-tt/lunaJson
 			if index == 1
 				or (t[index].itag and t[index].itag ~= 22)
 			then
-			 return url .. videoLogo
+			 return url
 			end
 		local session_check = m_simpleTV.Http.New(userAgent, proxy, true)
 			if not session_check then
-			 return url .. videoLogo
+			 return url
 			end
 		m_simpleTV.Http.SetTimeout(session_check, 14000)
 		m_simpleTV.Http.Request(session_check, {url = url:gsub('$.+',''), method = 'head'})
@@ -2004,14 +2003,14 @@ https://github.com/grafi-tt/lunaJson
 				if t[index].isCipher then
 					url = DeCipherSign(url)
 				end
-			 return url .. videoLogo, index
+			 return url, index
 			end
-	 return url .. videoLogo
+	 return url
 	end
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
 			.. (adrStart or '')
-			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT'
+			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:sub-source=logo:marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
