@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (31/5/21)
+-- видеоскрипт для сайта https://www.youtube.com (1/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2009,8 +2009,13 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
-			.. (adrStart or '')
-			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
+				.. (adrStart or '')
+				.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT'
+		if infoInFile then
+			adr = adr .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=50$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
+		else
+			adr = adr .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
+		end
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
