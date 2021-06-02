@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (2/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2011,10 +2011,11 @@ https://github.com/grafi-tt/lunaJson
 		local adr = StreamFormat(v.Address, v.isCipher)
 				.. (adrStart or '')
 				.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT'
+		local k = math.ceil(v.qlty / 100)
 		if infoInFile then
-			adr = adr .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=50$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
+			adr = adr .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (10 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
 		else
-			adr = adr .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=12$OPT:marq-x=10$OPT:marq-y=10$OPT:marq-position=9$OPT:marq-marquee=YouTube'
+			adr = adr .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=' .. (2.5 * k) .. '$OPT:marq-x=' .. (3 * k) .. '$OPT:marq-y=' .. (3 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 		end
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
