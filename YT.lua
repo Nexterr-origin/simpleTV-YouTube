@@ -2046,7 +2046,7 @@ https://github.com/grafi-tt/lunaJson
 	local function GetVideoInfo()
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_videoInfo then return end
-		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
+		local headers = 'X-Goog-AuthUser: 0\nX-Origin: https://www.youtube.com\nOrigin: https://www.youtube.com\nReferer: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
 		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
