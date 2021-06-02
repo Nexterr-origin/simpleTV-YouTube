@@ -2015,7 +2015,7 @@ https://github.com/grafi-tt/lunaJson
 		if infoInFile then
 			adr = adr .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (10 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
 		else
-			adr = adr .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=230$OPT:marq-size=' .. (2.5 * k) .. '$OPT:marq-x=' .. (3 * k) .. '$OPT:marq-y=' .. (3 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
+			adr = adr .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=' .. (2.5 * k) .. '$OPT:marq-x=' .. (3 * k) .. '$OPT:marq-y=' .. (3 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 		end
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
