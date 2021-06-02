@@ -15,20 +15,15 @@ https://www.youtube.com/feed/history - история
 https://www.youtube.com/playlist?list=LL - понравившиеся
 https://www.youtube.com/playlist?list=LM - понравившиеся (музыка)
 https://www.youtube.com/playlist?list=WL - посмотреть позже
-https://www.youtube.com/watch?v=kFW8kJ9Y1tM - видео
+https://www.youtube.com/watch?v=kFW8kJ9Y1tM - age check + no embeded
+https://www.youtube.com/watch?v=6LZM3_wp2ps - age check
+https://youtu.be/1B__8N5d_LA - age check
 ---------------------------------------------------
 RSS feed:
 https://www.youtube.com/feeds/videos.xml?channel_id=UCba3hpU7EFBSk817y9qZkiA
 https://www.youtube.com/feeds/videos.xml?user=periodicvideos
 ---------------------------------------------------
--- Gate + рефер
-https://www.youtube.com/watch?v=zbT53Q_olkU$OPT:http-referrer=https://cinema.mosfilm.ru
--- Gate
-https://youtu.be/1B__8N5d_LA
--- Gate
-https://www.youtube.com/watch?v=0e9JgyzCIBc
--- Gate
-https://www.youtube.com/watch?v=6LZM3_wp2ps
+https://www.youtube.com/watch?v=0e9JgyzCIBc - заблокировано по требованию пж
 ---------------------------------------------------
 hashtag #sayso
 https://www.youtube.com/hashtag/sayso
