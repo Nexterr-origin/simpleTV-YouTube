@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -2043,21 +2043,16 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return v
 	end
-	local function GetVideoInfo(param)
+	local function GetVideoInfo()
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_videoInfo then return end
-		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
-		param = param or ''
-		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://www.youtube.com'
-		local sts = m_simpleTV.User.YT.sts or ''
-		local url = string.format('https://www.youtube.com/get_video_info?html5=1&&gl=US&eurl=%s&hl=%s&sts=%s&video_id=%s&%s', referer, m_simpleTV.User.YT.Lng.hl, sts, m_simpleTV.User.YT.vId, param)
+		local headers = 'X-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210519.01.00' .. header_Auth()
+		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210519.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
+		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url})
+		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
-			if rc ~= 200 then return end
-		answer = answer:gsub('++', ' ')
-		answer = m_simpleTV.Common.fromPercentEncoding(answer)
-	 return rc, answer:match('player_response=([^&]+)')
+	 return rc, answer
 	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
@@ -2097,12 +2092,6 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.User.YT.vId = trailer
 			m_simpleTV.User.YT.isTrailer = true
 			rc, player_response = GetVideoInfo()
-			player_response = player_response or ''
-		end
-		if not player_response:match('status":%s*"OK')
-			and not player_response:match('status":%s*"ERROR')
-		then
-			rc, player_response = GetVideoInfo('el=detailpage&cco=1')
 			player_response = player_response or ''
 		end
 		if infoInFile then
