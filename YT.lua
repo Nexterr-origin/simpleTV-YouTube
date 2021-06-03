@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (2/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (3/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1895,9 +1895,9 @@ https://github.com/grafi-tt/lunaJson
 				ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
 			 return	'vlc://pause:5'
 			end
-			for cipherSign in adr:gmatch('&s=([^&]*)') do
+			for cipherSign in adr:gmatch('&s=([^&]+)') do
 				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
-				adr = adr:gsub('&s=[^&]*', '&sig=' .. signature, 1)
+				adr = adr:gsub('&s=[^&]+', '&sig=' .. signature, 1)
 			end
 	 return adr
 	end
@@ -2010,7 +2010,7 @@ https://github.com/grafi-tt/lunaJson
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
 				.. (adrStart or '')
-				.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT'
+				.. '$OPT:NO-STIMESHIFT'
 		local k = v.qlty / 100
 		if infoInFile then
 			adr = adr .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (10 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
@@ -2031,10 +2031,10 @@ https://github.com/grafi-tt/lunaJson
 				extOpt_demux = '$OPT:demux=avcodec,any'
 			end
 			v.aItag = itag_audio
-			v.Address = adr .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
+			v.Address = adr .. '$OPT:sub-track-id=1$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
 		else
 			if captions then
-				adr = adr .. '$OPT:input-slave=' .. captions
+				adr = adr .. '$OPT:sub-track-id=2$OPT:input-slave=' .. captions
 			end
 			v.Address = adr
 		end
