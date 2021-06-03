@@ -62,6 +62,8 @@ https://www.youtube.com/watch?v=arlev2tjDtk
 https://www.youtube.com/watch?v=COWtsRUxFJo
 встраиваемое видео
 https://www.youtube.com/embed/owsfdh4gxyc
+видео с указаным временем
+https://youtu.be/h_D3VFfhvs4?t=241
 встроеный плейлист
 https://www.youtube.com/embed/playlist?list=PLcLrKCb6x5m2J2v9KoVw9JiWt2laXd0AR
 список роликов в ссылке
