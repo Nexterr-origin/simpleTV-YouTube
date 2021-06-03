@@ -2010,7 +2010,8 @@ https://github.com/grafi-tt/lunaJson
 	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
 				.. (adrStart or '')
-				.. '$OPT:NO-STIMESHIFT'
+				.. '$OPT:NO-STIMESHIFT$OPT:meta-description='
+				.. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
 		local k = v.qlty / 100
 		if infoInFile then
 			adr = adr .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (10 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
