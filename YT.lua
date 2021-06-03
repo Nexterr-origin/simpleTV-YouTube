@@ -1305,9 +1305,9 @@ https://github.com/grafi-tt/lunaJson
 		infoInFile = string_rep
 						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
 						.. string_rep
-						.. 'qlty: ' .. tostring(qlty)
-						.. ' | video itag: ' .. tostring(t[index].itag)
-						.. ' | audio itag: ' .. tostring(t[index].aItag) .. '\n'
+						.. 'qlty: ' .. t[index].Name
+						.. ' (vItag: ' .. tostring(t[index].itag)
+						.. ', aItag: ' .. tostring(t[index].aItag) .. ')\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(t[index].isCipher)
 						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
@@ -1975,6 +1975,23 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function StreamCheck(t, index)
 		local url = t[index].Address
+		url = url .. '$OPT:NO-STIMESHIFT$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
+		local k = t[index].Name
+		if k then
+			k = k:match('%d+') or 600
+			if infoInFile then
+				url = url .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (0.1 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
+			else
+				url = url .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=' .. (0.025 * k) .. '$OPT:marq-x=' .. (0.03 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
+			end
+		end
+		local adrStart = inAdr:match('[?&]t=[^&]+')
+		if adrStart and videoId == m_simpleTV.User.YT.vId then
+			url = url .. StreamStart(adrStart)
+		end
+		if proxy ~= '' then
+			url = url .. '$OPT:http-proxy=' .. proxy
+		end
 		if t[index].isCipher then
 			url = DeCipherSign(url)
 		end
@@ -2007,17 +2024,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return url
 	end
-	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
+	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		local adr = StreamFormat(v.Address, v.isCipher)
-				.. (adrStart or '')
-				.. '$OPT:NO-STIMESHIFT$OPT:meta-description='
-				.. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
-		local k = v.qlty / 100
-		if infoInFile then
-			adr = adr .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (10 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
-		else
-			adr = adr .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=30$OPT:marq-size=' .. (2.5 * k) .. '$OPT:marq-x=' .. (3 * k) .. '$OPT:marq-y=' .. (3 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
-		end
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
@@ -2032,15 +2040,12 @@ https://github.com/grafi-tt/lunaJson
 				extOpt_demux = '$OPT:demux=avcodec,any'
 			end
 			v.aItag = itag_audio
-			v.Address = adr .. '$OPT:sub-track-id=1$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
+			v.Address = adr .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '') .. '$OPT:sub-track-id=1'
 		else
 			if captions then
-				adr = adr .. '$OPT:sub-track-id=2$OPT:input-slave=' .. captions
+				adr = adr .. '$OPT:input-slave=' .. captions .. '$OPT:sub-track-id=2'
 			end
 			v.Address = adr
-		end
-		if proxy ~= '' then
-			v.Address = v.Address .. '$OPT:http-proxy=' .. proxy
 		end
 	 return v
 	end
@@ -2076,12 +2081,6 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-		local adrStart = inAdr:match('[?&]t=[^&]*')
-		if adrStart and videoId == m_simpleTV.User.YT.vId then
-			adrStart = StreamStart(adrStart)
-		else
-			adrStart = nil
-		end
 		if not m_simpleTV.User.YT.signScr then
 			pcall(GetSignScr)
 		end
@@ -2423,12 +2422,12 @@ https://github.com/grafi-tt/lunaJson
 		t = {}
 			for i = 1, #noDuplicate do
 				if noDuplicate[i].qlty > 300 then
-					t[#t + 1] = Stream(noDuplicate[i], adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
+					t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, aAdr_opus, aItag_opus, captions)
 				end
 			end
 		if #t == 0 then
 			for i = 1, #noDuplicate do
-				t[#t + 1] = Stream(noDuplicate[i], adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
+				t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, aAdr_opus, aItag_opus, captions)
 			end
 		end
 			if #t == 0 then
@@ -2444,7 +2443,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		local aAdrName, audioId, itag_a
 		if aAdr_opus or aAdr then
-			aAdr = (aAdr_opus or aAdr) .. (adrStart or '') .. '$OPT:NO-STIMESHIFT$OPT:http-proxy=' .. proxy
+			aAdr = aAdr_opus or aAdr
 			aAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
 			if infoInFile then
@@ -2457,23 +2456,16 @@ https://github.com/grafi-tt/lunaJson
 		end
 		t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, isCipher = aAdr_isCipher, aItag = itag_a}
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
-		if infoInFile then
-			inf0_qlty = {}
-		end
 			for i = 1, #t do
 				t[i].Id = i
-				if infoInFile then
-					if i == 1 then
-						inf0_qlty[1] = '[1] audio itag = ' .. tostring(t[1].aItag)
-					else
-						inf0_qlty[i] = '[' .. i .. '] qlty: ' .. tostring(t[i].qlty)
-								.. ' | video itag: ' .. tostring(t[i].itag) .. ' | audio itag: ' .. tostring(t[i].aItag)
-					end
+			end
+		if infoInFile then
+			inf0_qlty = {}
+				for i = 1, #t do
+					inf0_qlty[i] = string.format('[%s] %s (vItag: %s, aItag: %s)', i, t[i].Name, tostring(t[i].itag), tostring(t[i].aItag))
 				end
-			end
-			if infoInFile then
-				inf0_qlty = table.concat(inf0_qlty, '\n')
-			end
+			inf0_qlty = table.concat(inf0_qlty, '\n')
+		end
 		if m_simpleTV.User.YT.qlty < 100 then
 			if audioId == 99 and not isInfoPanel then
 				title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.audio
@@ -2851,7 +2843,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 			 return
 			end
-			if not plstPos and videoId and inAdr:match('[?&]t=') then
+			if not m_simpleTV.User.YT.plstPos and videoId and inAdr:match('[?&]t=') then
 				inAdr = inAdr:gsub('[?&]list=[%w_%-]+', '')
 				m_simpleTV.Http.Close(session)
 				m_simpleTV.Control.ChangeAddress = 'No'
