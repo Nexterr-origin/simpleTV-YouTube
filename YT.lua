@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (3/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (4/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1975,7 +1975,18 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function StreamCheck(t, index)
 		local url = t[index].Address
-		url = url .. '$OPT:NO-STIMESHIFT$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
+		if t[index].isCipher then
+			url = DeCipherSign(url)
+		end
+		url = url .. '$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
+		if not m_simpleTV.User.YT.isLiveContent then
+			url = url .. '$OPT:NO-STIMESHIFT'
+		end
+		if t[index].isAdaptive == true then
+			url = url .. '$OPT:sub-track-id=1'
+		elseif t[index].isAdaptive == false then
+			url = url .. '$OPT:sub-track-id=2'
+		end
 		local k = t[index].Name
 		if k then
 			k = k:match('%d+') or 600
@@ -1991,9 +2002,6 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if proxy ~= '' then
 			url = url .. '$OPT:http-proxy=' .. proxy
-		end
-		if t[index].isCipher then
-			url = DeCipherSign(url)
 		end
 			if index == 1
 				or (t[index].itag and t[index].itag ~= 22)
@@ -2040,10 +2048,10 @@ https://github.com/grafi-tt/lunaJson
 				extOpt_demux = '$OPT:demux=avcodec,any'
 			end
 			v.aItag = itag_audio
-			v.Address = adr .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '') .. '$OPT:sub-track-id=1'
+			v.Address = adr .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
 		else
 			if captions then
-				adr = adr .. '$OPT:input-slave=' .. captions .. '$OPT:sub-track-id=2'
+				adr = adr .. '$OPT:input-slave=' .. captions
 			end
 			v.Address = adr
 		end
