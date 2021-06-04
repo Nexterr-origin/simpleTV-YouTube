@@ -2865,7 +2865,7 @@ https://github.com/grafi-tt/lunaJson
 		if plstPos > 1 or inAdr:match('[?&]t=') or #tab == 1 then
 			pl = 32
 		end
-		local FilterType, AutoNumberFormat
+		local FilterType, AutoNumberFormat, Random, PlayMode
 		if #tab > 2 then
 			if #tab < 15 then
 				FilterType = 2
@@ -2876,6 +2876,17 @@ https://github.com/grafi-tt/lunaJson
 		else
 			FilterType = 2
 			AutoNumberFormat = ''
+		end
+		if plstId:match('^RD') and urlAdr:match('isLogo=false') then
+			if #tab > 2 then
+				plstPos = math.random(3, #tab)
+			end
+			pl = 32
+			Random = 1
+			PlayMode = 1
+		else
+			Random = - 1
+			PlayMode = - 1
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonOptions then
 			tab.ExtButton0 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOptions, ButtonScript = 'Qlty_YT()'}
@@ -2908,6 +2919,8 @@ https://github.com/grafi-tt/lunaJson
 		local retAdr
 		tab.ExtParams = {}
 		tab.ExtParams.FilterType = FilterType
+		tab.ExtParams.Random = Random
+		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
@@ -2941,8 +2954,18 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.QltyIndex = index
 		retAdr = retAdr or StreamCheck(t, index)
 		local plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
-		m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
+		local plstPicId
+		if plstId:match('^RD') then
+			plstPicId = plstId:gsub('^RD', '')
+		else
+			plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
+		end
 		m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
+		if m_simpleTV.User.YT.isPlstsCh then
+			m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
+		else
+			m_simpleTV.User.YT.AddToBaseUrlinAdr = inAdr
+		end
 		if #tab == 1 then
 			retAdr = positionToContinue(retAdr)
 		else
@@ -3694,9 +3717,7 @@ https://github.com/grafi-tt/lunaJson
 					t1[3] = {}
 					t1[3].Id = 3
 					t1[3].Name = '🎵🔀 Music-Mix ' .. m_simpleTV.User.YT.Lng.plst
-					t1[3].Address = 'https://www.youtube.com/embed?listType=playlist&list=RD'
-									.. m_simpleTV.User.YT.vId
-									.. '&isLogo=false'
+					t1[3].Address = string.format('https://www.youtube.com/playlist?list=RD%s&isLogo=false', m_simpleTV.User.YT.vId)
 					m_simpleTV.User.YT.PlstsCh.chTitle = nil
 				end
 			end
@@ -4197,14 +4218,14 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('/feed/')
 		or inAdr:match('/hashtag/')
 		or inAdr:match('youtube%.com$')
-		or inAdr:match('list=TL')
-		or inAdr:match('list=RD')
 		or inAdr:match('list=WL')
-		or inAdr:match('list=OL')
 		or inAdr:match('list=LM')
 		or inAdr:match('list=LL')
+		or inAdr:match('list=TL')
+		or inAdr:match('list=OL')
 		or inAdr:match('youtube%.com/[^/]+/videos')
 		or inAdr:match('search_query')
+		and not inAdr:match('/playlist?list=RD')
 	then
 		Plst(inAdr)
 	elseif inAdr:match('/user/')
