@@ -1591,7 +1591,7 @@ https://github.com/grafi-tt/lunaJson
 	local function StreamFormat(url, isCipher)
 		if isCipher then
 			url = m_simpleTV.Common.fromPercentEncoding(url)
-			url = url:gsub('(.-)url=(.+)', '%2&%1')
+			url = url:gsub('^(.-)url=(.+)', '%2&%1')
 		end
 	 return url
 	end
@@ -2005,7 +2005,7 @@ https://github.com/grafi-tt/lunaJson
 			 return url
 			end
 		m_simpleTV.Http.SetTimeout(session_check, 14000)
-		m_simpleTV.Http.Request(session_check, {url = url:gsub('$.+',''), method = 'head'})
+		m_simpleTV.Http.Request(session_check, {url = url:gsub('$.+', ''), method = 'head'})
 		local raw = m_simpleTV.Http.GetRawHeader(session_check)
 		m_simpleTV.Http.Close(session_check)
 			if raw:match('Content%-Length: 0') then
@@ -3046,6 +3046,12 @@ https://github.com/grafi-tt/lunaJson
 		local header = params.User.Title
 		local tab = params.User.tab
 			if #tab == 0 then
+					if url:match('[&?]list=') and not url:match('/watch?') then
+						m_simpleTV.Control.ChangeAddress = 'No'
+						m_simpleTV.Control.CurrentAddress = url:gsub('^.-&list=(..)([^&]+)', 'https://www.youtube.com/watch?v=%2&list=%1%2&isLogo=false')
+						dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
+					 return
+					end
 				StopOnErr(1)
 			 return
 			end
