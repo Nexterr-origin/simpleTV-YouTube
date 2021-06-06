@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (6/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -1991,7 +1991,7 @@ https://github.com/grafi-tt/lunaJson
 		if k then
 			k = k:match('%d+') or 600
 			if infoInFile then
-				url = url .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (0.1 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
+				url = url .. '$OPT:sub-source=marq$OPT:marq-opacity=150$OPT:marq-color=16776960$OPT:marq-size=' .. (0.05 * k) ..'$OPT:marq-position=10$OPT:marq-x=' .. (0.05 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-marquee=Debug mode [%H:%M:%S]'
 			else
 				url = url .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=' .. (0.025 * k) .. '$OPT:marq-x=' .. (0.03 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 			end
