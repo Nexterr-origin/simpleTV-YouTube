@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (7/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -1295,7 +1295,10 @@ https://github.com/grafi-tt/lunaJson
 			if not infoInFile then return end
 		local scr_time = string.format('%.3f', (os.clock() - infoInFile))
 		local calc = scr_time - inf0
-		local adr = m_simpleTV.Common.fromPercentEncoding(retAdr)
+		retAdr = string.gsub(retAdr, '(https://[^$]+)',
+				function(c)
+				 return m_simpleTV.Common.fromPercentEncoding(c)
+				end)
 		local string_rep = string.rep('–', 70) .. '\n'
 		index = noItag22 or index
 		local qlty = t[index].qlty
@@ -1331,7 +1334,7 @@ https://github.com/grafi-tt/lunaJson
 						.. (inf0_geo or '') .. '\n'
 						.. string_rep
 						.. 'address:\n\n'
-						.. adr:gsub('%$', '\n\n$'):gsub('slave=', 'slave=\n\n'):gsub('%#', '\n\n#\n\n') .. '\n'
+						.. retAdr:gsub('%$', '\n$'):gsub('slave=', 'slave=\n'):gsub('%#', '\n#\n'):gsub('\n+', '\n\n') .. '\n'
 		debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
 	end
 	local function Search(sAdr)
@@ -1593,6 +1596,7 @@ https://github.com/grafi-tt/lunaJson
 			url = m_simpleTV.Common.fromPercentEncoding(url)
 			url = url:gsub('^(.-)url=(.+)', '%2&%1')
 		end
+		-- url = url:gsub('&keepalive=yes', '')
 	 return url
 	end
 	local function GetSignScr()
@@ -1864,10 +1868,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 			local function table_slica(tbl, first, last, step)
 				local sliced = {}
-				local p = #sliced
 					for i = first or 1, last or #tbl, step or 1 do
-						p = p + 1
-						sliced[p] = tbl[i]
+						sliced[#sliced + 1] = tbl[i]
 					end
 			 return sliced
 			end
@@ -1876,7 +1878,6 @@ https://github.com/grafi-tt/lunaJson
 					if #t == 0 or not signScr then
 					 return s
 					end
-				local math_abs = math.abs
 					for i = 1, #signScr do
 						local a = signScr[i]
 						if a == 0 then
@@ -1885,7 +1886,7 @@ https://github.com/grafi-tt/lunaJson
 							if a > 0 then
 								t = table_swap(t, a)
 							else
-								t = table_slica(t, math_abs(a) + 1)
+								t = table_slica(t, math.abs(a) + 1)
 							end
 						end
 					end
@@ -1901,11 +1902,10 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return adr
 	end
-	local function StreamLive(hls, isLive, title)
+	local function StreamLive(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
 		m_simpleTV.Http.SetTimeout(session_live, 14000)
-		local extOpt = '$OPT:adaptive-use-access'
 		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
 		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
@@ -1926,7 +1926,7 @@ https://github.com/grafi-tt/lunaJson
 					t[#t + 1] = {}
 					t[#t].Id = #t
 					t[#t].Name = name .. 'p' .. fps
-					t[#t].Address = adr .. extOpt
+					t[#t].Address = adr
 					t[#t].qltyLive = qlty
 				end
 			end
@@ -1937,8 +1937,8 @@ https://github.com/grafi-tt/lunaJson
 		t[#t].Id = #t
 		t[#t].qltyLive = 10000
 		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
-		t[#t].Address = hls .. extOpt
-		if isLive == true and not isInfoPanel then
+		t[#t].Address = hls
+		if m_simpleTV.User.YT.isLive == true and not isInfoPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
 		end
 	 return t, title
@@ -1981,6 +1981,10 @@ https://github.com/grafi-tt/lunaJson
 		url = url .. '$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
 		if not m_simpleTV.User.YT.isLiveContent then
 			url = url .. '$OPT:NO-STIMESHIFT'
+		elseif not m_simpleTV.User.YT.isLive then
+			url = url .. '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access'
+		else
+			url = url .. '$OPT:adaptive-use-access'
 		end
 		if t[index].isAdaptive == true then
 			url = url .. '$OPT:sub-track-id=1'
@@ -1991,7 +1995,7 @@ https://github.com/grafi-tt/lunaJson
 		if k then
 			k = k:match('%d+') or 600
 			if infoInFile then
-				url = url .. '$OPT:sub-source=marq$OPT:marq-opacity=100$OPT:marq-color=16776960$OPT:marq-size=' .. (0.1 * k) ..'$OPT:marq-position=0$OPT:marq-marquee=Debug mode'
+				url = url .. '$OPT:sub-source=marq$OPT:marq-opacity=150$OPT:marq-color=16776960$OPT:marq-size=' .. (0.05 * k) ..'$OPT:marq-position=10$OPT:marq-x=' .. (0.05 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-marquee=Debug mode [%H:%M:%S]'
 			else
 				url = url .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=' .. (0.025 * k) .. '$OPT:marq-x=' .. (0.03 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 			end
@@ -2250,9 +2254,9 @@ https://github.com/grafi-tt/lunaJson
 			Thumbs(tab.storyboards.playerStoryboardSpecRenderer.spec)
 		end
 			if tab.streamingData and tab.streamingData.hlsManifestUrl
-				and (tab.videoDetails.isLiveContent == true or tab.videoDetails.isLive == true)
+				and (m_simpleTV.User.YT.isLiveContent == true or m_simpleTV.User.YT.isLive == true)
 			then
-			 return StreamLive(tab.streamingData.hlsManifestUrl, tab.videoDetails.isLive, title)
+			 return StreamLive(tab.streamingData.hlsManifestUrl, title)
 			end
 		if tab.streamingData and tab.streamingData.formats then
 			local k = 1
