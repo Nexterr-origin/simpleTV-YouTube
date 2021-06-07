@@ -1295,7 +1295,7 @@ https://github.com/grafi-tt/lunaJson
 			if not infoInFile then return end
 		local scr_time = string.format('%.3f', (os.clock() - infoInFile))
 		local calc = scr_time - inf0
-		retAdr = string.gsub(retAdr, 'https://[^$]+',
+		retAdr = string.gsub(retAdr, 'https://[^$#]+',
 				function(c)
 				 return m_simpleTV.Common.fromPercentEncoding(c)
 				end)
@@ -1315,8 +1315,8 @@ https://github.com/grafi-tt/lunaJson
 						.. ', aItag: ' .. tostring(t[index].aItag) .. ')\n'
 						.. string_rep
 						.. 'rTime: ' .. scr_time .. ' s.'
-						.. ' [getVideoInfo: ' .. inf0 .. ' s.'
-						.. ' + calc: ' .. calc .. ' s.]\n'
+						.. ' (getVideoInfo: ' .. inf0 .. ' s.'
+						.. ' + calc: ' .. calc .. ' s.)\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(retAdr:match('&sp=(%a+)'))
 						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
@@ -1590,11 +1590,6 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Http.SetCookies(session_markWatch, url, m_simpleTV.User.YT.cookies, '')
 			m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
-	end
-	local function StreamFormat(url)
-		url = m_simpleTV.Common.fromPercentEncoding(url)
-		url = url:gsub('^(.-)url=(.+)', '%2&%1')
-	 return url
 	end
 	local function GetSignScr()
 		local session_signScr = m_simpleTV.Http.New(userAgent, proxy, false)
@@ -1972,8 +1967,12 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function StreamCheck(t, index)
 		local url = t[index].Address
+		url = string.gsub(url, 's=[^$#]+',
+				function(c)
+					c = m_simpleTV.Common.fromPercentEncoding(c)
+				 return c:gsub('^(.-)url=(.+)', '%2&%1')
+				end)
 		url = DeCipherSign(url)
-		url = url .. '$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
 		if not m_simpleTV.User.YT.isLiveContent then
 			url = url .. '$OPT:NO-STIMESHIFT'
 		elseif not m_simpleTV.User.YT.isLive then
@@ -1986,6 +1985,13 @@ https://github.com/grafi-tt/lunaJson
 		elseif t[index].isAdaptive == false then
 			url = url .. '$OPT:sub-track-id=2'
 		end
+		local adrStart = inAdr:match('[?&]t=[^&]+')
+		if adrStart and videoId == m_simpleTV.User.YT.vId then
+			url = url .. StreamStart(adrStart)
+		end
+		if proxy ~= '' then
+			url = url .. '$OPT:http-proxy=' .. proxy
+		end
 		local k = t[index].Name
 		if k then
 			k = k:match('%d+') or 600
@@ -1995,13 +2001,7 @@ https://github.com/grafi-tt/lunaJson
 				url = url .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=' .. (0.025 * k) .. '$OPT:marq-x=' .. (0.03 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 			end
 		end
-		local adrStart = inAdr:match('[?&]t=[^&]+')
-		if adrStart and videoId == m_simpleTV.User.YT.vId then
-			url = url .. StreamStart(adrStart)
-		end
-		if proxy ~= '' then
-			url = url .. '$OPT:http-proxy=' .. proxy
-		end
+		url = url .. '$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
 			if index == 1
 				or (t[index].itag and t[index].itag ~= 22)
 			then
@@ -2030,7 +2030,6 @@ https://github.com/grafi-tt/lunaJson
 	 return url
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
-		local adr = StreamFormat(v.Address)
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
@@ -2045,12 +2044,11 @@ https://github.com/grafi-tt/lunaJson
 				extOpt_demux = '$OPT:demux=avcodec,any'
 			end
 			v.aItag = itag_audio
-			v.Address = adr .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
+			v.Address = v.Address .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
 		else
 			if captions then
-				adr = adr .. '$OPT:input-slave=' .. captions
+				v.Address = v.Address .. '$OPT:input-slave=' .. captions
 			end
-			v.Address = adr
 		end
 	 return v
 	end
@@ -2368,10 +2366,10 @@ https://github.com/grafi-tt/lunaJson
 					if t[z].audioIsDefault == true then
 						if audio_itags[i] == t[z].itag then
 							if audio_itags[i] == 251 then
-								aAdr_opus = StreamFormat(t[z].Address)
+								aAdr_opus = t[z].Address
 								aItag_opus = t[z].itag
 							elseif not aItag then
-								aAdr = StreamFormat(t[z].Address)
+								aAdr = t[z].Address
 								aItag = t[z].itag
 							end
 						 break
@@ -2384,10 +2382,10 @@ https://github.com/grafi-tt/lunaJson
 				for z = 1, #t do
 					if audio_itags[i] == t[z].itag then
 						if audio_itags[i] == 251 then
-							aAdr_opus = StreamFormat(t[z].Address)
+							aAdr_opus = t[z].Address
 							aItag_opus = t[z].itag
 						elseif not aItag then
-							aAdr = StreamFormat(t[z].Address)
+							aAdr = t[z].Address
 							aItag = t[z].itag
 						end
 					 break
