@@ -70,6 +70,7 @@ local infoInFile = true
 	htmlEntities = require 'htmlEntities'
 	require 'lfs'
 	require 'asynPlsLoaderHelper'
+	require('jsdecode')	
 	if not m_simpleTV.User then
 		m_simpleTV.User = {}
 	end
@@ -1608,6 +1609,13 @@ https://github.com/grafi-tt/lunaJson
 		rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
 		m_simpleTV.Http.Close(session_signScr)
 			if rc ~= 200 then return end
+---------------------------------------			
+		local p1, p2, p3 = string.match(answer, '(function%(a%){a=a%.split%(""%);)(..)(.-return a%.join%(""%)};)')
+			-- if p1==nil or p2==nil or p3==nil then return end
+		local p4 = string.match(answer, 'var ' .. p2 .. '.-};')
+			-- if p4==nil then return end
+		m_simpleTV.User.YT.scrjs = 'decode=' .. p1 .. p2 .. p3 .. p4			
+-----------------------------------------			
 		local f, var = answer:match('split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
@@ -1896,7 +1904,9 @@ https://github.com/grafi-tt/lunaJson
 			 return	'vlc://pause:5'
 			end
 			for cipherSign in adr:gmatch('&s=([^&]+)') do
+debug_in_file(jsdecode.DoDecode('decode("' .. cipherSign ..'")',false,m_simpleTV.User.YT.scrjs,128) .. '  jsdecode\n\n')
 				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
+debug_in_file(signature .. '  signature\n\n')
 				adr = adr:gsub('&s=[^&]+', '&sig=' .. signature, 1)
 			end
 	 return adr
