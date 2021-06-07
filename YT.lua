@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (7/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (8/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = true
+local infoInFile = false
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -1295,7 +1295,7 @@ https://github.com/grafi-tt/lunaJson
 			if not infoInFile then return end
 		local scr_time = string.format('%.3f', (os.clock() - infoInFile))
 		local calc = scr_time - inf0
-		retAdr = string.gsub(retAdr, '(https://[^$]+)',
+		retAdr = string.gsub(retAdr, 'https://[^$]+',
 				function(c)
 				 return m_simpleTV.Common.fromPercentEncoding(c)
 				end)
@@ -1306,34 +1306,34 @@ https://github.com/grafi-tt/lunaJson
 			qlty = nil
 		end
 		infoInFile = string_rep
+						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
+						.. string_rep
 						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
 						.. string_rep
 						.. 'qlty: ' .. t[index].Name
 						.. ' (vItag: ' .. tostring(t[index].itag)
 						.. ', aItag: ' .. tostring(t[index].aItag) .. ')\n'
 						.. string_rep
-						.. 'cipher: ' .. tostring(t[index].isCipher)
+						.. 'rTime: ' .. scr_time .. ' s.'
+						.. ' [getVideoInfo: ' .. inf0 .. ' s.'
+						.. ' + calc: ' .. calc .. ' s.]\n'
+						.. string_rep
+						.. 'cipher: ' .. tostring(retAdr:match('&sp=(%a+)'))
 						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
 						.. string_rep
-						.. 'time: ' .. scr_time .. ' s.'
-						.. ' | request: ' .. inf0 .. ' s.'
-						.. ' | calc: ' .. calc .. ' s.\n'
-						.. string_rep
-						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
-						.. string_rep
-						.. 'description:\n\n'
+						.. 'Description:\n\n'
 						.. m_simpleTV.User.YT.desc .. '\n'
 						.. string_rep
-						.. 'qlty table:\n\n'
+						.. 'Qlty table:\n\n'
 						.. (inf0_qlty or '') .. '\n'
 						.. string_rep
-						.. 'cookies:\n\n'
+						.. 'Cookies:\n\n'
 						.. m_simpleTV.User.YT.cookies:gsub('^[;]*(.-)[;]$', '%1'):gsub(';+', '\n') .. '\n'
 						.. string_rep
-						.. 'available countries:\n\n'
+						.. 'Available countries:\n\n'
 						.. (inf0_geo or '') .. '\n'
 						.. string_rep
-						.. 'address:\n\n'
+						.. 'Address:\n\n'
 						.. retAdr:gsub('%$', '\n$'):gsub('slave=', 'slave=\n'):gsub('%#', '\n#\n'):gsub('\n+', '\n\n') .. '\n'
 		debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
 	end
@@ -1591,12 +1591,9 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
-	local function StreamFormat(url, isCipher)
-		if isCipher then
-			url = m_simpleTV.Common.fromPercentEncoding(url)
-			url = url:gsub('^(.-)url=(.+)', '%2&%1')
-		end
-		-- url = url:gsub('&keepalive=yes', '')
+	local function StreamFormat(url)
+		url = m_simpleTV.Common.fromPercentEncoding(url)
+		url = url:gsub('^(.-)url=(.+)', '%2&%1')
 	 return url
 	end
 	local function GetSignScr()
@@ -1975,9 +1972,7 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function StreamCheck(t, index)
 		local url = t[index].Address
-		if t[index].isCipher then
-			url = DeCipherSign(url)
-		end
+		url = DeCipherSign(url)
 		url = url .. '$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
 		if not m_simpleTV.User.YT.isLiveContent then
 			url = url .. '$OPT:NO-STIMESHIFT'
@@ -2029,15 +2024,13 @@ https://github.com/grafi-tt/lunaJson
 				 return m_simpleTV.User.YT.logoPicFromDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
 				end
 				url = t[index].Address
-				if t[index].isCipher then
-					url = DeCipherSign(url)
-				end
+				url = DeCipherSign(url)
 			 return url, index
 			end
 	 return url
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
-		local adr = StreamFormat(v.Address, v.isCipher)
+		local adr = StreamFormat(v.Address)
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (aItag_opus and captions)
@@ -2268,9 +2261,6 @@ https://github.com/grafi-tt/lunaJson
 					t[i].width = tab.streamingData.formats[k].width
 					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 					t[i].isAdaptive = false
-					if tab.streamingData.formats[k].signatureCipher then
-						t[i].isCipher = true
-					end
 					k = k + 1
 					i = k
 				end
@@ -2287,9 +2277,6 @@ https://github.com/grafi-tt/lunaJson
 						t[i].fps = tab.streamingData.adaptiveFormats[k].fps
 						t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
 						t[i].isAdaptive = true
-						if tab.streamingData.adaptiveFormats[k].signatureCipher then
-							t[i].isCipher = true
-						end
 						if tab.streamingData.adaptiveFormats[k].audioTrack
 							and tab.streamingData.adaptiveFormats[k].audioTrack.audioIsDefault == true
 						then
@@ -2367,7 +2354,7 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		local aAdr, aItag, aAdr_isCipher, aItag_opus, aAdr_opus
+		local aAdr, aItag, aItag_opus, aAdr_opus
 		local video_itags, audio_itags = ItagTab()
 		if (m_simpleTV.User.YT.isVideo == true and m_simpleTV.Control.ChannelID ~= 268435455)
 			or m_simpleTV.User.YT.isVideo == false
@@ -2381,13 +2368,11 @@ https://github.com/grafi-tt/lunaJson
 					if t[z].audioIsDefault == true then
 						if audio_itags[i] == t[z].itag then
 							if audio_itags[i] == 251 then
-								aAdr_opus = StreamFormat(t[z].Address, t[z].isCipher)
+								aAdr_opus = StreamFormat(t[z].Address)
 								aItag_opus = t[z].itag
-								aAdr_isCipher = t[z].isCipher
 							elseif not aItag then
-								aAdr = StreamFormat(t[z].Address, t[z].isCipher)
+								aAdr = StreamFormat(t[z].Address)
 								aItag = t[z].itag
-								aAdr_isCipher = t[z].isCipher
 							end
 						 break
 						end
@@ -2399,13 +2384,11 @@ https://github.com/grafi-tt/lunaJson
 				for z = 1, #t do
 					if audio_itags[i] == t[z].itag then
 						if audio_itags[i] == 251 then
-							aAdr_opus = StreamFormat(t[z].Address, t[z].isCipher)
+							aAdr_opus = StreamFormat(t[z].Address)
 							aItag_opus = t[z].itag
-							aAdr_isCipher = t[z].isCipher
 						elseif not aItag then
-							aAdr = StreamFormat(t[z].Address, t[z].isCipher)
+							aAdr = StreamFormat(t[z].Address)
 							aItag = t[z].itag
-							aAdr_isCipher = t[z].isCipher
 						end
 					 break
 					end
@@ -2466,7 +2449,7 @@ https://github.com/grafi-tt/lunaJson
 			aAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, isCipher = aAdr_isCipher, aItag = itag_a}
+		t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = itag_a}
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
 			for i = 1, #t do
 				t[i].Id = i
