@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (8/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (11/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1965,69 +1965,38 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return index or 1
 	end
-	local function StreamCheck(t, index)
-		local url = t[index].Address
-		url = string.gsub(url, 's=[^$#]+',
-				function(c)
-					c = m_simpleTV.Common.fromPercentEncoding(c)
-				 return c:gsub('^(.-)url=(.+)', '%2&%1')
-				end)
-		url = DeCipherSign(url)
+	local function StreamOut(t, index)
+		local url = DeCipherSign(t[index].Address)
+		local extOpt = '$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
 		if not m_simpleTV.User.YT.isLiveContent then
-			url = url .. '$OPT:NO-STIMESHIFT'
+			extOpt = extOpt .. '$OPT:NO-STIMESHIFT'
 		elseif not m_simpleTV.User.YT.isLive then
-			url = url .. '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access'
+			extOpt = extOpt .. '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access'
 		else
-			url = url .. '$OPT:adaptive-use-access'
+			extOpt = extOpt .. '$OPT:adaptive-use-access'
 		end
 		if t[index].isAdaptive == true then
-			url = url .. '$OPT:sub-track-id=1'
+			extOpt = extOpt .. '$OPT:sub-track-id=1'
 		elseif t[index].isAdaptive == false then
-			url = url .. '$OPT:sub-track-id=2'
+			extOpt = extOpt .. '$OPT:sub-track-id=2'
 		end
 		local adrStart = inAdr:match('[?&]t=[^&]+')
 		if adrStart and videoId == m_simpleTV.User.YT.vId then
-			url = url .. StreamStart(adrStart)
+			extOpt = extOpt .. StreamStart(adrStart)
 		end
 		if proxy ~= '' then
-			url = url .. '$OPT:http-proxy=' .. proxy
+			extOpt = extOpt .. '$OPT:http-proxy=' .. proxy
 		end
 		local k = t[index].Name
 		if k then
 			k = k:match('%d+') or 600
 			if infoInFile then
-				url = url .. '$OPT:sub-source=marq$OPT:marq-opacity=150$OPT:marq-color=16776960$OPT:marq-size=' .. (0.05 * k) ..'$OPT:marq-position=10$OPT:marq-x=' .. (0.05 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-marquee=Debug mode [%H:%M:%S]'
+				extOpt = extOpt .. '$OPT:sub-source=marq$OPT:marq-opacity=150$OPT:marq-color=16776960$OPT:marq-size=' .. (0.05 * k) ..'$OPT:marq-position=10$OPT:marq-x=' .. (0.05 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-marquee=Debug mode [%H:%M:%S]'
 			else
-				url = url .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=' .. (0.025 * k) .. '$OPT:marq-x=' .. (0.03 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
+				extOpt = extOpt .. '$OPT:sub-source=marq$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=' .. (0.025 * k) .. '$OPT:marq-x=' .. (0.03 * k) .. '$OPT:marq-y=' .. (0.03 * k) .. '$OPT:marq-position=9$OPT:marq-marquee=YouTube'
 			end
 		end
-		url = url .. '$OPT:meta-description=' .. decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24')
-			if index == 1
-				or (t[index].itag and t[index].itag ~= 22)
-			then
-			 return url
-			end
-		local session_check = m_simpleTV.Http.New(userAgent, proxy, true)
-			if not session_check then
-			 return url
-			end
-		m_simpleTV.Http.SetTimeout(session_check, 14000)
-		m_simpleTV.Http.Request(session_check, {url = url:gsub('$.+', ''), method = 'head'})
-		local raw = m_simpleTV.Http.GetRawHeader(session_check)
-		m_simpleTV.Http.Close(session_check)
-			if raw:match('Content%-Length: 0') then
-				if index > 2 then
-					index = index - 1
-				elseif #t > index then
-					index = index + 1
-				else
-				 return m_simpleTV.User.YT.logoPicFromDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
-				end
-				url = t[index].Address
-				url = DeCipherSign(url)
-			 return url, index
-			end
-	 return url
+	 return url .. extOpt
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		if v.isAdaptive == true and aItag then
@@ -2259,6 +2228,8 @@ https://github.com/grafi-tt/lunaJson
 					t[i].width = tab.streamingData.formats[k].width
 					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 					t[i].isAdaptive = false
+					t[i].Address= m_simpleTV.Common.fromPercentEncoding(t[i].Address)
+					t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
 					k = k + 1
 					i = k
 				end
@@ -2283,6 +2254,8 @@ https://github.com/grafi-tt/lunaJson
 								audioTracks = true
 							end
 						end
+						t[i].Address= m_simpleTV.Common.fromPercentEncoding(t[i].Address)
+						t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
 						i = i + 1
 					end
 					k = k + 1
@@ -2354,11 +2327,6 @@ https://github.com/grafi-tt/lunaJson
 			end
 		local aAdr, aItag, aItag_opus, aAdr_opus
 		local video_itags, audio_itags = ItagTab()
-		if (m_simpleTV.User.YT.isVideo == true and m_simpleTV.Control.ChannelID ~= 268435455)
-			or m_simpleTV.User.YT.isVideo == false
-		then
-			video_itags = ItagRemove(video_itags, 22)
-		end
 		if audioTracks then
 			video_itags = ItagRemove(video_itags, 18)
 			for i = 1, #audio_itags do
@@ -2937,7 +2905,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 		m_simpleTV.User.YT.QltyIndex = index
-		retAdr = retAdr or StreamCheck(t, index)
+		retAdr = retAdr or StreamOut(t, index)
 		local plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
 		local plstPicId
 		if plstId:match('^RD') then
@@ -3215,7 +3183,7 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Control.CurrentTitle_UTF8 = header
 		end
 		m_simpleTV.User.YT.QltyIndex = index
-		retAdr = retAdr or StreamCheck(t, index)
+		retAdr = retAdr or StreamOut(t, index)
 		if #tab == 1 then
 			retAdr = positionToContinue(retAdr)
 		else
@@ -3607,7 +3575,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.QltyTab = t
 		local index = GetQltyIndex(t)
-		local retAdr, noItag22 = StreamCheck(t, index)
+		local retAdr, noItag22 = StreamOut(t, index)
 		m_simpleTV.User.YT.QltyIndex = index
 		if m_simpleTV.User.YT.isVideo == true then
 			local name = title:gsub('%c.-$', '')
@@ -3994,7 +3962,7 @@ https://github.com/grafi-tt/lunaJson
 				ShowMsg(t[id].Name, nil, true)
 			end
 			local retAdr = t[id].Address:gsub('$OPT:start%-time=%d+', '')
-			retAdr = StreamCheck(t, id)
+			retAdr = StreamOut(t, id)
 			m_simpleTV.Control.SetNewAddressT({address = retAdr, position = m_simpleTV.Control.GetPosition()})
 			if m_simpleTV.Control.GetState() == 0 then
 				m_simpleTV.Control.Restart(false)
