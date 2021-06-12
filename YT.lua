@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (11/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (12/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2878,6 +2878,9 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
+		if #tab > 1 then
+			tab.ExtParams.StopOnError = 0
+		end
 		local vId = tab[plstPos].Address:match('watch%?v=([^&]+)')
 		if (#tab > 1
 			and plstPos == 1)
@@ -3153,6 +3156,9 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
+		if #tab > 1 then
+			tab.ExtParams.StopOnError = 0
+		end
 		local vId = tab[plstPos].Address:match('v=([^&]+)')
 		m_simpleTV.User.YT.AddToBaseUrlinAdr = url
 		m_simpleTV.User.YT.AddToBaseVideoIdPlst = vId
