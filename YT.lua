@@ -3960,8 +3960,8 @@ https://github.com/grafi-tt/lunaJson
 			if isInfoPanel == false then
 				ShowMsg(t[id].Name, nil, true)
 			end
-			local retAdr = t[id].Address:gsub('$OPT:start%-time=%d+', '')
-			retAdr = StreamOut(t, id)
+			local retAdr = StreamOut(t, id)
+			retAdr = retAdr:gsub('$OPT:start%-time=%d+', '')
 			m_simpleTV.Control.SetNewAddressT({address = retAdr, position = m_simpleTV.Control.GetPosition()})
 			if m_simpleTV.Control.GetState() == 0 then
 				m_simpleTV.Control.Restart(false)
