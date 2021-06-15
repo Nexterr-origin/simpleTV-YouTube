@@ -2027,14 +2027,19 @@ https://github.com/grafi-tt/lunaJson
 		param = param or ''
 		local referer = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://www.youtube.com'
 		local sts = m_simpleTV.User.YT.sts or ''
-		local url = string.format('https://www.youtube.com/get_video_info?html5=1&&gl=US&eurl=%s&hl=%s&sts=%s&video_id=%s&%s', referer, m_simpleTV.User.YT.Lng.hl, sts, m_simpleTV.User.YT.vId, param)
+		local url = string.format('https://www.youtube.com/get_video_info?html5=1&eurl=%s&hl=%s&sts=%s&video_id=%s&%s', referer, m_simpleTV.User.YT.Lng.hl, sts, m_simpleTV.User.YT.vId, param)
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url})
 		m_simpleTV.Http.Close(session_videoInfo)
-			if rc ~= 200 then return end
+			if rc ~= 200 then
+			 return rc, nil
+			end
+		answer = answer:match('player_response=([^&]+)')
+			if not answer then
+			 return rc, nil
+			end
 		answer = answer:gsub('++', ' ')
-		answer = m_simpleTV.Common.fromPercentEncoding(answer)
-	 return rc, answer:match('player_response=([^&]+)')
+	 return rc, m_simpleTV.Common.fromPercentEncoding(answer)
 	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
@@ -2073,7 +2078,7 @@ https://github.com/grafi-tt/lunaJson
 		if not player_response:match('status":%s*"OK')
 			and not player_response:match('status":%s*"ERROR')
 		then
-			rc, player_response = GetVideoInfo('el=detailpage&cco=1')
+			rc, player_response = GetVideoInfo('el=detailpage&cco=1&gl=US')
 			player_response = player_response or ''
 		end
 		if infoInFile then
