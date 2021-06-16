@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (16/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -4175,6 +4175,7 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('list=LL')
 		or inAdr:match('list=TL')
 		or inAdr:match('list=OL')
+		or (inAdr:match('list=RD') and not inAdr:match('isLogo=false'))
 		or inAdr:match('youtube%.com/[^/]+/videos')
 		or inAdr:match('search_query')
 	then
