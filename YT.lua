@@ -161,9 +161,9 @@ local infoInFile = false
 		then
 			inAdr = inAdr:gsub('^https://[^/]+(/.+)', 'https://www.youtube.com%1')
 		end
-		local id = inAdr:match('/playlist%?list=RD([^&]*)')
+		local id = inAdr:match('/playlist%?list=RD([^&]+)')
 		if id and #id == 11 then
-			inAdr = inAdr:gsub('/playlist%?list=RD[^&]*', '/watch?v='.. id .. '&list=RD' .. id)
+			inAdr = inAdr:gsub('/playlist%?list=RD[^&]+', '/watch?v='.. id .. '&list=RD' .. id)
 		end
 	 return inAdr
 	end
@@ -1604,7 +1604,7 @@ https://github.com/grafi-tt/lunaJson
 		rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
 		m_simpleTV.Http.Close(session_signScr)
 			if rc ~= 200 then return end
-		local f, var = answer:match('split%(""%);((%a%w)%p%S+)')
+		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
 		local signScr = {}
@@ -2333,6 +2333,7 @@ https://github.com/grafi-tt/lunaJson
 		local video_itags, audio_itags = ItagTab()
 		if audioTracks then
 			video_itags = ItagRemove(video_itags, 18)
+			video_itags = ItagRemove(video_itags, 22)
 			for i = 1, #audio_itags do
 				for z = 1, #t do
 					if t[z].audioIsDefault == true then
@@ -2911,12 +2912,6 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.QltyIndex = index
 		retAdr = retAdr or StreamOut(t, index)
 		local plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
-		local plstPicId
-		if plstId:match('^RD') then
-			plstPicId = plstId:gsub('^RD', '')
-		else
-			plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
-		end
 		m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
 		if m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
@@ -4182,7 +4177,6 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('list=OL')
 		or inAdr:match('youtube%.com/[^/]+/videos')
 		or inAdr:match('search_query')
-		and not inAdr:match('/playlist?list=RD')
 	then
 		Plst(inAdr)
 	elseif inAdr:match('/user/')
