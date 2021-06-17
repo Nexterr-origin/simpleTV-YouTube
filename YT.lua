@@ -2020,12 +2020,13 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return v
 	end
-	local function GetVideoInfo()
+	local function GetVideoInfo(param)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
+		param = param or 'WEB'
 		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nX-Origin: https://www.youtube.com\nOrigin: https://www.youtube.com\nReferer: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210615.01.00'
-		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"WEB","clientVersion": "2.20210615.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
+		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"' .. param .. '","clientVersion": "2.20210615.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
@@ -2065,6 +2066,14 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.User.YT.isTrailer = true
 			rc, player_response = GetVideoInfo()
 			player_response = player_response or ''
+		end
+		if player_response:match('status":%s*"LOGIN_REQUIRED')
+		then
+			local rc_LR, player_response_LR = GetVideoInfo('WEB_EMBEDDED_PLAYER')
+			if player_response_LR:match('status":%s*"OK') then
+				player_response = player_response_LR
+				rc = rc_LR
+			end
 		end
 		if infoInFile then
 			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
