@@ -15,10 +15,11 @@ https://www.youtube.com/feed/history - история
 https://www.youtube.com/playlist?list=LL - понравившиеся
 https://www.youtube.com/playlist?list=LM - понравившиеся (музыка)
 https://www.youtube.com/playlist?list=WL - посмотреть позже
-https://www.youtube.com/watch?v=kFW8kJ9Y1tM - видео
-https://youtu.be/1B__8N5d_LA - видео
-https://www.youtube.com/watch?v=6LZM3_wp2ps - видео
+https://www.youtube.com/watch?v=kFW8kJ9Y1tM - age-gate
+https://youtu.be/1B__8N5d_LA - age-gate
 ---------------------------------------------------
+age-gate bypass
+https://www.youtube.com/watch?v=6LZM3_wp2ps
 RSS feed:
 https://www.youtube.com/feeds/videos.xml?channel_id=UCba3hpU7EFBSk817y9qZkiA
 https://www.youtube.com/feeds/videos.xml?user=periodicvideos
