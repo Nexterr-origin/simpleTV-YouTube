@@ -16,16 +16,19 @@ https://www.youtube.com/playlist?list=LL - понравившиеся
 https://www.youtube.com/playlist?list=LM - понравившиеся (музыка)
 https://www.youtube.com/playlist?list=WL - посмотреть позже
 https://www.youtube.com/watch?v=kFW8kJ9Y1tM - age-gate
-https://youtu.be/1B__8N5d_LA - age-gate
+---------------------------------------------------
+age-gate bypass
+https://www.youtube.com/watch?v=zbT53Q_olkU$OPT:http-referrer=https://cinema.mosfilm.ru + рефер
+https://youtu.be/1B__8N5d_LA
+https://www.youtube.com/watch?v=0e9JgyzCIBc
+---------------------------------------------------
+заблокировано для рф 
+https://www.youtube.com/watch?v=0e9JgyzCIBc
 ---------------------------------------------------
 RSS feed:
 https://www.youtube.com/feeds/videos.xml?channel_id=UCba3hpU7EFBSk817y9qZkiA
 https://www.youtube.com/feeds/videos.xml?user=periodicvideos
 ---------------------------------------------------
-age-gate bypass
-https://www.youtube.com/watch?v=6LZM3_wp2ps
-заблокировано для рф 
-https://www.youtube.com/watch?v=0e9JgyzCIBc
 hashtag #sayso
 https://www.youtube.com/hashtag/sayso
 в тренде
