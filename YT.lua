@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (17/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (18/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2023,10 +2023,11 @@ https://github.com/grafi-tt/lunaJson
 	local function GetVideoInfo(param)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_videoInfo then return end
-		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
+		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		param = param or 'WEB'
-		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nX-Origin: https://www.youtube.com\nOrigin: https://www.youtube.com\nReferer: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210615.01.00'
-		local body = '{"videoId":"' .. m_simpleTV.User.YT.vId .. '","context":{"client":{"hl":"' .. m_simpleTV.User.YT.Lng.hl .. '","gl":"US","clientName":"' .. param .. '","clientVersion": "2.20210615.01.00","playerType":"UNIPLAYER"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":' .. (m_simpleTV.User.YT.sts or '') ..'}}}'
+		local sts = m_simpleTV.User.YT.sts or ''
+		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nOrigin: https://www.youtube.com\nContent-Type: application/json'
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"%s","clientVersion": "2.20210615.01.00"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, param, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
