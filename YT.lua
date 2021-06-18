@@ -2022,14 +2022,15 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return v
 	end
-	local function GetVideoInfo(clientName)
+	local function GetVideoInfo(clientScreen)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
-		clientName = clientName or 'WEB'
+		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
+		local thirdParty = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://www.youtube.com'
 		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"%s","clientVersion": "2.20210615.01.00"}},"playbackContext":{"vis":0,"splay":false,"autoCaptionsDefaultOn":false,"autonavState":"STATE_NONE","html5Preference":"HTML5_PREF_WANTS","contentPlaybackContext":{"signatureTimestamp":%s,"lactMilliseconds":"-1"}},"racyCheckOk":false,"contentCheckOk":false}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientName, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210615.01.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"vis":0,"splay":false,"autoCaptionsDefaultOn":false,"autonavState":"STATE_NONE","html5Preference":"HTML5_PREF_WANTS","contentPlaybackContext":{"signatureTimestamp":%s,"lactMilliseconds":"-1"}},"racyCheckOk":false,"contentCheckOk":false}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
@@ -2070,10 +2071,13 @@ https://github.com/grafi-tt/lunaJson
 			rc, player_response = GetVideoInfo()
 			player_response = player_response or ''
 		end
-		if player_response:match('status":%s*"LOGIN_REQUIRED')
+		if not player_response:match('status":%s*"OK')
+			and not player_response:match('status":%s*"ERROR')
 		then
-			local rc_LR, player_response_LR = GetVideoInfo('WEB_EMBEDDED_PLAYER')
-			if player_response_LR:match('status":%s*"OK') then
+			local rc_LR, player_response_LR = GetVideoInfo('EMBED')
+			if player_response_LR
+				and player_response_LR:match('status":%s*"OK')
+			then
 				player_response = player_response_LR
 				rc = rc_LR
 			end
