@@ -1884,11 +1884,13 @@ https://github.com/grafi-tt/lunaJson
 					end
 			 return table.concat(t)
 			end
-			if not m_simpleTV.User.YT.signScr then
-				ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
-			 return	'vlc://pause:5'
-			end
 			for cipherSign in adr:gmatch('&s=([^&]+)') do
+					if not m_simpleTV.User.YT.sts
+						or not m_simpleTV.User.YT.signScr
+					then
+						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
+					 return	'vlc://pause:5'
+					end
 				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
 				adr = adr:gsub('&s=[^&]+', '&sig=' .. signature, 1)
 			end
@@ -2025,9 +2027,14 @@ https://github.com/grafi-tt/lunaJson
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		param = param or 'WEB'
-		local sts = m_simpleTV.User.YT.sts or ''
+		local sts = m_simpleTV.User.YT.sts
+		if sts then
+			sts = string.format('"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}', sts)
+		else
+			sts = ''
+		end
 		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"%s","clientVersion": "2.20210615.01.00"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, param, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"%s","clientVersion": "2.20210615.01.00"}},%s}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, param, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
