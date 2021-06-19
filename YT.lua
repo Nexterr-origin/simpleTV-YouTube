@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (20/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2028,10 +2028,9 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
-		local clientVersion = string.format('2.%s.01.01', os.date('%Y%m%d'))
-		local thirdParty = urlAdr:match('$OPT:http%-referrer=(.+)') or 'https://www.youtube.com'
+		local thirdParty = urlAdr:match('$OPT:http%-referrer=(.+)') or ''
 		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","playerType":"UNIPLAYER","clientName":"WEB","clientVersion": "%s","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"},"adSignalsInfo":{"params":[{"key":"dt","value":"%s000"},{"key":"flash","value":"0"},{"key":"frm","value":"0"},{"key":"u_tz","value":"180"},{"key":"u_his","value":"2"},{"key":"u_java","value":"false"},{"key":"u_h","value":"800"},{"key":"u_w","value":"1280"},{"key":"u_ah","value":"800"},{"key":"u_aw","value":"1280"},{"key":"u_cd","value":"24"},{"key":"u_nplug","value":"0"},{"key":"u_nmime","value":"0"},{"key":"bc","value":"31"},{"key":"bih","value":"334"},{"key":"biw","value":"1266"},{"key":"brdim","value":"-4,-4,-4,-4,1280,0,1288,808,1280,334"},{"key":"vis","value":"1"},{"key":"wgl","value":"true"},{"key":"ca_type","value":"image"}]}},"playbackContext":{"vis":0,"splay":false,"autoCaptionsDefaultOn":false,"autonavState":"STATE_NONE","html5Preference":"HTML5_PREF_WANTS","contentPlaybackContext":{"signatureTimestamp":%s,"lactMilliseconds":"-1"}},"racyCheckOk":false,"contentCheckOk":false}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientVersion, clientScreen, os.time(), thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","deviceMake":"","deviceModel":"","playerType":"UNIPLAYER","clientName":"WEB","clientVersion": "2.20210617.01.00","clientScreen":"%s"},"user":{"lockedSafetyMode":false},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"autoCaptionsDefaultOn":false,"autonavState":"STATE_NONE","html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s,"lactMilliseconds":"-1","referer": "https://www.youtube.com/"}},"racyCheckOk":false,"contentCheckOk":false}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
