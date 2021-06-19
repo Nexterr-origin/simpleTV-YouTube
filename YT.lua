@@ -1191,9 +1191,10 @@ https://github.com/grafi-tt/lunaJson
 				dur = m_simpleTV.User.YT.Lng.duration .. ': ' .. secondsToClock(m_simpleTV.User.YT.duration)
 				author = m_simpleTV.User.YT.Lng.upLoadOnCh .. ': ' .. m_simpleTV.User.YT.author
 				local year, month, day = m_simpleTV.User.YT.publishedAt:match('(%d+)%-(%d+)%-(%d+)')
-				year = year:sub(2, 4)
-				publishedAt = m_simpleTV.User.YT.Lng.published .. ': '
-						.. string.format('%d/%d/%02d', day, month, year)
+				if year and month and day then
+					year = year:sub(2, 4)
+					publishedAt = m_simpleTV.User.YT.Lng.published .. ': ' .. string.format('%d/%d/%02d', day, month, year)
+				end
 			end
 			info = title .. '\n'
 					.. author .. '\n'
@@ -2030,7 +2031,7 @@ https://github.com/grafi-tt/lunaJson
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=(.+)') or ''
 		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","deviceMake":"","deviceModel":"","playerType":"UNIPLAYER","clientName":"WEB","clientVersion": "2.20210617.01.00","clientScreen":"%s"},"user":{"lockedSafetyMode":false},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"vis":0,"splay":false,"autoCaptionsDefaultOn":false,"autonavState":"STATE_NONE","html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s,"lactMilliseconds":"-1","referer": "https://www.youtube.com/"}},"racyCheckOk":false,"contentCheckOk":false}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":2,"clientVersion": "2.20210617.01.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
