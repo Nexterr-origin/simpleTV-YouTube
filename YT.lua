@@ -1445,7 +1445,7 @@ https://github.com/grafi-tt/lunaJson
 			local origin = 'https://www.youtube.com'
 			local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.isAuth, origin)
 			local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
-		 return string.format('Authorization: SAPISIDHASH %s_%s', ostime, hash)
+		 return string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0', ostime, hash)
 		end
 	 return ''
 	end
@@ -2032,9 +2032,9 @@ https://github.com/grafi-tt/lunaJson
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or ''
-		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210617.01.00","clientScreen":"%s"},"adSignalsInfo":{},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
-		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		local headers = header_Auth() .. '\nOrigin: https://www.youtube.com\nContent-Type: application/json'
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210617.01.00","clientScreen":"%s","webpSupport":false},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
+		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
