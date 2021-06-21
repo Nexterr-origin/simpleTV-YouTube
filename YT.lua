@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (20/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (21/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1176,7 +1176,8 @@ https://github.com/grafi-tt/lunaJson
 					end
 				codec = table.concat(t)
 			end
-			local dur, publishedAt, author
+			local dur, author
+			local publishedAt = ''
 			if m_simpleTV.User.YT.isLive == true then
 				dur = ''
 				author = m_simpleTV.User.YT.Lng.live .. ' | '
@@ -1185,8 +1186,9 @@ https://github.com/grafi-tt/lunaJson
 				local timeSt = timeStamp(m_simpleTV.User.YT.actualStartTime)
 				timeSt = os.date('%y %d %m %H %M', tonumber(timeSt))
 				local year, day, month, hour, min = timeSt:match('(%d+) (%d+) (%d+) (%d+) (%d+)')
-				publishedAt = m_simpleTV.User.YT.Lng.started .. ': '
-						.. string.format('%d:%02d (%d/%d/%02d)', hour, min, day, month, year)
+				if year and month and day and hour and min then
+					publishedAt = m_simpleTV.User.YT.Lng.started .. ': ' .. string.format('%d:%02d (%d/%d/%02d)', hour, min, day, month, year)
+				end
 			else
 				dur = m_simpleTV.User.YT.Lng.duration .. ': ' .. secondsToClock(m_simpleTV.User.YT.duration)
 				author = m_simpleTV.User.YT.Lng.upLoadOnCh .. ': ' .. m_simpleTV.User.YT.author
@@ -2031,7 +2033,7 @@ https://github.com/grafi-tt/lunaJson
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$&]+)') or ''
 		local headers = header_Auth() .. '\nX-Goog-AuthUser: 0\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210617.01.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210617.01.00","clientScreen":"%s","yt_li":"1"},"adSignalsInfo":{},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
