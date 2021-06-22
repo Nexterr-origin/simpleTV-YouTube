@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -2829,7 +2829,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		local FilterType, AutoNumberFormat, Random, PlayMode
 		if #tab > 2 then
-			if #tab < 15 then
+			if #tab < 5 then
 				FilterType = 2
 			else
 				FilterType = 1
