@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -70,6 +70,7 @@ local infoInFile = false
 	htmlEntities = require 'htmlEntities'
 	require 'lfs'
 	require 'asynPlsLoaderHelper'
+	require 'jsdecode'
 	if not m_simpleTV.User then
 		m_simpleTV.User = {}
 	end
@@ -1594,7 +1595,7 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
-	local function GetSignScr()
+	local function GetJsPlayer()
 		local session_signScr = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_signScr then return end
 		m_simpleTV.Http.SetTimeout(session_signScr, 14000)
@@ -1607,6 +1608,11 @@ https://github.com/grafi-tt/lunaJson
 		rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
 		m_simpleTV.Http.Close(session_signScr)
 			if rc ~= 200 then return end
+	 return answer
+	end
+	local function GetSignScr()
+		local answer = GetJsPlayer()
+			if not answer then return end
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
@@ -1899,6 +1905,25 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return adr
 	end
+	local function GetNoThrottledRate_func()
+		local answer = GetJsPlayer()
+			if not answer then return end
+		local func_name = answer:match('a%.C&&%(b=a%.get%("n"%)%)&&%(b=(.-)%(')
+			if not func_name then return end
+		local func = answer:match(func_name .. '=function(.-return b%.join%(""%)};)')
+			if not func then return end
+		m_simpleTV.User.YT.throttledRate = 'function throttledRate' .. func
+	end
+	local function GetNoThrottledRate_param(n)
+		if m_simpleTV.User.YT.throttledRate then
+			local scr = m_simpleTV.User.YT.throttledRate .. 'var n=throttledRate("' .. n .. '");'
+			local n = jsdecode.DoDecode('n', false, scr, 0)
+				if n and #n > 0 then
+				 return n
+				end
+		end
+	 return
+	end
 	local function StreamLive(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
@@ -1971,6 +1996,15 @@ https://github.com/grafi-tt/lunaJson
 	 return index or 1
 	end
 	local function StreamOut(t, index)
+		local url = t[index].Address
+		url = DeCipherSign(url)
+		local n = url:match('&n=([^&]+)')
+		if n then
+			n = GetNoThrottledRate_param(n)
+			if n then
+				url = url:gsub('&n=[^&]+', '&n=' .. n)
+			end
+		end
 		local extOpt = string.format('$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
@@ -2000,7 +2034,7 @@ https://github.com/grafi-tt/lunaJson
 		if proxy ~= '' then
 			extOpt = string.format('$OPT:http-proxy=%s%s', proxy, extOpt)
 		end
-	 return DeCipherSign(t[index].Address) .. extOpt
+	 return url .. extOpt
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		if v.isAdaptive == true and aItag then
@@ -2058,6 +2092,9 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.isMusic = false
 		if not m_simpleTV.User.YT.signScr then
 			pcall(GetSignScr)
+		end
+		if not m_simpleTV.User.YT.throttledRate then
+			pcall(GetNoThrottledRate_func)
 		end
 		if infoInFile then
 			inf0 = os.clock()
