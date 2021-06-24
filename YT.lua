@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (24/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (25/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1915,10 +1915,6 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return adr
 	end
-	local function GetNoThrottledRate(n)
-		local scr = string.format('function throttledRate%svar n=throttledRate("%s");', m_simpleTV.User.YT.throttledRate_func, n)
-	 return jsdecode.DoDecode('n', false, scr, 0)
-	end
 	local function StreamLive(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
@@ -1992,14 +1988,14 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function StreamOut(t, index)
 		local url = t[index].Address
-		url = DeCipherSign(url)
 		local n = url:match('&n=([^&]+)')
 		if m_simpleTV.User.YT.throttledRate_func and n then
-			n = GetNoThrottledRate(n)
+			n = jsdecode.DoDecode('f("' .. n .. '");', false, 'function f' .. m_simpleTV.User.YT.throttledRate_func, 0)
 			if n and #n > 0 then
 				url = url:gsub('&n=[^&]+', '&n=' .. n)
 			end
 		end
+		url = DeCipherSign(url)
 		local extOpt = string.format('$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
