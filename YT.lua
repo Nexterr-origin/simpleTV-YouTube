@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (24/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -70,6 +70,7 @@ local infoInFile = false
 	htmlEntities = require 'htmlEntities'
 	require 'lfs'
 	require 'asynPlsLoaderHelper'
+	require 'jsdecode'
 	if not m_simpleTV.User then
 		m_simpleTV.User = {}
 	end
@@ -1308,6 +1309,10 @@ https://github.com/grafi-tt/lunaJson
 		if qlty and qlty < 100 then
 			qlty = nil
 		end
+		local throttled
+		if m_simpleTV.User.YT.throttledRate_func then
+			throttled = true
+		end
 		infoInFile = string_rep
 						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
 						.. string_rep
@@ -1322,10 +1327,8 @@ https://github.com/grafi-tt/lunaJson
 						.. ' + calc: ' .. calc .. ' s.)\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(retAdr:match('&sp=(%a+)'))
-						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
-						.. string_rep
-						.. 'Description:\n\n'
-						.. m_simpleTV.User.YT.desc .. '\n'
+						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts)
+						.. ' | throttled: ' .. tostring(throttled) .. '\n'
 						.. string_rep
 						.. 'Qlty table:\n\n'
 						.. (inf0_qlty or '') .. '\n'
@@ -1337,7 +1340,11 @@ https://github.com/grafi-tt/lunaJson
 						.. (inf0_geo or '') .. '\n'
 						.. string_rep
 						.. 'Address:\n\n'
-						.. retAdr:gsub('%$', '\n$'):gsub('slave=', 'slave=\n'):gsub('%#', '\n#\n'):gsub('\n+', '\n\n') .. '\n'
+						.. retAdr:gsub('%$', '\n$'):gsub('slave=', 'slave=\n'):gsub('%#', '\n#\n'):gsub('\n+', '\n\n')
+						.. '\n'
+						.. string_rep
+						.. 'Description:\n\n'
+						.. m_simpleTV.User.YT.desc
 		debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
 	end
 	local function Search(sAdr)
@@ -1594,7 +1601,7 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
-	local function GetSignScr()
+	local function GetJsPlayer()
 		local session_signScr = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_signScr then return end
 		m_simpleTV.Http.SetTimeout(session_signScr, 14000)
@@ -1607,6 +1614,15 @@ https://github.com/grafi-tt/lunaJson
 		rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
 		m_simpleTV.Http.Close(session_signScr)
 			if rc ~= 200 then return end
+	 return answer
+	end
+	local function GetJsPlayer_scr()
+		local answer = GetJsPlayer()
+			if not answer then return end
+		local throttledRate_func_name = answer:match('a%.C&&%(b=a%.get%("n"%)%)&&%(b=(.-)%(')
+		if throttledRate_func_name then
+			m_simpleTV.User.YT.throttledRate_func = answer:match(throttledRate_func_name .. '=function(.-return b%.join%(""%)};)')
+		end
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
@@ -1899,6 +1915,10 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return adr
 	end
+	local function GetNoThrottledRate(n)
+		local scr = string.format('function throttledRate%svar n=throttledRate("%s");', m_simpleTV.User.YT.throttledRate_func, n)
+	 return jsdecode.DoDecode('n', false, scr, 0)
+	end
 	local function StreamLive(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
@@ -1971,6 +1991,15 @@ https://github.com/grafi-tt/lunaJson
 	 return index or 1
 	end
 	local function StreamOut(t, index)
+		local url = t[index].Address
+		url = DeCipherSign(url)
+		local n = url:match('&n=([^&]+)')
+		if m_simpleTV.User.YT.throttledRate_func and n then
+			n = GetNoThrottledRate(n)
+			if n and #n > 0 then
+				url = url:gsub('&n=[^&]+', '&n=' .. n)
+			end
+		end
 		local extOpt = string.format('$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
@@ -2000,7 +2029,7 @@ https://github.com/grafi-tt/lunaJson
 		if proxy ~= '' then
 			extOpt = string.format('$OPT:http-proxy=%s%s', proxy, extOpt)
 		end
-	 return DeCipherSign(t[index].Address) .. extOpt
+	 return url .. extOpt
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		if v.isAdaptive == true and aItag then
@@ -2034,7 +2063,7 @@ https://github.com/grafi-tt/lunaJson
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or ''
 		local headers = header_Auth() .. '\nOrigin: https://www.youtube.com\nContent-Type: application/json'
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210617.01.00","clientScreen":"%s","webpSupport":false},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
-		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
@@ -2057,7 +2086,7 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
 		if not m_simpleTV.User.YT.signScr then
-			pcall(GetSignScr)
+			pcall(GetJsPlayer_scr)
 		end
 		if infoInFile then
 			inf0 = os.clock()
@@ -2086,7 +2115,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 		if infoInFile then
-			debug_in_file(player_response, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
+			local player_response_file = m_simpleTV.Common.fromPercentEncoding(player_response)
+			debug_in_file(m_simpleTV.Common.fromPercentEncoding(player_response_file), m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
 		end
 			if rc == 429 then
 			 return nil, 'HTTP Error 429: Too Many Requests\n\n' .. m_simpleTV.User.YT.Lng.noCookies
