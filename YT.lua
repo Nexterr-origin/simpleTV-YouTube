@@ -1601,24 +1601,19 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
-	local function GetJsPlayer()
-		local session_signScr = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_signScr then return end
-		m_simpleTV.Http.SetTimeout(session_signScr, 14000)
-		local url = string.format('https://www.youtube.com/embed/%s', m_simpleTV.User.YT.vId)
-		local rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
+	local function GetJsPlayer_scr()
+		local session_jsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_jsPlayer then return end
+		m_simpleTV.Http.SetTimeout(session_jsPlayer, 12000)
+		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
+		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
 			if not url then return end
-		url = string.format('https://www.youtube.com%s', url)
-		rc, answer = m_simpleTV.Http.Request(session_signScr, {url = url})
-		m_simpleTV.Http.Close(session_signScr)
+		url = 'https://www.youtube.com' .. url
+		rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
+		m_simpleTV.Http.Close(session_jsPlayer)
 			if rc ~= 200 then return end
-	 return answer
-	end
-	local function GetJsPlayer_scr()
-		local answer = GetJsPlayer()
-			if not answer then return end
 		local throttledRate_func_name = answer:match('a%.C&&%(b=a%.get%("n"%)%)&&%(b=(.-)%(')
 		if throttledRate_func_name then
 			m_simpleTV.User.YT.throttledRate_func = answer:match(throttledRate_func_name .. '=function(.-return b%.join%(""%)};)')
