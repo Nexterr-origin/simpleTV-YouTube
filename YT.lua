@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (26/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (28/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2390,6 +2390,10 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
+		end
+		if captions then
+			video_itags = ItagRemove(video_itags, 244)
+			video_itags = ItagRemove(video_itags, 247)
 		end
 		local sort = {}
 			for i = 1, #video_itags do
