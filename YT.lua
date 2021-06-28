@@ -408,8 +408,23 @@ local infoInFile = false
 		m_simpleTV.User.YT.OpenUrlHelpCheck = true
 	end
 	if not m_simpleTV.User.YT.cookies then
+		local e = os.clock()
 			local function cookiesFromFile()
-				local f = string.format('%scookies.txt', m_simpleTV.Common.GetMainPath(1))
+				local tab = m_simpleTV.Common.DirectoryEntryList(m_simpleTV.Common.GetMainPath(1), '*cookies.txt','Files')
+					if #tab == 0 then return end
+				local prioTab = {'youtube.com_cookies', 'cookies'}
+				local f
+					for i = 1, #prioTab do
+						local fileName = tab[i].completeBaseName
+							for j = 1, #tab do
+								if prioTab[i] == tab[j].completeBaseName then
+									f = tab[j].absoluteFilePath
+								 break
+								end
+							end
+							if f then break end
+					end
+					if not f then return end
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
 				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF'}
@@ -439,6 +454,7 @@ local infoInFile = false
 			or 'VISITOR_INFO1_LIVE=r8isH8_QXtc;PREF=&hl=' .. m_simpleTV.User.YT.Lng.hl
 		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+cb.20210518-05-p0.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%d%-_]+)') or m_simpleTV.User.YT.Lng.hl
+		debug_in_file(string.format('%.3f', (os.clock() - e)) .. '\n')
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
 		m_simpleTV.User.YT.PlstsCh = {}
