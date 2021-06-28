@@ -415,7 +415,6 @@ local infoInFile = false
 				local prioTab = {'youtube.com_cookies', 'cookies'}
 				local f
 					for i = 1, #prioTab do
-						local fileName = tab[i].completeBaseName
 							for j = 1, #tab do
 								if prioTab[i] == tab[j].completeBaseName then
 									f = tab[j].absoluteFilePath
