@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (28/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (29/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1840,9 +1840,9 @@ https://github.com/grafi-tt/lunaJson
 		local video = {
 							394, 160, 278, -- 144
 							395, 133, 242, -- 240
-							134, 243, 18, -- 360
-							244, 135, -- 480
-							247, 136, 22, -- 720
+							134, 18, 243, -- 360
+							135, 244, -- 480
+							136, 22, 247, -- 720
 							298, -- 720 (60 fps)
 							302, 334, -- 720 (60 fps, HDR)
 							137, 248, -- 1080
