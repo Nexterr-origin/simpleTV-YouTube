@@ -2119,15 +2119,14 @@ https://github.com/grafi-tt/lunaJson
 			if rc ~= 200 or player_response == '' then
 			 return nil, m_simpleTV.User.YT.Lng.videoNotExst
 			end
-			if player_response:match('drmFamilies') then
-			 return nil, 'DRM'
-			end
 		local err, tab = pcall(lunaJson_decode, player_response)
 			if err == false then
-				if infoInFile then
-					debug_in_file(answer, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
-				end
-			 return nil, 'Json decode error'
+			 return nil, 'StreamsTab json decode error'
+			end
+			if tab.streamingData
+				and tab.streamingData.licenseInfos
+			then
+			 return nil, 'DRM'
 			end
 			if tab.multicamera
 				and m_simpleTV.User.YT.isVideo == true
