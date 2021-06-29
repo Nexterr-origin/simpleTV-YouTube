@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/6/21)
+-- видеоскрипт для сайта https://www.youtube.com (30/6/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1757,15 +1757,6 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return p
 	end
-	local function ItagRemove(z, e)
-		for k, v in pairs(z) do
-			if v == e then
-				table.remove(z, k)
-			 return z
-			end
-		end
-	 return z
-	end
 	local function StreamStart(adrStart)
 		local h = adrStart:match('(%d+)h') or 0
 		local m = adrStart:match('(%d+)m') or 0
@@ -1840,9 +1831,9 @@ https://github.com/grafi-tt/lunaJson
 		local video = {
 							394, 160, 278, -- 144
 							395, 133, 242, -- 240
-							134, 18, 243, -- 360
+							18, 134, 243, -- 360
 							135, 244, -- 480
-							136, 22, 247, -- 720
+							136, 247, 22, -- 720
 							298, -- 720 (60 fps)
 							302, 334, -- 720 (60 fps, HDR)
 							137, 248, -- 1080
@@ -2038,8 +2029,8 @@ https://github.com/grafi-tt/lunaJson
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
-			if (aItag_opus and captions)
-				and not (v.qlty > 1080 or v.itag == 302 or v.itag == 334)
+			if (captions and aItag_opus)
+				and (v.itag == 137 or v.itag == 136 or v.itag == 22 or v.itag == 135 or v.itag == 134 or v.itag == 18 or v.itag == 395 or v.itag == 133 or v.itag == 394 or v.itag == 160)
 			then
 				adr_audio = aAdr_opus
 				itag_audio = aItag_opus
@@ -2047,7 +2038,7 @@ https://github.com/grafi-tt/lunaJson
 			else
 				adr_audio = aAdr
 				itag_audio = aItag
-				extOpt_demux = '$OPT:demux=avcodec,any'
+				extOpt_demux = '$OPT:demux=avcodec'
 			end
 			v.aItag = itag_audio
 			v.Address = v.Address .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
@@ -2370,8 +2361,6 @@ https://github.com/grafi-tt/lunaJson
 		local aAdr, aItag, aItag_opus, aAdr_opus
 		local video_itags, audio_itags = ItagTab()
 		if audioTracks then
-			video_itags = ItagRemove(video_itags, 18)
-			video_itags = ItagRemove(video_itags, 22)
 			for i = 1, #audio_itags do
 				for z = 1, #t do
 					if t[z].audioIsDefault == true then
@@ -2404,11 +2393,17 @@ https://github.com/grafi-tt/lunaJson
 				end
 			end
 		end
-		if captions then
-			video_itags = ItagRemove(video_itags, 244)
-			video_itags = ItagRemove(video_itags, 247)
-		end
 		local sort = {}
+		if audioTracks then
+			for i = 1, #video_itags do
+				for z = 1, #t do
+					if video_itags[i] == t[z].itag and t[z].isAdaptive == true then
+						sort[#sort + 1] = t[z]
+					 break
+					end
+				end
+			end
+		else
 			for i = 1, #video_itags do
 				for z = 1, #t do
 					if video_itags[i] == t[z].itag then
@@ -2417,6 +2412,7 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
+		end
 		if #sort == 0 then
 			sort = t
 		end
