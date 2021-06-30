@@ -1308,7 +1308,7 @@ https://github.com/grafi-tt/lunaJson
 		ShowMsg(msg)
 		m_simpleTV.Control.SetTitle(msg:gsub('\n', ' '))
 	end
-	local function debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
+	local function debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 			if not infoInFile then return end
 		local scr_time = string.format('%.3f', (os.clock() - infoInFile))
 		local calc = scr_time - inf0
@@ -1317,7 +1317,6 @@ https://github.com/grafi-tt/lunaJson
 				 return m_simpleTV.Common.fromPercentEncoding(c)
 				end)
 		local string_rep = string.rep('–', 70) .. '\n'
-		index = noItag22 or index
 		local qlty = t[index].qlty
 		if qlty and qlty < 100 then
 			qlty = nil
@@ -2982,7 +2981,7 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Control.SetTitle(header .. ' (' .. title .. ')')
 			end
 		end
-		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
+		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 	end
 	local function Plst(inAdr)
 		m_simpleTV.Control.ExecuteAction(37)
@@ -3239,7 +3238,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 			end
 		end
-		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
+		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 	end
 	local function PlstsCh(inAdr)
 			if (m_simpleTV.Control.Reason == 'Stopped' or m_simpleTV.Control.Reason == 'EndReached')
@@ -3611,7 +3610,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.QltyTab = t
 		local index = GetQltyIndex(t)
-		local retAdr, noItag22 = StreamOut(t, index)
+		local retAdr = StreamOut(t, index)
 		m_simpleTV.User.YT.QltyIndex = index
 		if m_simpleTV.User.YT.isVideo == true then
 			local name = title:gsub('%c.-$', '')
@@ -3753,7 +3752,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		m_simpleTV.Http.Close(session)
 		m_simpleTV.Control.CurrentAddress = retAdr
-		debug_InfoInFile(infoInFile, retAdr, index, t, noItag22, inf0_qlty, inf0, title, inf0_geo)
+		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 	end
 	function AsynPlsCallb_Plst_YT(session, rc, answer, userstring, params)
 		local ret = {}
