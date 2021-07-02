@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (2/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1833,7 +1833,7 @@ https://github.com/grafi-tt/lunaJson
 							18, 134, 243, -- 360
 							135, 244, -- 480
 							136, 247, 22, -- 720
-							298, -- 720 (60 fps)
+							298, -- 720 (50|60 fps)
 							302, 334, -- 720 (60 fps, HDR)
 							137, 248, -- 1080
 							299, 335, -- 1080 (60 fps, HDR)
@@ -2029,7 +2029,7 @@ https://github.com/grafi-tt/lunaJson
 		if v.isAdaptive == true and aItag then
 			local extOpt_demux, adr_audio, itag_audio, adr_captions
 			if (captions and aItag_opus)
-				and (v.itag == 137 or v.itag == 136 or v.itag == 22 or v.itag == 135 or v.itag == 134 or v.itag == 18 or v.itag == 395 or v.itag == 133 or v.itag == 394 or v.itag == 160)
+				and not v.mimeType:match('video/webm')
 			then
 				adr_audio = aAdr_opus
 				itag_audio = aItag_opus
@@ -2259,6 +2259,7 @@ https://github.com/grafi-tt/lunaJson
 					t[i].width = tab.streamingData.formats[k].width
 					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 					t[i].isAdaptive = false
+					t[i].mimeType = tab.streamingData.formats[k].mimeType
 					t[i].Address= m_simpleTV.Common.fromPercentEncoding(t[i].Address)
 					t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
 					k = k + 1
@@ -2277,6 +2278,7 @@ https://github.com/grafi-tt/lunaJson
 						t[i].fps = tab.streamingData.adaptiveFormats[k].fps
 						t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
 						t[i].isAdaptive = true
+						t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
 						if tab.streamingData.adaptiveFormats[k].audioTrack
 							and tab.streamingData.adaptiveFormats[k].audioTrack.audioIsDefault == true
 						then
