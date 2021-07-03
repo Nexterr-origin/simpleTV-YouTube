@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (2/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (4/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1866,6 +1866,18 @@ https://github.com/grafi-tt/lunaJson
 		t.InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
 	return t
 	end
+	local function DeCipherThrottledRate(adr)
+		if m_simpleTV.User.YT.throttledRate_func then
+			local n = adr:match('&n=([^&]+)')
+			if n then
+				n = jsdecode.DoDecode('f("' .. n .. '");', false, 'function f' .. m_simpleTV.User.YT.throttledRate_func, 0)
+				if n and #n > 0 then
+					adr = adr:gsub('&n=[^&]+', '&n=' .. n)
+				end
+			end
+		end
+	 return adr
+	end
 	local function DeCipherSign(adr)
 			local function table_swap(t, a)
 					if a >= #t then return end
@@ -1986,13 +1998,7 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function StreamOut(t, index)
 		local url = t[index].Address
-		local n = url:match('&n=([^&]+)')
-		if m_simpleTV.User.YT.throttledRate_func and n then
-			n = jsdecode.DoDecode('f("' .. n .. '");', false, 'function f' .. m_simpleTV.User.YT.throttledRate_func, 0)
-			if n and #n > 0 then
-				url = url:gsub('&n=[^&]+', '&n=' .. n)
-			end
-		end
+		url = DeCipherThrottledRate(url)
 		url = DeCipherSign(url)
 		local extOpt = string.format('$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
