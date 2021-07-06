@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -1630,22 +1630,12 @@ https://github.com/grafi-tt/lunaJson
 		if throttleRateFuncName then
 			m_simpleTV.User.YT.throttleRateScr = answer:match(throttleRateFuncName .. '=(function.-return b%.join%(""%)};)')
 		end
-		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
-			if not f or not var then return end
-		f = f:gsub('%]', '')
-		local signScr = {}
-			for param in f:gmatch(var .. '%p([^)]+)') do
-				local func, p = param:match('([^(]+)%(a,(%d+)')
-				func = answer:match('[%p%s]' .. func .. ':function([^}]+)')
-				if func:match('a%.reverse') then
-					p = 0
-				elseif func:match('a%.splice') then
-					p = '-' .. p
-				end
-				signScr[#signScr + 1] = tonumber(p)
-			end
+		local p1, p2, p3 = answer:match('(function%(a%){a=a%.split%(""%);)(..)(.-return a%.join%(""%)};)')
+			if not (p1 and p2 and p3) then return end
+		local p4 = answer:match('var ' .. p2 .. '.-};')
+			if not p4 then return end
+		m_simpleTV.User.YT.signScr = 'decode=' .. p1 .. p2 .. p3 .. p4
 		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts:["]*(%d+)')
-		m_simpleTV.User.YT.signScr = signScr
 	end
 	local function Subtitle(tab)
 		local subt = {}
@@ -1879,40 +1869,6 @@ https://github.com/grafi-tt/lunaJson
 	 return adr
 	end
 	local function DeCipherSign(adr)
-			local function table_swap(t, a)
-					if a >= #t then return end
-				local c = t[1]
-				local p = (a % #t) + 1
-				t[1] = t[p]
-				t[p] = c
-			 return t
-			end
-			local function table_slica(tbl, first, last, step)
-				local sliced = {}
-					for i = first or 1, last or #tbl, step or 1 do
-						sliced[#sliced + 1] = tbl[i]
-					end
-			 return sliced
-			end
-			local function sign_decode(s, signScr)
-				local t = split_str(s)
-					if #t == 0 or not signScr then
-					 return s
-					end
-					for i = 1, #signScr do
-						local a = signScr[i]
-						if a == 0 then
-							t = table_reversa(t)
-						else
-							if a > 0 then
-								t = table_swap(t, a)
-							else
-								t = table_slica(t, math.abs(a) + 1)
-							end
-						end
-					end
-			 return table.concat(t)
-			end
 			for cipherSign in adr:gmatch('&s=([^&]+)') do
 					if not m_simpleTV.User.YT.sts
 						or not m_simpleTV.User.YT.signScr
@@ -1920,7 +1876,7 @@ https://github.com/grafi-tt/lunaJson
 						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
 					 return	'vlc://pause:5'
 					end
-				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
+				local signature = jsdecode.DoDecode('decode("' .. cipherSign ..'")', false, m_simpleTV.User.YT.signScr, 0)
 				adr = adr:gsub('&s=[^&]+', '&sig=' .. signature, 1)
 			end
 	 return adr
