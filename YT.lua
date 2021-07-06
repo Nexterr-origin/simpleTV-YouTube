@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (6/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1628,7 +1628,7 @@ https://github.com/grafi-tt/lunaJson
 			if rc ~= 200 then return end
 		local throttleRateFuncName = answer:match('a%.C&&%(b=a%.get%("n"%)%)&&%(b=(.-)%(')
 		if throttleRateFuncName then
-			m_simpleTV.User.YT.throttleRateScr = answer:match(throttleRateFuncName .. '=function(.-return b%.join%(""%)};)')
+			m_simpleTV.User.YT.throttleRateScr = answer:match(throttleRateFuncName .. '=(function.-return b%.join%(""%)};)')
 		end
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
@@ -1870,7 +1870,7 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.throttleRateScr then
 			local n = adr:match('&n=([^&]+)')
 			if n then
-				n = jsdecode.DoDecode('f("' .. n .. '");', false, 'function f' .. m_simpleTV.User.YT.throttleRateScr, 0)
+				n = jsdecode.DoDecode('decode("' ..  n ..'")', false, 'decode=' .. m_simpleTV.User.YT.throttleRateScr, 0)
 				if n and #n > 0 then
 					adr = adr:gsub('&n=[^&]+', '&n=' .. n)
 				end
