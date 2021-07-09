@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (6/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (9/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1522,6 +1522,7 @@ https://github.com/grafi-tt/lunaJson
 			for i = 1, #t do
 				local title = t[i].title
 				title = title:gsub('%s+', ' ')
+				title = title:gsub('—', '-')
 				title = title:gsub('–', '-')
 				title = title:gsub('^%s*"(.-)"%s*$', '%1')
 				title = title:gsub('[(%[][%s%-]*[%])]', '')
