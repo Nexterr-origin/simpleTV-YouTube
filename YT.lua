@@ -2127,7 +2127,7 @@ https://github.com/grafi-tt/lunaJson
 			 return nil, m_simpleTV.User.YT.Lng.videoNotExst
 			end
 		local err, tab = pcall(lunaJson_decode, player_response)
-			if err == false then
+			if err == false or not tab then
 			 return nil, 'StreamsTab json decode error'
 			end
 			if tab.streamingData
