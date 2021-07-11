@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (10/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (11/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -933,9 +933,9 @@ https://github.com/grafi-tt/lunaJson
 		 return v, pos
 		else
 			f, pos = find(json, '^[ \n\r\t]*', pos)
-			if pos ~= #json then
+			-- if pos ~= #json then
 				-- decode_error('json ended')
-			end
+			-- end
 		 return v
 		end
 	 return decode
@@ -1027,6 +1027,7 @@ https://github.com/grafi-tt/lunaJson
 	local function title_clean(s)
 		s = s:gsub('%c', ' ')
 		s = s:gsub('%%22', '"')
+		s = s:gsub('\\t', ' ')
 		s = s:gsub('\\\\u', '\\u')
 		s = s:gsub('\\u0026', '&')
 		s = s:gsub('\\u2060', '')
@@ -2926,7 +2927,6 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
-		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
 		local vId = tab[plstPos].Address:match('watch%?v=([^&]+)')
 		if (#tab > 1
@@ -3195,7 +3195,6 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.Random = Random
 		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
-		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
 		local vId = tab[plstPos].Address:match('v=([^&]+)')
 		m_simpleTV.User.YT.AddToBaseUrlinAdr = url
@@ -4101,13 +4100,6 @@ https://github.com/grafi-tt/lunaJson
 	end
 	function MarkWatched_YT(session_markWatch)
 		m_simpleTV.Http.Close(session_markWatch)
-	end
-	function OnMultiAddressOk_YT(Object, id)
-		if id == 0 then
-			OnMultiAddressCancel_YT(Object)
-		else
-			m_simpleTV.User.YT.DelayedAddress = nil
-		end
 	end
 	function OnMultiAddressCancel_YT(Object)
 		if m_simpleTV.User.YT.DelayedAddress then
