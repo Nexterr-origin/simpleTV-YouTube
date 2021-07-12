@@ -4104,7 +4104,7 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.Http.Close(session_markWatch)
 	end
 	function OnMultiAddressOk_YT(Object, id)
-		if id == 0 then
+		if id == 1 then
 			OnMultiAddressCancel_YT(Object)
 		else
 			m_simpleTV.User.YT.DelayedAddress = nil
