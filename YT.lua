@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (10/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (12/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -933,9 +933,9 @@ https://github.com/grafi-tt/lunaJson
 		 return v, pos
 		else
 			f, pos = find(json, '^[ \n\r\t]*', pos)
-			if pos ~= #json then
+			-- if pos ~= #json then
 				-- decode_error('json ended')
-			end
+			-- end
 		 return v
 		end
 	 return decode
@@ -1027,6 +1027,7 @@ https://github.com/grafi-tt/lunaJson
 	local function title_clean(s)
 		s = s:gsub('%c', ' ')
 		s = s:gsub('%%22', '"')
+		s = s:gsub('\\t', ' ')
 		s = s:gsub('\\\\u', '\\u')
 		s = s:gsub('\\u0026', '&')
 		s = s:gsub('\\u2060', '')
@@ -2126,7 +2127,7 @@ https://github.com/grafi-tt/lunaJson
 			 return nil, m_simpleTV.User.YT.Lng.videoNotExst
 			end
 		local err, tab = pcall(lunaJson_decode, player_response)
-			if err == false then
+			if err == false or not tab then
 			 return nil, 'StreamsTab json decode error'
 			end
 			if tab.streamingData
