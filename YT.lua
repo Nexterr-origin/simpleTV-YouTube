@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (11/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (12/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -2920,22 +2920,20 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.paramScriptForSkin_buttonOk then
 			tab.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
 		end
-		local retAdr
 		tab.ExtParams = {}
 		tab.ExtParams.FilterType = FilterType
 		tab.ExtParams.Random = Random
 		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
+		-- tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
 		local vId = tab[plstPos].Address:match('watch%?v=([^&]+)')
 		if (#tab > 1
 			and plstPos == 1)
 			or m_simpleTV.User.YT.isPlstsCh
 		then
-			m_simpleTV.User.YT.DelayedAddress = tab[1].Address
 			m_simpleTV.OSD.ShowSelect_UTF8(header, 0, tab, 10000, 2)
-			retAdr = 'wait'
 		else
 			m_simpleTV.OSD.ShowSelect_UTF8(header, plstPos - 1, tab, 10000, pl)
 		end
@@ -2946,16 +2944,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.QltyTab = t
 		local index = GetQltyIndex(t)
-		if not retAdr then
-			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
-			MarkWatch_YT()
-			if infoPanelCheck() == false then
-				title = title_is_no_infoPanel(title, t[index].Name)
-				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
-			end
-		end
 		m_simpleTV.User.YT.QltyIndex = index
-		retAdr = retAdr or StreamOut(t, index)
+		local retAdr = StreamOut(t, index)
 		local plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
 		m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
 		if m_simpleTV.User.YT.isPlstsCh then
@@ -2967,6 +2957,19 @@ https://github.com/grafi-tt/lunaJson
 			retAdr = positionToContinue(retAdr)
 		else
 			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+		end
+		if (#tab > 1
+			and plstPos == 1)
+			or m_simpleTV.User.YT.isPlstsCh
+		then
+			m_simpleTV.User.YT.DelayedAddress = retAdr
+			retAdr = 'wait'
+		end
+		m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
+		MarkWatch_YT()
+		if infoPanelCheck() == false then
+			title = title_is_no_infoPanel(title, t[index].Name)
+			ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
 		if m_simpleTV.User.YT.isPlstsCh then
@@ -3188,13 +3191,13 @@ https://github.com/grafi-tt/lunaJson
 			Random = - 1
 			PlayMode = - 1
 		end
-		local retAdr
 		tab.ExtParams = {}
 		tab.ExtParams.FilterType = FilterType
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.Random = Random
 		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
+		-- tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
 		local vId = tab[plstPos].Address:match('v=([^&]+)')
 		m_simpleTV.User.YT.AddToBaseUrlinAdr = url
@@ -3202,9 +3205,7 @@ https://github.com/grafi-tt/lunaJson
 		if #tab > 1
 			and plstPos == 1
 		then
-			m_simpleTV.User.YT.DelayedAddress = tab[1].Address
 			m_simpleTV.OSD.ShowSelect_UTF8(header, 0, tab, 10000, 2)
-			retAdr = 'wait'
 		else
 			m_simpleTV.OSD.ShowSelect_UTF8(header, plstPos - 1, tab, 10000, pl)
 		end
@@ -3215,22 +3216,24 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.QltyTab = t
 		local index = GetQltyIndex(t)
-		if not retAdr then
-			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
-			MarkWatch_YT()
-			if infoPanelCheck() == false then
-				title = title_is_no_infoPanel(title, t[index].Name)
-				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
-			end
-		else
-			m_simpleTV.Control.CurrentTitle_UTF8 = header
+		m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
+		MarkWatch_YT()
+		if infoPanelCheck() == false then
+			title = title_is_no_infoPanel(title, t[index].Name)
+			ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 		end
 		m_simpleTV.User.YT.QltyIndex = index
-		retAdr = retAdr or StreamOut(t, index)
+		local retAdr = StreamOut(t, index)
 		if #tab == 1 then
 			retAdr = positionToContinue(retAdr)
 		else
 			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+		end
+		if #tab > 1
+			and plstPos == 1
+		then
+			m_simpleTV.User.YT.DelayedAddress = retAdr
+			retAdr = 'wait'
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
 		if m_simpleTV.User.YT.isPlstsCh then
@@ -4100,6 +4103,13 @@ https://github.com/grafi-tt/lunaJson
 	end
 	function MarkWatched_YT(session_markWatch)
 		m_simpleTV.Http.Close(session_markWatch)
+	end
+	function OnMultiAddressOk_YT(Object, id)
+		if id == 1 then
+			OnMultiAddressCancel_YT(Object)
+		else
+			m_simpleTV.User.YT.DelayedAddress = nil
+		end
 	end
 	function OnMultiAddressCancel_YT(Object)
 		if m_simpleTV.User.YT.DelayedAddress then
