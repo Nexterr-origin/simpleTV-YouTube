@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (13/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2939,36 +2939,35 @@ https://github.com/grafi-tt/lunaJson
 			retAdr = 'wait'
 		else
 			m_simpleTV.OSD.ShowSelect_UTF8(header, plstPos - 1, tab, 10000, pl)
-		end
-		local t, title = GetStreamsTab(vId)
-			if not t or type(t) ~= 'table' then
-				StopOnErr(10, title)
-			 return
-			end
-		m_simpleTV.User.YT.QltyTab = t
-		local index = GetQltyIndex(t)
-		if not retAdr then
+			local t, title = GetStreamsTab(vId)
+				if not t or type(t) ~= 'table' then
+					StopOnErr(10, title)
+				 return
+				end
+			m_simpleTV.User.YT.QltyTab = t
+			local index = GetQltyIndex(t)
 			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
 			MarkWatch_YT()
 			if infoPanelCheck() == false then
 				title = title_is_no_infoPanel(title, t[index].Name)
 				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
+			m_simpleTV.User.YT.QltyIndex = index
+			retAdr = StreamOut(t, index)
+			if #tab == 1 then
+				retAdr = positionToContinue(retAdr)
+			else
+				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+			end
+			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 		end
-		m_simpleTV.User.YT.QltyIndex = index
-		retAdr = retAdr or StreamOut(t, index)
-		local plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
-		m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
 		if m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
 		else
 			m_simpleTV.User.YT.AddToBaseUrlinAdr = inAdr
 		end
-		if #tab == 1 then
-			retAdr = positionToContinue(retAdr)
-		else
-			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
-		end
+		local plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
+		m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
 		m_simpleTV.Control.CurrentAddress = retAdr
 		if m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.Control.CurrentAddress})
@@ -2988,10 +2987,11 @@ https://github.com/grafi-tt/lunaJson
 			if not urlAdr:match('isLogo=false') then
 				m_simpleTV.Control.CurrentTitle_UTF8 = header
 			else
-				m_simpleTV.Control.SetTitle(header .. ' (' .. title .. ')')
+				if title then
+					m_simpleTV.Control.SetTitle(header .. ' (' .. title .. ')')
+				end
 			end
 		end
-		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 	end
 	local function Plst(inAdr)
 		m_simpleTV.Control.ExecuteAction(37)
@@ -3207,32 +3207,30 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.User.YT.DelayedAddress = tab[1].Address
 			m_simpleTV.OSD.ShowSelect_UTF8(header, 0, tab, 10000, 2)
 			retAdr = 'wait'
+			m_simpleTV.Control.CurrentTitle_UTF8 = header
 		else
 			m_simpleTV.OSD.ShowSelect_UTF8(header, plstPos - 1, tab, 10000, pl)
-		end
-		local t, title = GetStreamsTab(vId)
-			if not t or type(t) ~= 'table' then
-				StopOnErr(2, title)
-			 return
-			end
-		m_simpleTV.User.YT.QltyTab = t
-		local index = GetQltyIndex(t)
-		if not retAdr then
+			local t, title = GetStreamsTab(vId)
+				if not t or type(t) ~= 'table' then
+					StopOnErr(2, title)
+				 return
+				end
+			m_simpleTV.User.YT.QltyTab = t
+			local index = GetQltyIndex(t)
 			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
 			MarkWatch_YT()
 			if infoPanelCheck() == false then
 				title = title_is_no_infoPanel(title, t[index].Name)
 				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
-		else
-			m_simpleTV.Control.CurrentTitle_UTF8 = header
-		end
-		m_simpleTV.User.YT.QltyIndex = index
-		retAdr = retAdr or StreamOut(t, index)
-		if #tab == 1 then
-			retAdr = positionToContinue(retAdr)
-		else
-			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+			m_simpleTV.User.YT.QltyIndex = index
+			retAdr = retAdr or StreamOut(t, index)
+			if #tab == 1 then
+				retAdr = positionToContinue(retAdr)
+			else
+				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+			end
+			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
 		if m_simpleTV.User.YT.isPlstsCh then
@@ -3248,7 +3246,6 @@ https://github.com/grafi-tt/lunaJson
 				end
 			end
 		end
-		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 	end
 	local function PlstsCh(inAdr)
 			if (m_simpleTV.Control.Reason == 'Stopped' or m_simpleTV.Control.Reason == 'EndReached')
