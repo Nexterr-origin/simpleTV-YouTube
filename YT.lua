@@ -1624,14 +1624,12 @@ https://github.com/grafi-tt/lunaJson
 		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
-			if not url then return end
-		local ver = url:match('/player/([^/]+)')
-			if m_simpleTV.User.YT.verJsPlayer
-				and m_simpleTV.User.YT.verJsPlayer == ver
+			if not url
+				or (m_simpleTV.User.YT.verJsPlayer
+					and m_simpleTV.User.YT.verJsPlayer == url)
 			then
 			 return
 			end
-		m_simpleTV.User.YT.verJsPlayer = ver
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 		m_simpleTV.Http.Close(session_jsPlayer)
@@ -1656,6 +1654,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts:["]*(%d+)')
 		m_simpleTV.User.YT.signScr = signScr
+		m_simpleTV.User.YT.verJsPlayer = url
 	end
 	local function Subtitle(tab)
 		local subt = {}
