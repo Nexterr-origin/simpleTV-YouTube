@@ -1619,12 +1619,19 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
 		local session_jsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_jsPlayer then return end
-		m_simpleTV.Http.SetTimeout(session_jsPlayer, 12000)
+		m_simpleTV.Http.SetTimeout(session_jsPlayer, 8000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
 		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
 			if not url then return end
+		local ver = url:match('/player/([^/]+)')
+			if m_simpleTV.User.YT.verJsPlayer
+				and m_simpleTV.User.YT.verJsPlayer == ver
+			then
+			 return
+			end
+		m_simpleTV.User.YT.verJsPlayer = ver
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 		m_simpleTV.Http.Close(session_jsPlayer)
