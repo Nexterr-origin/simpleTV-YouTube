@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (13/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (14/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1616,6 +1616,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 	end
 	local function GetJsPlayer()
+		m_simpleTV.User.YT.checkJsPlayer = os.time()
 		local session_jsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_jsPlayer then return end
 		m_simpleTV.Http.SetTimeout(session_jsPlayer, 12000)
@@ -2087,7 +2088,9 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-		if not m_simpleTV.User.YT.signScr then
+		if not m_simpleTV.User.YT.checkJsPlayer
+			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 3600
+		then
 			pcall(GetJsPlayer)
 		end
 		if infoInFile then
