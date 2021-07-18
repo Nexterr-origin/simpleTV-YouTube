@@ -425,7 +425,7 @@ local infoInFile = false
 					if not f then return end
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF', 'VISITOR_INFO1_LIVE'}
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF'}
 				local cookie_SAPISID
 				local t = {}
 					for line in fhandle:lines() do
@@ -441,10 +441,10 @@ local infoInFile = false
 								end
 							end
 						end
-						if #t == 7 then break end
+						if #t == 6 then break end
 					end
 				fhandle:close()
-					if #t < 7 then return end
+					if #t < 6 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return table.concat(t, ';')
 			end
@@ -2038,9 +2038,6 @@ https://github.com/grafi-tt/lunaJson
 		if proxy ~= '' then
 			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
 		end
-		if m_simpleTV.User.YT.isAuth then
-			extOpt = '$OPT:http-referrer=https://www.youtube.com/$OPT:http-ext-header=cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
-		end
 	 return url .. extOpt
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
@@ -2074,7 +2071,7 @@ https://github.com/grafi-tt/lunaJson
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or ''
 		local headers = Header_Auth() .. '\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","visitorData":"Cgt2YTl4VWVQWW51Yyi8o9CHBg==","clientName":"WEB","clientVersion": "2.20210623.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210623.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
