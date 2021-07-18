@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (18/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (15/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -425,7 +425,8 @@ local infoInFile = false
 					if not f then return end
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'PREF', 'APISID', 'SIDCC'}
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF', 'SIDCC'}
+				local cookie_SAPISID, cookie_SIDCC
 				local t = {}
 					for line in fhandle:lines() do
 						local name, val = line:match('youtube%.com.+%s(%S+)%s+(%S+)')
@@ -433,6 +434,12 @@ local infoInFile = false
 							for i = 1, #YT_Cookies do
 								if name == YT_Cookies[i] then
 									t[#t + 1] = string.format('%s=%s', name, val)
+									if not cookie_SAPISID and name == 'SAPISID' then
+										cookie_SAPISID = val
+									end
+									if not cookie_SIDCC and name == 'SIDCC' then
+										cookie_SIDCC = val
+									end
 								 break
 								end
 							end
@@ -441,20 +448,8 @@ local infoInFile = false
 					end
 				fhandle:close()
 					if #t < 6 then return end
-				local cookie_SID
-				local YT_Cookies_SID = {'SIDCC', 'SAPISID'}
-					for i = 1, #YT_Cookies_SID do
-						for j = 1, #t do
-							if t[j]:match(YT_Cookies_SID[i]) then
-								cookie_SID = t[j]:match('=(.+)')
-							 break
-							end
-						end
-						if cookie_SID then break end
-					end
-				if cookie_SID then
-					m_simpleTV.User.YT.isAuth = cookie_SID
-				end
+				m_simpleTV.User.YT.isAuth = cookie_SAPISID
+				m_simpleTV.User.YT.cookie_SIDCC = cookie_SIDCC
 			 return table.concat(t, ';')
 			end
 		local cookies = cookiesFromFile()
@@ -1468,11 +1463,17 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return t, types, header
 	end
-	local function header_Auth()
+	local function header_Auth(origin, videoInfo)
 		if m_simpleTV.User.YT.isAuth then
+			local cookie
+			if videoInfo then
+				cookie = m_simpleTV.User.YT.cookie_SIDCC or m_simpleTV.User.YT.isAuth
+			else
+				cookie = m_simpleTV.User.YT.isAuth
+			end
+			origin = origin or 'https://www.youtube.com'
 			local ostime = os.time()
-			local origin = 'https://www.youtube.com'
-			local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.isAuth, origin)
+			local toHash = string.format('%s %s %s', ostime, cookie, origin)
 			local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
 		 return string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0', ostime, hash)
 		end
@@ -2079,7 +2080,7 @@ https://github.com/grafi-tt/lunaJson
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or ''
-		local headers = header_Auth() .. '\nOrigin: https://www.youtube.com\nContent-Type: application/json'
+		local headers = header_Auth(nil, true) .. '\nOrigin: https://www.youtube.com\nContent-Type: application/json'
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210623.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
