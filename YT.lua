@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (18/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -425,8 +425,7 @@ local infoInFile = false
 					if not f then return end
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF'}
-				local cookie_SAPISID
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'PREF', 'APISID', 'SIDCC'}
 				local t = {}
 					for line in fhandle:lines() do
 						local name, val = line:match('youtube%.com.+%s(%S+)%s+(%S+)')
@@ -434,18 +433,28 @@ local infoInFile = false
 							for i = 1, #YT_Cookies do
 								if name == YT_Cookies[i] then
 									t[#t + 1] = string.format('%s=%s', name, val)
-									if not cookie_SAPISID and name == 'SAPISID' then
-										cookie_SAPISID = val
-									end
 								 break
 								end
 							end
 						end
-						if #t == 6 then break end
+						if #t == 7 then break end
 					end
 				fhandle:close()
 					if #t < 6 then return end
-				m_simpleTV.User.YT.isAuth = cookie_SAPISID
+				local cookie_SID
+				local YT_Cookies_SID = {'SIDCC', 'SAPISID'}
+					for i = 1, #YT_Cookies_SID do
+						for j = 1, #t do
+							if t[j]:match(YT_Cookies_SID[i]) then
+								cookie_SID = t[j]:match('=(.+)')
+							 break
+							end
+						end
+						if cookie_SID then break end
+					end
+				if cookie_SID then
+					m_simpleTV.User.YT.isAuth = cookie_SID
+				end
 			 return table.concat(t, ';')
 			end
 		local cookies = cookiesFromFile()
@@ -2107,7 +2116,7 @@ https://github.com/grafi-tt/lunaJson
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
 		player_response = player_response or ''
-		local trailer = player_response:match('"trailerVideoId":%s*"([^"]+)')
+		local trailer = player_response:match('trailerVideoId":%s*"([^"]+)')
 		if trailer then
 			m_simpleTV.User.YT.vId = trailer
 			m_simpleTV.User.YT.isTrailer = true
