@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (22/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -425,7 +425,7 @@ local infoInFile = false
 					if not f then return end
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF'}
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF', 'VISITOR_INFO1_LIVE'}
 				local cookie_SAPISID
 				local t = {}
 					for line in fhandle:lines() do
@@ -441,10 +441,10 @@ local infoInFile = false
 								end
 							end
 						end
-						if #t == 6 then break end
+							if #t == 7 then break end
 					end
 				fhandle:close()
-					if #t < 6 then return end
+					if #t < 7 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return table.concat(t, ';')
 			end
@@ -1621,6 +1621,7 @@ https://github.com/grafi-tt/lunaJson
 			if not session_jsPlayer then return end
 		m_simpleTV.Http.SetTimeout(session_jsPlayer, 8000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
+		m_simpleTV.Http.SetCookies(session_jsPlayer, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
@@ -1630,6 +1631,7 @@ https://github.com/grafi-tt/lunaJson
 			then
 			 return
 			end
+		m_simpleTV.User.YT.visitorData = answer:match('"visitorData":"([^"]+)')
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 		m_simpleTV.Http.Close(session_jsPlayer)
@@ -1879,7 +1881,7 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.throttleRateScr then
 			local n = adr:match('&n=([^&]+)')
 			if n then
-				n = jsdecode.DoDecode('decipher("' ..  n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
+				n = jsdecode.DoDecode('decipher("' .. n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
 				if n and #n > 0 then
 					adr = adr:gsub('&n=[^&]+', '&n=' .. n)
 				end
@@ -2009,7 +2011,7 @@ https://github.com/grafi-tt/lunaJson
 		local url = t[index].Address
 		url = DeCipherThrottleRate(url)
 		url = DeCipherSign(url)
-		local extOpt = string.format('$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
+		local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
 			k = k:match('%d+') or 600
@@ -2037,6 +2039,9 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if proxy ~= '' then
 			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
+		end
+		if not url:match('$OPT:image') then
+			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
 		end
 	 return url .. extOpt
 	end
@@ -2070,7 +2075,7 @@ https://github.com/grafi-tt/lunaJson
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or ''
-		local headers = Header_Auth() .. 'Content-Type: application/json'
+		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"1","clientVersion": "1.20210623","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
@@ -2114,7 +2119,8 @@ https://github.com/grafi-tt/lunaJson
 			rc, player_response = GetVideoInfo()
 			player_response = player_response or ''
 		end
-		if not player_response:match('status":%s*"OK')
+		if not m_simpleTV.User.YT.isAuth
+			and not player_response:match('status":%s*"OK')
 			and not player_response:match('status":%s*"ERROR')
 		then
 			local rc_LR, player_response_LR = GetVideoInfo('EMBED')
