@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (23/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2043,6 +2043,7 @@ https://github.com/grafi-tt/lunaJson
 		if not url:match('$OPT:image') then
 			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
 		end
+		url = url:gsub('https://www%.youtube%.com/api/', 'http://www.youtube.com/api/')
 	 return url .. extOpt
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
@@ -2963,16 +2964,16 @@ https://github.com/grafi-tt/lunaJson
 			local index = GetQltyIndex(t)
 			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
 			MarkWatch_YT()
-			if infoPanelCheck() == false then
-				title = title_is_no_infoPanel(title, t[index].Name)
-				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
-			end
 			m_simpleTV.User.YT.QltyIndex = index
 			retAdr = Stream_Out(t, index)
 			if #tab == 1 then
 				retAdr = positionToContinue(retAdr)
 			else
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+			end
+			if infoPanelCheck() == false or retAdr:match('$OPT:image') then
+				title = title_is_no_infoPanel(title, t[index].Name)
+				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
 			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 		end
@@ -3234,16 +3235,16 @@ https://github.com/grafi-tt/lunaJson
 			local index = GetQltyIndex(t)
 			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
 			MarkWatch_YT()
-			if infoPanelCheck() == false then
-				title = title_is_no_infoPanel(title, t[index].Name)
-				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
-			end
 			m_simpleTV.User.YT.QltyIndex = index
 			retAdr = retAdr or Stream_Out(t, index)
 			if #tab == 1 then
 				retAdr = positionToContinue(retAdr)
 			else
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+			end
+			if infoPanelCheck() == false or retAdr:match('$OPT:image') then
+				title = title_is_no_infoPanel(title, t[index].Name)
+				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
 			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 		end
