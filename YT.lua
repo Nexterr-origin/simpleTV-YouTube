@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (23/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -425,7 +425,7 @@ local infoInFile = false
 					if not f then return end
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF'}
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF', 'VISITOR_INFO1_LIVE'}
 				local cookie_SAPISID
 				local t = {}
 					for line in fhandle:lines() do
@@ -441,10 +441,10 @@ local infoInFile = false
 								end
 							end
 						end
-						if #t == 6 then break end
+							if #t == 7 then break end
 					end
 				fhandle:close()
-					if #t < 6 then return end
+					if #t < 7 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return table.concat(t, ';')
 			end
@@ -471,7 +471,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:89.0) Gecko/20100101 Firefox/89.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:90.0) Gecko/20100101 Firefox/90.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -1459,13 +1459,13 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return t, types, header
 	end
-	local function header_Auth()
+	local function Header_Auth()
 		if m_simpleTV.User.YT.isAuth then
 			local ostime = os.time()
 			local origin = 'https://www.youtube.com'
 			local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.isAuth, origin)
 			local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
-		 return string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0', ostime, hash)
+		 return string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0\nX-Origin:%s\n', ostime, hash, origin)
 		end
 	 return ''
 	end
@@ -1621,6 +1621,7 @@ https://github.com/grafi-tt/lunaJson
 			if not session_jsPlayer then return end
 		m_simpleTV.Http.SetTimeout(session_jsPlayer, 8000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
+		m_simpleTV.Http.SetCookies(session_jsPlayer, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
@@ -1630,6 +1631,7 @@ https://github.com/grafi-tt/lunaJson
 			then
 			 return
 			end
+		m_simpleTV.User.YT.visitorData = answer:match('"visitorData":"([^"]+)')
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
 		m_simpleTV.Http.Close(session_jsPlayer)
@@ -1765,7 +1767,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return p
 	end
-	local function StreamStart(adrStart)
+	local function Stream_Start(adrStart)
 		local h = adrStart:match('(%d+)h') or 0
 		local m = adrStart:match('(%d+)m') or 0
 		local s = adrStart:match('(%d+)s') or 0
@@ -1778,7 +1780,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return '$OPT:start-time=' .. adrStart
 	end
-	local function StreamError(tab, title)
+	local function Stream_Error(tab, title)
 			if not tab.playabilityStatus then
 			 return nil, m_simpleTV.User.YT.Lng.videoNotExst
 			end
@@ -1879,7 +1881,7 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.throttleRateScr then
 			local n = adr:match('&n=([^&]+)')
 			if n then
-				n = jsdecode.DoDecode('decipher("' ..  n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
+				n = jsdecode.DoDecode('decipher("' .. n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
 				if n and #n > 0 then
 					adr = adr:gsub('&n=[^&]+', '&n=' .. n)
 				end
@@ -1934,7 +1936,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return adr
 	end
-	local function StreamLive(hls, title)
+	local function Stream_Live(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
 		m_simpleTV.Http.SetTimeout(session_live, 14000)
@@ -2005,11 +2007,11 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return index or 1
 	end
-	local function StreamOut(t, index)
+	local function Stream_Out(t, index)
 		local url = t[index].Address
 		url = DeCipherThrottleRate(url)
 		url = DeCipherSign(url)
-		local extOpt = string.format('$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
+		local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
 			k = k:match('%d+') or 600
@@ -2033,11 +2035,15 @@ https://github.com/grafi-tt/lunaJson
 		end
 		local adrStart = inAdr:match('[?&]t=[^&]+')
 		if adrStart and videoId == m_simpleTV.User.YT.vId then
-			extOpt = StreamStart(adrStart) .. extOpt
+			extOpt = Stream_Start(adrStart) .. extOpt
 		end
 		if proxy ~= '' then
-			extOpt = string.format('$OPT:http-proxy=%s%s', proxy, extOpt)
+			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
 		end
+		if not url:match('$OPT:image') and not m_simpleTV.User.YT.isLiveContent then
+			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
+		end
+		url = url:gsub('https://www%.youtube%.com/api/', 'http://www.youtube.com/api/')
 	 return url .. extOpt
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
@@ -2070,9 +2076,9 @@ https://github.com/grafi-tt/lunaJson
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or ''
-		local headers = header_Auth() .. '\nOrigin: https://www.youtube.com\nContent-Type: application/json'
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"WEB","clientVersion": "2.20210623.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}}}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
-		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"1","clientVersion": "1.20210623","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
+		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
@@ -2107,14 +2113,15 @@ https://github.com/grafi-tt/lunaJson
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
 		player_response = player_response or ''
-		local trailer = player_response:match('"trailerVideoId":%s*"([^"]+)')
+		local trailer = player_response:match('trailerVideoId":%s*"([^"]+)')
 		if trailer then
 			m_simpleTV.User.YT.vId = trailer
 			m_simpleTV.User.YT.isTrailer = true
 			rc, player_response = GetVideoInfo()
 			player_response = player_response or ''
 		end
-		if not player_response:match('status":%s*"OK')
+		if not m_simpleTV.User.YT.isAuth
+			and not player_response:match('status":%s*"OK')
 			and not player_response:match('status":%s*"ERROR')
 		then
 			local rc_LR, player_response_LR = GetVideoInfo('EMBED')
@@ -2264,7 +2271,7 @@ https://github.com/grafi-tt/lunaJson
 			if tab.streamingData and tab.streamingData.hlsManifestUrl
 				and (m_simpleTV.User.YT.isLiveContent == true or m_simpleTV.User.YT.isLive == true)
 			then
-			 return StreamLive(tab.streamingData.hlsManifestUrl, title)
+			 return Stream_Live(tab.streamingData.hlsManifestUrl, title)
 			end
 		if tab.streamingData and tab.streamingData.formats then
 			local k = 1
@@ -2314,7 +2321,7 @@ https://github.com/grafi-tt/lunaJson
 			if #t == 0 then
 					if urlAdr:match('PARAMS=psevdotv') then return end
 				isInfoPanel = false
-			 return StreamError(tab, title)
+			 return Stream_Error(tab, title)
 			end
 		local captions, captions_title
 		local subtitle_config = m_simpleTV.Config.GetValue('subtitle/disableAtStart', 'simpleTVConfig') or 'true'
@@ -2957,16 +2964,16 @@ https://github.com/grafi-tt/lunaJson
 			local index = GetQltyIndex(t)
 			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
 			MarkWatch_YT()
-			if infoPanelCheck() == false then
-				title = title_is_no_infoPanel(title, t[index].Name)
-				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
-			end
 			m_simpleTV.User.YT.QltyIndex = index
-			retAdr = StreamOut(t, index)
+			retAdr = Stream_Out(t, index)
 			if #tab == 1 then
 				retAdr = positionToContinue(retAdr)
 			else
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+			end
+			if infoPanelCheck() == false or retAdr:match('$OPT:image') then
+				title = title_is_no_infoPanel(title, t[index].Name)
+				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
 			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 		end
@@ -3228,16 +3235,16 @@ https://github.com/grafi-tt/lunaJson
 			local index = GetQltyIndex(t)
 			m_simpleTV.Control.CurrentTitle_UTF8 = header .. ' (' .. title:gsub('\n.-$', '') .. ')'
 			MarkWatch_YT()
-			if infoPanelCheck() == false then
-				title = title_is_no_infoPanel(title, t[index].Name)
-				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
-			end
 			m_simpleTV.User.YT.QltyIndex = index
-			retAdr = retAdr or StreamOut(t, index)
+			retAdr = retAdr or Stream_Out(t, index)
 			if #tab == 1 then
 				retAdr = positionToContinue(retAdr)
 			else
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
+			end
+			if infoPanelCheck() == false or retAdr:match('$OPT:image') then
+				title = title_is_no_infoPanel(title, t[index].Name)
+				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
 			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
 		end
@@ -3339,7 +3346,7 @@ https://github.com/grafi-tt/lunaJson
 			body = url:match('body=([^&]*)') or ''
 			body = decode64(body)
 		end
-		local headers = header_Auth() .. '\nX-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
+		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&is%a+=%a+', ''), headers = headers})
 			if rc ~= 200 then
@@ -3626,7 +3633,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.QltyTab = t
 		local index = GetQltyIndex(t)
-		local retAdr = StreamOut(t, index)
+		local retAdr = Stream_Out(t, index)
 		m_simpleTV.User.YT.QltyIndex = index
 		if m_simpleTV.User.YT.isVideo == true then
 			local name = title:gsub('%c.-$', '')
@@ -3783,7 +3790,7 @@ https://github.com/grafi-tt/lunaJson
 			else
 				answer = answer:gsub('\\"', '%%22')
 			end
-			params.User.headers = header_Auth() .. '\nX-Origin: https://www.youtube.com\nContent-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
+			params.User.headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
 			params.User.First = false
 			local title
 			if params.User.typePlst == 'rssVideos'	then
@@ -4012,7 +4019,7 @@ https://github.com/grafi-tt/lunaJson
 			if isInfoPanel == false then
 				ShowMsg(t[id].Name, nil, true)
 			end
-			local retAdr = StreamOut(t, id)
+			local retAdr = Stream_Out(t, id)
 			retAdr = retAdr:gsub('$OPT:start%-time=%d+', '')
 			m_simpleTV.Control.SetNewAddressT({address = retAdr, position = m_simpleTV.Control.GetPosition()})
 			if m_simpleTV.Control.GetState() == 0 then
