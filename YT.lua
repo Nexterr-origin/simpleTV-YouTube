@@ -2040,7 +2040,7 @@ https://github.com/grafi-tt/lunaJson
 		if proxy ~= '' then
 			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
 		end
-		if not url:match('$OPT:image') then
+		if not url:match('$OPT:image') and not m_simpleTV.User.YT.isLiveContent then
 			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
 		end
 		url = url:gsub('https://www%.youtube%.com/api/', 'http://www.youtube.com/api/')
