@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (25/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2009,8 +2009,9 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function Stream_Out(t, index)
 		local url = t[index].Address
-		url = DeCipherThrottleRate(url)
-		url = DeCipherSign(url)
+			if url:match('$OPT:image') then
+			 return url
+			end
 		local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
@@ -2022,28 +2023,28 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 		if not m_simpleTV.User.YT.isLiveContent then
+			url = DeCipherThrottleRate(url)
+			url = DeCipherSign(url)
 			extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
+			if t[index].isAdaptive == true then
+				extOpt = '$OPT:sub-track-id=1' .. extOpt
+			elseif t[index].isAdaptive == false then
+				extOpt = '$OPT:sub-track-id=2' .. extOpt
+			end
+			local adrStart = inAdr:match('[?&]t=[^&]+')
+			if adrStart and videoId == m_simpleTV.User.YT.vId then
+				extOpt = Stream_Start(adrStart) .. extOpt
+			end
+			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
+			url = url:gsub('#https', '#http')
 		elseif not m_simpleTV.User.YT.isLive then
 			extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
 		else
 			extOpt = '$OPT:adaptive-use-access' .. extOpt
 		end
-		if t[index].isAdaptive == true then
-			extOpt = '$OPT:sub-track-id=1' .. extOpt
-		elseif t[index].isAdaptive == false then
-			extOpt = '$OPT:sub-track-id=2' .. extOpt
-		end
-		local adrStart = inAdr:match('[?&]t=[^&]+')
-		if adrStart and videoId == m_simpleTV.User.YT.vId then
-			extOpt = Stream_Start(adrStart) .. extOpt
-		end
 		if proxy ~= '' then
 			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
 		end
-		if not url:match('$OPT:image') and not m_simpleTV.User.YT.isLiveContent then
-			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
-		end
-		url = url:gsub('https://www%.youtube%.com/api/', 'http://www.youtube.com/api/')
 	 return url .. extOpt
 	end
 	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
