@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (25/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (26/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
