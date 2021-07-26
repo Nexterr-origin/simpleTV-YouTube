@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (26/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (27/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -3092,9 +3092,9 @@ https://github.com/grafi-tt/lunaJson
 		local header = params.User.Title
 		local tab = params.User.tab
 			if #tab == 0 then
-					if url:match('[&?]list=') and not url:match('/watch?') then
+					if url:match('&list=') and url:match('/watch?') then
 						m_simpleTV.Control.ChangeAddress = 'No'
-						m_simpleTV.Control.CurrentAddress = url:gsub('^.-&list=(..)([^&]+)', 'https://www.youtube.com/watch?v=%2&list=%1%2&isLogo=false')
+						m_simpleTV.Control.CurrentAddress = url:gsub('&list=.-$', '') .. '&isLogo=false'
 						dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
 					 return
 					end
