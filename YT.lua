@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/7/21)
+-- видеоскрипт для сайта https://www.youtube.com (28/7/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2076,7 +2076,7 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
-		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or ''
+		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
 		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"1","clientVersion": "1.20210623","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
