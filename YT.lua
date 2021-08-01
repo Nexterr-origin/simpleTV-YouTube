@@ -449,8 +449,8 @@ local infoInFile = false
 			 return table.concat(t, ';')
 			end
 		local cookies = cookiesFromFile()
-			or 'VISITOR_INFO1_LIVE=r8isH8_QXtc;PREF=&hl=' .. m_simpleTV.User.YT.Lng.hl
-		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+cb.20210518-05-p0.ru+FX+%s;', cookies, math.random(100, 999))
+			or 'VISITOR_INFO1_LIVE=tdu4s7pZs6U;PREF=&hl=' .. m_simpleTV.User.YT.Lng.hl
+		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%d%-_]+)') or m_simpleTV.User.YT.Lng.hl
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
@@ -2078,7 +2078,7 @@ https://github.com/grafi-tt/lunaJson
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
 		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"1","clientVersion": "1.25250101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"1","clientVersion": "1.20210729.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
@@ -2122,8 +2122,7 @@ https://github.com/grafi-tt/lunaJson
 			player_response = player_response or ''
 		end
 		if not m_simpleTV.User.YT.isAuth
-			and not player_response:match('status":%s*"OK')
-			and not player_response:match('status":%s*"ERROR')
+			and player_response:match('status":%s*"LOGIN')
 		then
 			local rc_LR, player_response_LR = GetVideoInfo('EMBED')
 			if player_response_LR
@@ -3344,10 +3343,10 @@ https://github.com/grafi-tt/lunaJson
 					StopOnErr(3.1)
 				 return
 				end
-			body = url:match('body=([^&]*)') or ''
+			body = url:match('body=([^&]+)') or ''
 			body = decode64(body)
 		end
-		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
+		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&is%a+=%a+', ''), headers = headers})
 			if rc ~= 200 then
@@ -3382,7 +3381,7 @@ https://github.com/grafi-tt/lunaJson
 		local buttonNext = false
 		local continuation = answer:match('"continuation":%s*"([^"]+)') or answer:match('"continuationCommand":%s*{%s*"token":%s*"([^"]+)')
 		if continuation then
-			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8			&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20201021.03.00","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'",}},"continuation":"' .. continuation .. '"}')
+			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'"}},"continuation":"' .. continuation .. '"}')
 			buttonNext = true
 		end
 		local tab0, i = {}, 1
@@ -3791,7 +3790,7 @@ https://github.com/grafi-tt/lunaJson
 			else
 				answer = answer:gsub('\\"', '%%22')
 			end
-			params.User.headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210302.07.01' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
+			params.User.headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
 			params.User.First = false
 			local title
 			if params.User.typePlst == 'rssVideos'	then
@@ -3844,7 +3843,7 @@ https://github.com/grafi-tt/lunaJson
 			ret.request.url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		end
 		ret.request.method = 'post'
-		ret.request.body = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210302.07.01","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'",}},"continuation":"' .. continuation .. '"}'
+		ret.request.body = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'"}},"continuation":"' .. continuation .. '"}'
 		ret.request.headers = params.User.headers
 		ret.Count = #params.User.tab
 		if params.User.plstTotalResults then
