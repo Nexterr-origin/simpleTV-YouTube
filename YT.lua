@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (2/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1459,15 +1459,17 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return t, types, header
 	end
-	local function Header_Auth()
-		if m_simpleTV.User.YT.isAuth then
-			local ostime = os.time()
+	local function GetHeader_Auth()
+		if m_simpleTV.User.YT.isAuth
+			and not m_simpleTV.User.YT.headerAuth
+		then
 			local origin = 'https://www.youtube.com'
+			local ostime = os.time()
 			local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.isAuth, origin)
 			local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
-		 return string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0\nX-Origin:%s\n', ostime, hash, origin)
+			m_simpleTV.User.YT.headerAuth = string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0\nX-Origin:%s\n', ostime, hash, origin)
 		end
-	 return ''
+	 return m_simpleTV.User.YT.headerAuth or ''
 	end
 	local function GetUrlWatchVideos(url)
 		local session_watchVideos = m_simpleTV.Http.New(userAgent, proxy, true)
@@ -2077,7 +2079,7 @@ https://github.com/grafi-tt/lunaJson
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
-		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
+		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"1","clientVersion": "1.20210729.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
@@ -3346,7 +3348,7 @@ https://github.com/grafi-tt/lunaJson
 			body = url:match('body=([^&]+)') or ''
 			body = decode64(body)
 		end
-		local headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
+		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&is%a+=%a+', ''), headers = headers})
 			if rc ~= 200 then
@@ -3790,7 +3792,7 @@ https://github.com/grafi-tt/lunaJson
 			else
 				answer = answer:gsub('\\"', '%%22')
 			end
-			params.User.headers = Header_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
+			params.User.headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
 			params.User.First = false
 			local title
 			if params.User.typePlst == 'rssVideos'	then
