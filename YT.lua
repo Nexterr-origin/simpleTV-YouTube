@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (2/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (3/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -218,7 +218,12 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.Lng then
 		m_simpleTV.User.YT.Lng = {}
-		if m_simpleTV.Interface.GetLanguage() == 'ru' then
+		local stvLang, _ = m_simpleTV.Interface.GetLanguage()
+		local _, osLang_country = m_simpleTV.Interface.GetLanguageCountry()
+		local country = osLang_country:gsub('[^_]+_', '')
+		m_simpleTV.User.YT.Lng.lang = stvLang
+		m_simpleTV.User.YT.Lng.country = country
+		if stvLang == 'ru' then
 			m_simpleTV.User.YT.Lng.adaptiv = 'адаптивное'
 			m_simpleTV.User.YT.Lng.desc = 'описание'
 			m_simpleTV.User.YT.Lng.qlty = 'качество'
@@ -239,8 +244,6 @@ local infoInFile = false
 			m_simpleTV.User.YT.Lng.videoNotAvail = 'видео не доступно'
 			m_simpleTV.User.YT.Lng.videoNotExst = 'видео не существует'
 			m_simpleTV.User.YT.Lng.page = 'стр.'
-			m_simpleTV.User.YT.Lng.hl = 'ru_RU'
-			m_simpleTV.User.YT.Lng.hl_sub = 'ru'
 			m_simpleTV.User.YT.Lng.camera = 'вид с видеокамеры'
 			m_simpleTV.User.YT.Lng.camera_plst_title = 'список видеокамер'
 			m_simpleTV.User.YT.Lng.channel = 'канал'
@@ -254,114 +257,6 @@ local infoInFile = false
 			m_simpleTV.User.YT.Lng.link = 'открыть в браузере'
 			m_simpleTV.User.YT.Lng.noCookies = 'ТРЕБУЕТСЯ ВХОД: используйте "cookies файл" для авторизации'
 			m_simpleTV.User.YT.Lng.chapter = 'главы'
-		elseif m_simpleTV.Interface.GetLanguage() == 'pt' then
-			m_simpleTV.User.YT.Lng.adaptiv = 'adaptável'
-			m_simpleTV.User.YT.Lng.desc = 'descrição'
-			m_simpleTV.User.YT.Lng.qlty = 'qualidade'
-			m_simpleTV.User.YT.Lng.savePlstFolder = 'playlists salvas'
-			m_simpleTV.User.YT.Lng.savePlst_1 = 'lista de reprodução salva em arquivo'
-			m_simpleTV.User.YT.Lng.savePlst_2 = 'para pasta'
-			m_simpleTV.User.YT.Lng.savePlst_3 = 'não é possível salvar a playlist'
-			m_simpleTV.User.YT.Lng.sub = 'legendas'
-			m_simpleTV.User.YT.Lng.subTr = 'traduzido'
-			m_simpleTV.User.YT.Lng.preview = 'preview'
-			m_simpleTV.User.YT.Lng.audio = 'áudio'
-			m_simpleTV.User.YT.Lng.noAudio = 'sem áudio'
-			m_simpleTV.User.YT.Lng.plst = 'lista de reprodução'
-			m_simpleTV.User.YT.Lng.error = 'erro'
-			m_simpleTV.User.YT.Lng.live = 'em direto'
-			m_simpleTV.User.YT.Lng.upLoadOnCh = 'uploads do canal'
-			m_simpleTV.User.YT.Lng.loading = 'a carregar'
-			m_simpleTV.User.YT.Lng.videoNotAvail = 'vídeo não disponível'
-			m_simpleTV.User.YT.Lng.videoNotExst = 'vídeo não existe'
-			m_simpleTV.User.YT.Lng.page = 'página'
-			m_simpleTV.User.YT.Lng.hl = 'pt_PT'
-			m_simpleTV.User.YT.Lng.hl_sub = 'pt'
-			m_simpleTV.User.YT.Lng.camera = 'visão da câmera'
-			m_simpleTV.User.YT.Lng.camera_plst_title = 'álternar câmera'
-			m_simpleTV.User.YT.Lng.channel = 'chanel'
-			m_simpleTV.User.YT.Lng.video = 'vídeo'
-			m_simpleTV.User.YT.Lng.search = 'procurar'
-			m_simpleTV.User.YT.Lng.notFound = 'não encontrado'
-			m_simpleTV.User.YT.Lng.started = 'started'
-			m_simpleTV.User.YT.Lng.published = 'published'
-			m_simpleTV.User.YT.Lng.duration = 'duration'
-			m_simpleTV.User.YT.Lng.relatedVideos = 'vídeos relacionados'
-			m_simpleTV.User.YT.Lng.link = 'abra no navegador'
-			m_simpleTV.User.YT.Lng.noCookies = 'LOGIN NECESSÁRIO: usar "cookies file" para autorização'
-			m_simpleTV.User.YT.Lng.chapter = 'chapters'
-		elseif m_simpleTV.Interface.GetLanguage() == 'vi' then
-			m_simpleTV.User.YT.Lng.adaptiv = 'Thích nghi'
-			m_simpleTV.User.YT.Lng.desc = 'Sự miêu tả'
-			m_simpleTV.User.YT.Lng.qlty = 'Chất lượng'
-			m_simpleTV.User.YT.Lng.savePlstFolder = 'Đã lưu danh sách phát'
-			m_simpleTV.User.YT.Lng.savePlst_1 = 'Danh sách phát được lưu thành file'
-			m_simpleTV.User.YT.Lng.savePlst_2 = 'vào thư mục'
-			m_simpleTV.User.YT.Lng.savePlst_3 = 'Không thể lưu'
-			m_simpleTV.User.YT.Lng.sub = 'Phụ đề'
-			m_simpleTV.User.YT.Lng.subTr = 'Google dịch'
-			m_simpleTV.User.YT.Lng.preview = 'Xem lại'
-			m_simpleTV.User.YT.Lng.audio = 'Âm thanh'
-			m_simpleTV.User.YT.Lng.noAudio = 'Không có âm thanh'
-			m_simpleTV.User.YT.Lng.plst = 'Danh sách phát'
-			m_simpleTV.User.YT.Lng.error = 'Lỗi'
-			m_simpleTV.User.YT.Lng.live = 'Trực tiếp'
-			m_simpleTV.User.YT.Lng.upLoadOnCh = 'Kênh'
-			m_simpleTV.User.YT.Lng.loading = 'Đang tải'
-			m_simpleTV.User.YT.Lng.videoNotAvail = 'Video không có sẵn'
-			m_simpleTV.User.YT.Lng.videoNotExst = 'Video không tồn tại'
-			m_simpleTV.User.YT.Lng.page = 'Trang.'
-			m_simpleTV.User.YT.Lng.hl = 'vi'
-			m_simpleTV.User.YT.Lng.hl_sub = 'vi'
-			m_simpleTV.User.YT.Lng.camera = 'Xem camera'
-			m_simpleTV.User.YT.Lng.camera_plst_title = 'Đổi camera'
-			m_simpleTV.User.YT.Lng.channel = 'Kênh'
-			m_simpleTV.User.YT.Lng.video = 'Video'
-			m_simpleTV.User.YT.Lng.search = 'Tìm kiếm'
-			m_simpleTV.User.YT.Lng.notFound = 'Không tìm thấy'
-			m_simpleTV.User.YT.Lng.started = 'Bắt đầu'
-			m_simpleTV.User.YT.Lng.published = 'Xuất bản'
-			m_simpleTV.User.YT.Lng.duration = 'Thời lượng'
-			m_simpleTV.User.YT.Lng.relatedVideos = 'Video liên quan'
-			m_simpleTV.User.YT.Lng.link = 'Mở trong trình duyệt'
-			m_simpleTV.User.YT.Lng.noCookies = 'YÊU CẦU ĐĂNG NHẬP: sử dụng "cookies file" để ủy quyền'
-			m_simpleTV.User.YT.Lng.chapter = 'Chươngi'
-		elseif m_simpleTV.Interface.GetLanguage() == 'pl' then
-			m_simpleTV.User.YT.Lng.adaptiv = 'adaptacyjny'
-			m_simpleTV.User.YT.Lng.desc = 'opis'
-			m_simpleTV.User.YT.Lng.qlty = 'jakość'
-			m_simpleTV.User.YT.Lng.savePlstFolder = 'zapisane listy odtwarzania'
-			m_simpleTV.User.YT.Lng.savePlst_1 = 'lista odtwarzania zapisana do pliku'
-			m_simpleTV.User.YT.Lng.savePlst_2 = 'do folderu'
-			m_simpleTV.User.YT.Lng.savePlst_3 = 'nie można zapisać listy odtwarzania'
-			m_simpleTV.User.YT.Lng.sub = 'napisy na filmie obcojęzycznym'
-			m_simpleTV.User.YT.Lng.subTr = 'przetłumaczony'
-			m_simpleTV.User.YT.Lng.preview = 'zapowiedź'
-			m_simpleTV.User.YT.Lng.audio = 'audio'
-			m_simpleTV.User.YT.Lng.noAudio = 'brak dźwięku'
-			m_simpleTV.User.YT.Lng.plst = 'lista odtwarzania'
-			m_simpleTV.User.YT.Lng.error = 'błąd'
-			m_simpleTV.User.YT.Lng.live = 'relacja na żywo'
-			m_simpleTV.User.YT.Lng.upLoadOnCh = 'przesłane z kanału'
-			m_simpleTV.User.YT.Lng.loading = 'Ładowanie'
-			m_simpleTV.User.YT.Lng.videoNotAvail = 'video not available'
-			m_simpleTV.User.YT.Lng.videoNotExst = 'wideo niedostępne'
-			m_simpleTV.User.YT.Lng.page = 'strona'
-			m_simpleTV.User.YT.Lng.hl = 'pl'
-			m_simpleTV.User.YT.Lng.hl_sub = 'pl'
-			m_simpleTV.User.YT.Lng.camera = 'widok z kamery'
-			m_simpleTV.User.YT.Lng.camera_plst_title = 'przełącz aparat'
-			m_simpleTV.User.YT.Lng.channel = 'kanał'
-			m_simpleTV.User.YT.Lng.video = 'wideo'
-			m_simpleTV.User.YT.Lng.search = 'Szukaj'
-			m_simpleTV.User.YT.Lng.notFound = 'nie znaleziono'
-			m_simpleTV.User.YT.Lng.started = 'started'
-			m_simpleTV.User.YT.Lng.published = 'Rozpoczęty'
-			m_simpleTV.User.YT.Lng.duration = 'Trwanie'
-			m_simpleTV.User.YT.Lng.relatedVideos = 'powiązane wideo'
-			m_simpleTV.User.YT.Lng.link = 'Otwórz w przeglądarce'
-			m_simpleTV.User.YT.Lng.noCookies = 'WYMAGANE LOGOWANIE: użyj „pliku cookie” do autoryzacji'
-			m_simpleTV.User.YT.Lng.chapter = 'rozdziałi'
 		else
 			m_simpleTV.User.YT.Lng.adaptiv = 'adaptive'
 			m_simpleTV.User.YT.Lng.desc = 'description'
@@ -383,8 +278,6 @@ local infoInFile = false
 			m_simpleTV.User.YT.Lng.videoNotAvail = 'video not available'
 			m_simpleTV.User.YT.Lng.videoNotExst = 'video does not exist'
 			m_simpleTV.User.YT.Lng.page = 'page'
-			m_simpleTV.User.YT.Lng.hl = 'en_US'
-			m_simpleTV.User.YT.Lng.hl_sub = 'en'
 			m_simpleTV.User.YT.Lng.camera = 'camera view'
 			m_simpleTV.User.YT.Lng.camera_plst_title = 'switch camera'
 			m_simpleTV.User.YT.Lng.channel = 'channel'
@@ -449,9 +342,10 @@ local infoInFile = false
 			 return table.concat(t, ';')
 			end
 		local cookies = cookiesFromFile()
-			or 'VISITOR_INFO1_LIVE=tdu4s7pZs6U;PREF=&hl=' .. m_simpleTV.User.YT.Lng.hl
+			or 'VISITOR_INFO1_LIVE=tdu4s7pZs6U;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
 		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
-		m_simpleTV.User.YT.Lng.hl = cookies:match('&hl=([%a%d%-_]+)') or m_simpleTV.User.YT.Lng.hl
+		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&; ]+)') or m_simpleTV.User.YT.Lng.lang
+		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&; ]+)') or m_simpleTV.User.YT.Lng.country
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
 		m_simpleTV.User.YT.PlstsCh = {}
@@ -1335,8 +1229,8 @@ https://github.com/grafi-tt/lunaJson
 						.. ' (vItag: ' .. tostring(t[index].itag)
 						.. ', aItag: ' .. tostring(t[index].aItag) .. ')\n'
 						.. string_rep
-						.. 'rTime: ' .. scr_time .. ' s.'
-						.. ' (getVideoInfo: ' .. inf0 .. ' s.'
+						.. 'clockTime: ' .. scr_time .. ' s.'
+						.. ' (videoInfo: ' .. inf0 .. ' s.'
 						.. ' + calc: ' .. calc .. ' s.)\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(retAdr:match('&sp=(%a+)'))
@@ -1390,12 +1284,12 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if types == 'related' then
 			sAdr = sAdr:gsub('%-related=', '')
-			url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&fields=nextPageToken,items/snippet/title,items/id/videoId,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&type=video&relatedToVideoId=' .. sAdr .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.hl
+			url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&fields=nextPageToken,items/snippet/title,items/id/videoId,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&type=video&relatedToVideoId=' .. sAdr .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
 		else
 			sAdr = sAdr:gsub('^[%-%+%s]+(.-)%s*$', '%1')
 				if sAdr == '' then return end
 			sAdr = m_simpleTV.Common.toPercentEncoding(sAdr)
-			url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' .. sAdr .. '&type=' .. types .. '&fields=nextPageToken,items/id,items/snippet/title,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&maxResults=50' .. eventType .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.hl
+			url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' .. sAdr .. '&type=' .. types .. '&fields=nextPageToken,items/id,items/snippet/title,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&maxResults=50' .. eventType .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
 		end
 		local t = {}
 		local k, i = 1, 1
@@ -1663,19 +1557,13 @@ https://github.com/grafi-tt/lunaJson
 	local function Subtitle(tab)
 		local subt = {}
 		local subtList = tostring(m_simpleTV.Config.GetValue('subtitle/lang', 'simpleTVConfig') or '')
-		if subtList == 'none'
-			or subtList == ''
-		then
-			subt[1] = m_simpleTV.User.YT.Lng.hl
-		else
-			subtList = subtList:gsub('%s', ',')
-			subtList = subtList:gsub('[^%d%a,%-_]', '')
-			subtList = subtList:gsub('_', '-')
-			subtList = subtList:gsub(',+', ',')
-			subt = split_str(subtList, ',')
-			if #subt == 0 then
-				subt[1] = m_simpleTV.User.YT.Lng.hl
-			end
+		subtList = subtList:gsub('%s', ',')
+		subtList = subtList:gsub('[^%d%a,%-_]', '')
+		subtList = subtList:gsub('_', '-')
+		subtList = subtList:gsub(',+', ',')
+		subt = split_str(subtList, ',')
+		if #subt == 0 then
+			subt[1] = m_simpleTV.User.YT.Lng.lang
 		end
 		local r = 1
 		local languageCode, kind, q, subtAdr
@@ -1724,7 +1612,7 @@ https://github.com/grafi-tt/lunaJson
 				r = r + 1
 			end
 		if not lngCodeTr then
-			lngCodeTr = m_simpleTV.User.YT.Lng.hl_sub
+			lngCodeTr = m_simpleTV.User.YT.Lng.lang
 			while true do
 					if not subt[r] or lngCodeTr then break end
 				q = 1
@@ -2080,7 +1968,7 @@ https://github.com/grafi-tt/lunaJson
 		local sts = m_simpleTV.User.YT.sts or 0
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"US","clientName":"1","clientVersion": "1.20210729.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.hl, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.20210729.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
@@ -2802,7 +2690,7 @@ https://github.com/grafi-tt/lunaJson
 		if not m_simpleTV.User.YT.apiKey then
 			GetApiKey()
 		end
-		local url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&fields=items/snippet/localized/title&id=' .. plstId .. '&hl=' .. m_simpleTV.User.YT.Lng.hl .. '&key=' .. m_simpleTV.User.YT.apiKey
+		local url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&fields=items/snippet/localized/title&id=' .. plstId .. '&hl=' .. m_simpleTV.User.YT.Lng.lang .. '&key=' .. m_simpleTV.User.YT.apiKey
 		local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = m_simpleTV.User.YT.apiKeyHeader})
 		if rc ~= 200 then
 			answer = ''
@@ -3383,7 +3271,7 @@ https://github.com/grafi-tt/lunaJson
 		local buttonNext = false
 		local continuation = answer:match('"continuation":%s*"([^"]+)') or answer:match('"continuationCommand":%s*{%s*"token":%s*"([^"]+)')
 		if continuation then
-			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'"}},"continuation":"' .. continuation .. '"}')
+			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.lang ..'"}},"continuation":"' .. continuation .. '"}')
 			buttonNext = true
 		end
 		local tab0, i = {}, 1
@@ -3845,7 +3733,7 @@ https://github.com/grafi-tt/lunaJson
 			ret.request.url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		end
 		ret.request.method = 'post'
-		ret.request.body = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.hl ..'"}},"continuation":"' .. continuation .. '"}'
+		ret.request.body = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.lang ..'"}},"continuation":"' .. continuation .. '"}'
 		ret.request.headers = params.User.headers
 		ret.Count = #params.User.tab
 		if params.User.plstTotalResults then
