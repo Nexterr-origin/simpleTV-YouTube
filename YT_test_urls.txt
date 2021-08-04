@@ -17,6 +17,7 @@ https://www.youtube.com/playlist?list=LM - понравившиеся (музы�
 https://www.youtube.com/playlist?list=WL - посмотреть позже
 https://www.youtube.com/watch?v=kFW8kJ9Y1tM - age-gate: playback on other websites disabled
 https://www.youtube.com/watch?v=Cr381pDsSsA - age-gate: 18 + non-embed
+https://www.youtube.com/watch?v=0e9JgyzCIBc = RU country not set
 ---------------------------------------------------
 age-gate bypass
 https://www.youtube.com/watch?v=zbT53Q_olkU$OPT:http-referrer=https://cinema.mosfilm.ru - playback on other websites disabled 
@@ -26,9 +27,6 @@ https://www.youtube.com/watch?v=QWlNyzzwgcc
 ---------------------------------------------------
 controversial video
 https://www.youtube.com/watch?v=SZJvDhaSDnc
----------------------------------------------------
-заблокировано для рф 
-https://www.youtube.com/watch?v=0e9JgyzCIBc
 ---------------------------------------------------
 RSS feed:
 https://www.youtube.com/feeds/videos.xml?channel_id=UCba3hpU7EFBSk817y9qZkiA
