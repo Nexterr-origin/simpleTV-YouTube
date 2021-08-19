@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (3/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (19/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -342,7 +342,7 @@ local infoInFile = false
 			 return table.concat(t, ';')
 			end
 		local cookies = cookiesFromFile()
-			or 'VISITOR_INFO1_LIVE=tdu4s7pZs6U;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
+			or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
 		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&; ]+)') or m_simpleTV.User.YT.Lng.lang
 		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&; ]+)') or m_simpleTV.User.YT.Lng.country
@@ -365,7 +365,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:90.0) Gecko/20100101 Firefox/90.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -1515,7 +1515,7 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
 		local session_jsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_jsPlayer then return end
-		m_simpleTV.Http.SetTimeout(session_jsPlayer, 8000)
+		m_simpleTV.Http.SetTimeout(session_jsPlayer, 18000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
 		m_simpleTV.Http.SetCookies(session_jsPlayer, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
@@ -1966,8 +1966,9 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		clientScreen = clientScreen or 'WATCH'
 		local sts = m_simpleTV.User.YT.sts or 0
+		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
-		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.visitorData or '')
+		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. visitorData
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.20210729.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
@@ -3753,7 +3754,7 @@ https://github.com/grafi-tt/lunaJson
 			 return ret
 			end
 		local nextPageToken = answer:match('"nextPageToken": "([^"]+)')
-			if not nextPageToken then
+			if not nextPageToken or #nextPageToken > 32 then
 				ret.Done = true
 			 return ret
 			end
