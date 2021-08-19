@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (17/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (19/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -3754,7 +3754,7 @@ https://github.com/grafi-tt/lunaJson
 			 return ret
 			end
 		local nextPageToken = answer:match('"nextPageToken": "([^"]+)')
-			if not nextPageToken then
+			if not nextPageToken or #nextPageToken > 32 then
 				ret.Done = true
 			 return ret
 			end
