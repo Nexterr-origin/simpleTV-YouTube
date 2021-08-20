@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (20/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1513,24 +1513,20 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function GetJsPlayer()
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
-		local session_jsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_jsPlayer then return end
-		m_simpleTV.Http.SetTimeout(session_jsPlayer, 18000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		m_simpleTV.Http.SetCookies(session_jsPlayer, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
+		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
 			if not url
-				or (m_simpleTV.User.YT.verJsPlayer
-					and m_simpleTV.User.YT.verJsPlayer == url)
+				or tostring(m_simpleTV.User.YT.verJsPlayer) == url
 			then
 			 return
 			end
+		m_simpleTV.User.YT.verJsPlayer = url
 		m_simpleTV.User.YT.visitorData = answer:match('visitorData":"([^"]+)')
 		url = 'https://www.youtube.com' .. url
-		rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
-		m_simpleTV.Http.Close(session_jsPlayer)
+		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
 		local throttleRateFuncName = answer:match('a%.get%("n"%)%)&&%(b=([^%(]+)')
 		if throttleRateFuncName then
@@ -1539,10 +1535,11 @@ https://github.com/grafi-tt/lunaJson
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
+		local alg = answer:match('var ' .. var .. '=[^;]+')
 		local signScr = {}
 			for param in f:gmatch(var .. '%p([^)]+)') do
 				local func, p = param:match('([^(]+)%(a,(%d+)')
-				func = answer:match('[%p%s]' .. func .. ':function([^}]+)')
+				func = alg:match('[%p%s]' .. func .. ':function([^}]+)')
 				if func:match('a%.reverse') then
 					p = 0
 				elseif func:match('a%.splice') then
@@ -1552,7 +1549,6 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts:["]*(%d+)')
 		m_simpleTV.User.YT.signScr = signScr
-		m_simpleTV.User.YT.verJsPlayer = url
 	end
 	local function Subtitle(tab)
 		local subt = {}
@@ -1912,7 +1908,7 @@ https://github.com/grafi-tt/lunaJson
 				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=YouTube$OPT:marq-position=9$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', 0.025 * k, 0.03 * k, 0.03 * k, extOpt)
 			end
 		end
-		if not m_simpleTV.User.YT.isLiveContent then
+		if not m_simpleTV.User.YT.isLive then
 			url = DeCipherThrottleRate(url)
 			url = DeCipherSign(url)
 			extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
@@ -1927,10 +1923,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
 			url = url:gsub('#https', '#http')
-		elseif not m_simpleTV.User.YT.isLive then
-			extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
 		else
-			extOpt = '$OPT:adaptive-use-access' .. extOpt
+			extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
 		end
 		if proxy ~= '' then
 			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
@@ -1977,7 +1971,6 @@ https://github.com/grafi-tt/lunaJson
 	 return rc, answer
 	end
 	local function GetStreamsTab(vId)
-		m_simpleTV.Http.Close(session)
 		m_simpleTV.User.YT.ThumbsInfo = nil
 		m_simpleTV.User.YT.vId = vId
 		m_simpleTV.User.YT.chId = ''
@@ -1988,7 +1981,6 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.pic = nil
 		m_simpleTV.User.YT.videostats = nil
 		m_simpleTV.User.YT.isLive = false
-		m_simpleTV.User.YT.isLiveContent = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
@@ -1997,6 +1989,7 @@ https://github.com/grafi-tt/lunaJson
 		then
 			pcall(GetJsPlayer)
 		end
+		m_simpleTV.Http.Close(session)
 		if infoInFile then
 			inf0 = os.clock()
 		end
@@ -2079,9 +2072,6 @@ https://github.com/grafi-tt/lunaJson
 			if tab.videoDetails.isLive == true then
 				m_simpleTV.User.YT.isLive = true
 			end
-			if tab.videoDetails.isLiveContent == true then
-				m_simpleTV.User.YT.isLiveContent = true
-			end
 			if tab.videoDetails.lengthSeconds then
 				m_simpleTV.User.YT.duration = tonumber(tab.videoDetails.lengthSeconds)
 			end
@@ -2160,7 +2150,7 @@ https://github.com/grafi-tt/lunaJson
 			Thumbs(tab.storyboards.playerStoryboardSpecRenderer.spec)
 		end
 			if tab.streamingData and tab.streamingData.hlsManifestUrl
-				and (m_simpleTV.User.YT.isLiveContent == true or m_simpleTV.User.YT.isLive == true)
+				and m_simpleTV.User.YT.isLive == true
 			then
 			 return Stream_Live(tab.streamingData.hlsManifestUrl, title)
 			end
@@ -3608,7 +3598,7 @@ https://github.com/grafi-tt/lunaJson
 									.. title_clean(m_simpleTV.User.YT.author)
 									.. publishedAt
 			end
-			if m_simpleTV.User.YT.isLiveContent == false
+			if m_simpleTV.User.YT.isLive == false
 				and m_simpleTV.User.YT.isTrailer == false
 			then
 				t1[2] = {}
@@ -3681,7 +3671,8 @@ https://github.com/grafi-tt/lunaJson
 			else
 				answer = answer:gsub('\\"', '%%22')
 			end
-			params.User.headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00' .. '\nX-Goog-Visitor-Id: ' .. (answer:match('"visitorData":"([^"]+)') or '')
+			params.User.visitorData = answer:match('"visitorData":"([^"]+)') or ''
+			params.User.headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00' .. '\nX-Goog-Visitor-Id: ' .. params.User.visitorData
 			params.User.First = false
 			local title
 			if params.User.typePlst == 'rssVideos'	then
@@ -3717,6 +3708,7 @@ https://github.com/grafi-tt/lunaJson
 			if params.ProgressEnabled == true then
 				params.User.plstTotalResults = answer:match('"stats":%[{"runs":%[{"text":"(%d+)')
 			end
+			params.User.url = 'https://www.youtube.com/youtubei/v1/%s?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		end
 			if not AddInPl_Plst_YT(answer, params.User.tab, params.User.typePlst) then
 				ret.Done = true
@@ -3729,12 +3721,12 @@ https://github.com/grafi-tt/lunaJson
 			end
 		ret.request = {}
 		if params.User.typePlst == 'search' then
-			ret.request.url = 'https://www.youtube.com/youtubei/v1/search?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+			ret.request.url = string.format(params.User.url, 'search')
 		else
-			ret.request.url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+			ret.request.url = string.format(params.User.url, 'browse')
 		end
 		ret.request.method = 'post'
-		ret.request.body = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.lang ..'"}},"continuation":"' .. continuation .. '"}'
+		ret.request.body = string.format('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"%s","gl":"%s","visitorData":"%s"}},"continuation":"%s"}', m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, params.User.visitorData, continuation)
 		ret.request.headers = params.User.headers
 		ret.Count = #params.User.tab
 		if params.User.plstTotalResults then
