@@ -1513,12 +1513,9 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function GetJsPlayer()
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
-		local session_jsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_jsPlayer then return end
-		m_simpleTV.Http.SetTimeout(session_jsPlayer, 18000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		m_simpleTV.Http.SetCookies(session_jsPlayer, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
+		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
 		url = answer:match('[^"\']+base%.js')
 			if not url
@@ -1529,8 +1526,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.visitorData = answer:match('visitorData":"([^"]+)')
 		url = 'https://www.youtube.com' .. url
-		rc, answer = m_simpleTV.Http.Request(session_jsPlayer, {url = url})
-		m_simpleTV.Http.Close(session_jsPlayer)
+		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
 		local throttleRateFuncName = answer:match('a%.get%("n"%)%)&&%(b=([^%(]+)')
 		if throttleRateFuncName then
@@ -1978,7 +1974,6 @@ https://github.com/grafi-tt/lunaJson
 	 return rc, answer
 	end
 	local function GetStreamsTab(vId)
-		m_simpleTV.Http.Close(session)
 		m_simpleTV.User.YT.ThumbsInfo = nil
 		m_simpleTV.User.YT.vId = vId
 		m_simpleTV.User.YT.chId = ''
@@ -1998,6 +1993,7 @@ https://github.com/grafi-tt/lunaJson
 		then
 			pcall(GetJsPlayer)
 		end
+		m_simpleTV.Http.Close(session)
 		if infoInFile then
 			inf0 = os.clock()
 		end
