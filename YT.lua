@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (20/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1539,10 +1539,11 @@ https://github.com/grafi-tt/lunaJson
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
+		local alg = answer:match('var ' .. var .. '=[^;]+')
 		local signScr = {}
 			for param in f:gmatch(var .. '%p([^)]+)') do
 				local func, p = param:match('([^(]+)%(a,(%d+)')
-				func = answer:match('[%p%s]' .. func .. ':function([^}]+)')
+				func = alg:match('[%p%s]' .. func .. ':function([^}]+)')
 				if func:match('a%.reverse') then
 					p = 0
 				elseif func:match('a%.splice') then
