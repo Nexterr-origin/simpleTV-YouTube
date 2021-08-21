@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (20/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (21/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1254,23 +1254,23 @@ https://github.com/grafi-tt/lunaJson
 						.. m_simpleTV.User.YT.desc
 		debug_in_file(infoInFile, m_simpleTV.Common.GetMainPath(2) .. 'YT_play_info.txt', true)
 	end
-	local function Search(sAdr)
-		local types, yt, header, url
+	local function Search(url)
+		local types, yt, header
 		local eventType = ''
-		if sAdr:match('^%s*%-%s*%-%s*%-') then
+		if url:match('^%s*%-%s*%-%s*%-') then
 			types = 'channel'
 			header = m_simpleTV.User.YT.Lng.channel
 			yt = 'channel/'
-		elseif sAdr:match('^%s*%-%s*%-') then
+		elseif url:match('^%s*%-%s*%-') then
 			types = 'playlist'
 			header = m_simpleTV.User.YT.Lng.plst
 			yt = 'playlist?list='
-		elseif sAdr:match('^%s*%-%s*%+') then
+		elseif url:match('^%s*%-%s*%+') then
 			eventType = '&eventType=live'
 			types = 'video'
 			header = m_simpleTV.User.YT.Lng.live
 			yt = 'watch?v='
-		elseif sAdr:match('^%-related=') then
+		elseif url:match('^%-related=') then
 			types = 'related'
 			header = m_simpleTV.User.YT.Lng.relatedVideos
 			yt = 'watch?v='
@@ -1283,74 +1283,64 @@ https://github.com/grafi-tt/lunaJson
 			GetApiKey()
 		end
 		if types == 'related' then
-			sAdr = sAdr:gsub('%-related=', '')
-			url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&fields=nextPageToken,items/snippet/title,items/id/videoId,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&type=video&relatedToVideoId=' .. sAdr .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
+			url = url:gsub('%-related=', '')
+			url = '&items/snippet/title,items/id/videoId,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&type=video&maxResults=100&relatedToVideoId=' .. url .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
 		else
-			sAdr = sAdr:gsub('^[%-%+%s]+(.-)%s*$', '%1')
-				if sAdr == '' then return end
-			sAdr = m_simpleTV.Common.toPercentEncoding(sAdr)
-			url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' .. sAdr .. '&type=' .. types .. '&fields=nextPageToken,items/id,items/snippet/title,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&maxResults=50' .. eventType .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
+			url = url:gsub('^[%-%+%s]+(.-)%s*$', '%1')
+				if url == '' then return end
+			url = m_simpleTV.Common.toPercentEncoding(url)
+			url = '&q=' .. url .. '&type=' .. types .. '&items/id,items/snippet/title,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&maxResults=50' .. eventType .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
 		end
-		local t = {}
-		local k, i = 1, 1
-		local adrUrl = url
-			while true do
-					if k > 200 then break end
-				local rc, answer = m_simpleTV.Http.Request(session, {url = adrUrl, headers = m_simpleTV.User.YT.apiKeyHeader})
-					if rc ~= 200 then break end
-					if not answer:match('"id"') then break end
-				local err, tab = pcall(lunaJson_decode, answer)
-					if err == false
-						or not tab.items
+		local t, i, k = {}, 1, 1
+		url = 'https://www.googleapis.com/youtube/v3/search?part=snippet' .. url
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = m_simpleTV.User.YT.apiKeyHeader})
+			if rc ~= 200 then return end
+			local err, tab = pcall(lunaJson_decode, answer)
+				if err == false
+					or not tab.items
+				then
+				 return
+				end
+				while tab.items[k] do
+					if eventType == '&eventType=live'
+						or (eventType == ''
+								and tab.items[k].snippet
+								and tab.items[k].snippet.liveBroadcastContent
+								and tab.items[k].snippet.liveBroadcastContent ~= 'live')
 					then
-					 break
-					end
-				local j = 1
-					while true do
-							if not tab.items[j] or k > 200 then break end
-						if eventType == '&eventType=live'
-							or (eventType == ''
-								and tab.items[j].snippet
-								and tab.items[j].snippet.liveBroadcastContent
-								and tab.items[j].snippet.liveBroadcastContent ~= 'live')
-						then
-							local name = title_clean(tab.items[j].snippet.title)
-							t[k] = {}
-							t[k].Id = k
-							t[k].Name = name
-							t[k].Address = 'https://www.youtube.com/' .. yt .. (tab.items[j].id.videoId or tab.items[j].id.playlistId or tab.items[j].id.channelId)
-							if isInfoPanel == true then
-								if tab.items[j].snippet
-									and tab.items[j].snippet.thumbnails
-									and tab.items[j].snippet.thumbnails.default
-									and tab.items[j].snippet.thumbnails.default.url
-								then
-									t[k].InfoPanelLogo = tab.items[j].snippet.thumbnails.default.url
-								else
-									t[k].InfoPanelLogo = m_simpleTV.User.YT.logoPicFromDisk
-								end
-								t[k].InfoPanelName = name
-								t[k].InfoPanelShowTime = 10000
-								local desc = tab.items[j].snippet.description
-								local panelDescName
-								if desc and desc ~= '' then
-									panelDescName = m_simpleTV.User.YT.Lng.desc .. ' | '
-								end
-								t[k].InfoPanelDesc = desc_html(desc, t[k].InfoPanelLogo, name, t[k].Address, true)
-								if tab.items[j].snippet.channelTitle then
-									t[k].InfoPanelTitle = (panelDescName or '')
-														.. m_simpleTV.User.YT.Lng.channel
-														.. ': ' .. title_clean(tab.items[j].snippet.channelTitle)
-								end
+						local name = title_clean(tab.items[k].snippet.title)
+						t[i] = {}
+						t[i].Id = i
+						t[i].Name = name
+						t[i].Address = 'https://www.youtube.com/' .. yt .. (tab.items[k].id.videoId or tab.items[k].id.playlistId or tab.items[k].id.channelId)
+						if isInfoPanel == true then
+							if tab.items[k].snippet
+								and tab.items[k].snippet.thumbnails
+								and tab.items[k].snippet.thumbnails.default
+								and tab.items[k].snippet.thumbnails.default.url
+							then
+								t[i].InfoPanelLogo = tab.items[k].snippet.thumbnails.default.url
+							else
+								t[i].InfoPanelLogo = m_simpleTV.User.YT.logoPicFromDisk
 							end
-							k = k + 1
+							t[i].InfoPanelName = name
+							t[i].InfoPanelShowTime = 10000
+							local desc = tab.items[k].snippet.description
+							local panelDescName
+							if desc and desc ~= '' then
+								panelDescName = m_simpleTV.User.YT.Lng.desc .. ' | '
+							end
+							t[i].InfoPanelDesc = desc_html(desc, t[i].InfoPanelLogo, name, t[i].Address, true)
+							if tab.items[k].snippet.channelTitle then
+								t[i].InfoPanelTitle = (panelDescName or '')
+														.. m_simpleTV.User.YT.Lng.channel
+														.. ': ' .. title_clean(tab.items[k].snippet.channelTitle)
+							end
 						end
-						j = j + 1
+						i = i + 1
 					end
-				local nextPageToken = answer:match('"nextPageToken": "([^"]+)')
-					if not nextPageToken then break end
-				adrUrl = url .. '&pageToken=' .. nextPageToken
-			end
+					k = k + 1
+				end
 	 return t, types, header
 	end
 	local function GetHeader_Auth()
