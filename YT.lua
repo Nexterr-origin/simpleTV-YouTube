@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (24/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1220,7 +1220,8 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.throttleRateScr then
 			throttle = true
 		end
-		infoInFile = string_rep
+		infoInFile = os.date('%c') .. '\n'
+						.. string_rep
 						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
 						.. string_rep
 						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
@@ -1525,7 +1526,7 @@ https://github.com/grafi-tt/lunaJson
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
-		local alg = answer:match('var ' .. var .. '=[^;]+')
+		local alg = answer:match('var ' .. var .. '.-};')
 		local signScr = {}
 			for param in f:gmatch(var .. '%p([^)]+)') do
 				local func, p = param:match('([^(]+)%(a,(%d+)')
