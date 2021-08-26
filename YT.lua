@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (24/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (26/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -52,9 +52,7 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.VersionCheck then
 		local ver = m_simpleTV.Common.GetVersion()
-		if ver < 910
-			or m_simpleTV.Common.GetVlcVersion() < 3000
-		then
+		if ver < 910 then
 			local msg = 'Your version of simpleTV is out of date'
 			local cpt = 'YouTube'
 			if ver < 870 then
@@ -1844,11 +1842,13 @@ https://github.com/grafi-tt/lunaJson
 			if #t == 0 then
 			 return nil, 'GetStreamsTab live Error 2'
 			end
-		t[#t + 1] = {}
-		t[#t].Id = #t
-		t[#t].qltyLive = 10000
-		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
-		t[#t].Address = hls
+		if m_simpleTV.Common.GetVlcVersion() ~= 2280 then
+			t[#t + 1] = {}
+			t[#t].Id = #t
+			t[#t].qltyLive = 10000
+			t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
+			t[#t].Address = hls
+		end
 		if m_simpleTV.User.YT.isLive == true and not isInfoPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
 		end
@@ -1915,7 +1915,11 @@ https://github.com/grafi-tt/lunaJson
 			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
 			url = url:gsub('#https', '#http')
 		else
-			extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
+			if m_simpleTV.Common.GetVlcVersion() == 2280 then
+				extOpt = '$OPT:no-ts-trust-pcr' .. extOpt
+			else
+				extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
+			end
 		end
 		if proxy ~= '' then
 			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
@@ -1941,6 +1945,9 @@ https://github.com/grafi-tt/lunaJson
 		else
 			if captions then
 				v.Address = v.Address .. '$OPT:input-slave=' .. captions
+			end
+			if m_simpleTV.Common.GetVlcVersion() == 2280 then
+				v.Address = v.Address .. '$OPT:demux=avcodec'
 			end
 		end
 	 return v
@@ -2163,7 +2170,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 		end
 		local audioTracks
-		if tab.streamingData and tab.streamingData.adaptiveFormats then
+		if tab.streamingData and tab.streamingData.adaptiveFormats and m_simpleTV.Common.GetVlcVersion() ~= 2280 then
 			local k = 1
 				while tab.streamingData.adaptiveFormats[k] do
 					if tab.streamingData.adaptiveFormats[k].contentLength then
@@ -2203,6 +2210,9 @@ https://github.com/grafi-tt/lunaJson
 			and subtitle_config == 'true'
 		then
 			captions, captions_title = Subtitle(tab)
+			if captions and m_simpleTV.Common.GetVlcVersion() == 2280 then
+				captions = captions:gsub('://', '/subtitle://')
+			end
 		end
 			for i = 1, #t do
 				t[i].qlty = tonumber(t[i].qlty or '0')
