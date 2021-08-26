@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (26/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (27/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2364,7 +2364,9 @@ https://github.com/grafi-tt/lunaJson
 			aAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = itag_a}
+		if m_simpleTV.Common.GetVlcVersion() ~= 2280 then
+			t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = itag_a}
+		end
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
 			for i = 1, #t do
 				t[i].Id = i
