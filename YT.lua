@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (28/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1520,7 +1520,7 @@ https://github.com/grafi-tt/lunaJson
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		local throttleRateFuncName = answer:match('a%.get%("n"%)%)&&%(b=([^%(]+)')
+		local throttleRateFuncName = answer:match('%("n"%)%)&&%(b=([^(]+)')
 		if throttleRateFuncName then
 			m_simpleTV.User.YT.throttleRateScr = answer:match(throttleRateFuncName .. '(=function.-};)')
 		end
@@ -1539,7 +1539,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 				signScr[#signScr + 1] = tonumber(p)
 			end
-		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts:["]*(%d+)')
+		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		m_simpleTV.User.YT.signScr = signScr
 	end
 	local function Subtitle(tab)
