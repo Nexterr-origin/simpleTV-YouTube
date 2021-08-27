@@ -64,6 +64,9 @@ local infoInFile = false
 		 return
 		end
 		m_simpleTV.User.YT.VersionCheck = true
+		if m_simpleTV.Common.GetVlcVersion() == 2280 then
+			m_simpleTV.User.YT.vlc228 = true
+		end
 	end
 	htmlEntities = require 'htmlEntities'
 	require 'lfs'
@@ -1842,7 +1845,7 @@ https://github.com/grafi-tt/lunaJson
 			if #t == 0 then
 			 return nil, 'GetStreamsTab live Error 2'
 			end
-		if m_simpleTV.Common.GetVlcVersion() ~= 2280 then
+		if not m_simpleTV.User.YT.vlc228 then
 			t[#t + 1] = {}
 			t[#t].Id = #t
 			t[#t].qltyLive = 10000
@@ -1875,11 +1878,13 @@ https://github.com/grafi-tt/lunaJson
 					end
 				index = u
 			end
-		if index == 1
-			and m_simpleTV.User.YT.qlty > 100
-		then
-			if #t > 1 then
-				index = 2
+		if not m_simpleTV.User.YT.vlc228 then
+			if index == 1
+				and m_simpleTV.User.YT.qlty > 100
+			then
+				if #t > 1 then
+					index = 2
+				end
 			end
 		end
 	 return index or 1
@@ -1915,7 +1920,7 @@ https://github.com/grafi-tt/lunaJson
 			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
 			url = url:gsub('#https', '#http')
 		else
-			if m_simpleTV.Common.GetVlcVersion() == 2280 then
+			if m_simpleTV.User.YT.vlc228 then
 				extOpt = '$OPT:no-ts-trust-pcr' .. extOpt
 			else
 				extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
@@ -1946,7 +1951,7 @@ https://github.com/grafi-tt/lunaJson
 			if captions then
 				v.Address = v.Address .. '$OPT:input-slave=' .. captions
 			end
-			if m_simpleTV.Common.GetVlcVersion() == 2280 then
+			if m_simpleTV.User.YT.vlc228 then
 				v.Address = v.Address .. '$OPT:demux=avcodec'
 			end
 		end
@@ -2170,7 +2175,7 @@ https://github.com/grafi-tt/lunaJson
 				end
 		end
 		local audioTracks
-		if tab.streamingData and tab.streamingData.adaptiveFormats and m_simpleTV.Common.GetVlcVersion() ~= 2280 then
+		if tab.streamingData and tab.streamingData.adaptiveFormats and not m_simpleTV.User.YT.vlc228 then
 			local k = 1
 				while tab.streamingData.adaptiveFormats[k] do
 					if tab.streamingData.adaptiveFormats[k].contentLength then
@@ -2210,7 +2215,7 @@ https://github.com/grafi-tt/lunaJson
 			and subtitle_config == 'true'
 		then
 			captions, captions_title = Subtitle(tab)
-			if captions and m_simpleTV.Common.GetVlcVersion() == 2280 then
+			if captions and m_simpleTV.User.YT.vlc228 then
 				captions = captions:gsub('://', '/subtitle://')
 			end
 		end
@@ -2364,7 +2369,7 @@ https://github.com/grafi-tt/lunaJson
 			aAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		if m_simpleTV.Common.GetVlcVersion() ~= 2280 then
+		if not m_simpleTV.User.YT.vlc228 then
 			t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = itag_a}
 		end
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
@@ -3845,7 +3850,7 @@ https://github.com/grafi-tt/lunaJson
 	end
 	function Qlty_YT()
 		local t = m_simpleTV.User.YT.QltyTab
-			if not t or #t < 2 then
+			if not t or (t[1].Name and t[1].Name == '') then
 				m_simpleTV.Control.ExecuteAction(37)
 			 return
 			end
@@ -3872,8 +3877,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 		m_simpleTV.Control.ExecuteAction(37)
-		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('⚙ ' .. m_simpleTV.User.YT.Lng.qlty
-														, m_simpleTV.User.YT.QltyIndex - 1, t, 5000, 1 + 4 + 2)
+		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('⚙ ' .. m_simpleTV.User.YT.Lng.qlty, m_simpleTV.User.YT.QltyIndex - 1, t, 5000, 1 + 4 + 2)
 		if m_simpleTV.Control.GetState() == 0 and ret == 0 then
 			m_simpleTV.Control.ExecuteAction(108)
 		end
