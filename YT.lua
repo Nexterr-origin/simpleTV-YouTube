@@ -379,6 +379,7 @@ local infoInFile = false
 				or inAdr:match('/watch/(.+)')
 				or inAdr:match('y[2out]*u%.be/(.+)')
 				or inAdr:match('video_id=(.+)')
+				or inAdr:match('/shorts/(.+)')
 				or ''
 	videoId = videoId:sub(1, 11)
 	local function ShowMsg(msg, reason, qlty)
