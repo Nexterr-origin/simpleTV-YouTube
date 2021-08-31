@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (30/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (31/8/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2220,14 +2220,8 @@ https://github.com/grafi-tt/lunaJson
 				t[i].width = tonumber(t[i].width or '0')
 				t[i].fps = tonumber(t[i].fps or '0')
 				t[i].itag = tonumber(t[i].itag or '0')
-				if (t[i].qlty > 340 and t[i].qlty < 500) and t[i].width > 640 then
-					t[i].qlty = 480
-				end
-				if (t[i].qlty > 250 and t[i].qlty < 300) and t[i].width > 600 then
-					t[i].qlty = 360
-				end
-				if (t[i].qlty > 760 and t[i].qlty < 1200) and t[i].width > 1600 then
-					t[i].qlty = 1080
+				if t[i].qlty < t[i].width then
+					t[i].qlty, t[i].width = t[i].width, t[i].qlty
 				end
 				if t[i].qlty > 0 and t[i].qlty <= 180 then
 					t[i].qlty = 144
@@ -2245,10 +2239,6 @@ https://github.com/grafi-tt/lunaJson
 					t[i].qlty = 1440
 				elseif t[i].qlty > 1500 and t[i].qlty <= 2800 then
 					t[i].qlty = 2160
-				elseif t[i].qlty > 2160 and t[i].qlty < 5000 then
-					t[i].qlty = 4320
-				else
-					t[i].qlty = 0
 				end
 				t[i].Name = t[i].qlty .. 'p'
 				if t[i].fps > 30 then
