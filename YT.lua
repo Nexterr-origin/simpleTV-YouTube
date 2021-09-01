@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (31/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (1/9/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1725,8 +1725,8 @@ https://github.com/grafi-tt/lunaJson
 						137, 248, -- 1080
 						299, 335, -- 1080 (60 fps, HDR)
 						271, 308, 336, -- 1440 (60 fps, HDR)
-						313, 315, 337, -- 2160 (60 fps, HDR)
-						272 -- 4320 (60 fps)
+						313, 315, 337, 401, 701, -- 2160 (60 fps, HDR)
+						272, 571, 703 -- 4320 (60 fps, HDR)
 					}
 		local audio = {
 							258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
@@ -2158,13 +2158,11 @@ https://github.com/grafi-tt/lunaJson
 				while tab.streamingData.formats[k] do
 					t[i] = {}
 					t[i].itag = tab.streamingData.formats[k].itag
-					t[i].fps = tab.streamingData.formats[k].fps
-					t[i].qlty = tab.streamingData.formats[k].height
-					t[i].width = tab.streamingData.formats[k].width
+					t[i].qualityLabel = tab.streamingData.formats[k].qualityLabel
 					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 					t[i].isAdaptive = false
 					t[i].mimeType = tab.streamingData.formats[k].mimeType
-					t[i].Address= m_simpleTV.Common.fromPercentEncoding(t[i].Address)
+					t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
 					t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
 					k = k + 1
 					i = k
@@ -2177,9 +2175,7 @@ https://github.com/grafi-tt/lunaJson
 					if tab.streamingData.adaptiveFormats[k].contentLength then
 						t[i] = {}
 						t[i].itag = tab.streamingData.adaptiveFormats[k].itag
-						t[i].qlty = tab.streamingData.adaptiveFormats[k].height
-						t[i].width = tab.streamingData.adaptiveFormats[k].width
-						t[i].fps = tab.streamingData.adaptiveFormats[k].fps
+						t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
 						t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
 						t[i].isAdaptive = true
 						t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
@@ -2216,52 +2212,19 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 			for _, v in pairs(t) do
-				local qlty = tonumber(v.qlty or 0)
-				local width = tonumber(v.width or 0)
-				local fps = tonumber(v.fps or 0)
-				if qlty > 340 and qlty < 500 and width > 640 then
-					qlty = 480
-				end
-				if qlty > 250 and qlty < 300 and width > 600 then
-					qlty = 360
-				end
-				if qlty > 760 and qlty < 1200 and width > 1600 then
-					qlty = 1080
-				end
-				if qlty > 0 and qlty <= 180 then
-					qlty = 144
-				elseif qlty > 180 and qlty <= 300 then
-					qlty = 240
-				elseif qlty > 300 and qlty <= 400 then
-					qlty = 360
-				elseif qlty > 400 and qlty <= 500 then
-					qlty = 480
-				elseif qlty > 500 and qlty <= 780 then
-					qlty = 720
-				elseif qlty > 780 and qlty <= 1200 then
-					qlty = 1080
-				elseif qlty > 1200 and qlty <= 1500 then
-					qlty = 1440
-				elseif qlty > 1500 and qlty <= 2800 then
-					qlty = 2160
-				end
-				if fps > 30 then
-					local itag = tonumber(v.itag or '0')
-					v.Name = qlty .. 'p ' .. fps .. ' FPS'
-					if itag == 334
-						or itag == 335
-						or itag == 336
-						or itag == 337
-					then
-						v.qlty = qlty + 7
-						v.Name = v.Name .. ' HDR'
-					else
-						v.qlty = qlty + 6
+				local qualityLabel = v.qualityLabel
+				local res
+				if qualityLabel then
+					res = qualityLabel:match('%d+')
+					res = tonumber(res)
+					if qualityLabel:match(' HDR') then
+						res = res + 7
+					elseif qualityLabel:match('%d+p(%d+)') then
+						res = res + 6
 					end
-				else
-					v.qlty = qlty
-					v.Name = qlty .. 'p'
 				end
+				v.qlty = res or 0
+				v.Name = qualityLabel or ''
 			end
 		local aAdr, aItag, aItag_opus, aAdr_opus
 		local video_itags, audio_itags = ItagTab()
