@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (30/8/21)
+-- видеоскрипт для сайта https://www.youtube.com (2/9/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1715,19 +1715,19 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function ItagTab()
 		local video = {
-							394, 160, 278, -- 144
-							395, 133, 242, -- 240
-							18, 134, 243, -- 360
-							135, 244, -- 480
-							136, 247, 22, -- 720
-							298, -- 720 (50|60 fps)
-							302, 334, -- 720 (60 fps, HDR)
-							137, 248, -- 1080
-							299, 335, -- 1080 (60 fps, HDR)
-							271, 308, 336, -- 1440 (60 fps, HDR)
-							313, 315, 337, -- 2160 (60 fps, HDR)
-							272 -- 4320 (60 fps)
-						}
+						394, 160, 278, -- 144 - height (qlty)
+						395, 133, 242, -- 240
+						18, 134, 243, -- 360
+						135, 244, -- 480
+						136, 247, 22, -- 720
+						298, -- 720 (50|60 fps)
+						302, 334, -- 720 (60 fps, HDR)
+						137, 248, -- 1080
+						299, 335, -- 1080 (60 fps, HDR)
+						271, 308, 336, -- 1440 (60 fps, HDR)
+						313, 315, 337, 401, 701, -- 2160 (60 fps, HDR)
+						272, 571, 703 -- 4320 (60 fps, HDR)
+					}
 		local audio = {
 							258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 							327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
@@ -2158,13 +2158,12 @@ https://github.com/grafi-tt/lunaJson
 				while tab.streamingData.formats[k] do
 					t[i] = {}
 					t[i].itag = tab.streamingData.formats[k].itag
-					t[i].fps = tab.streamingData.formats[k].fps
-					t[i].qlty = tab.streamingData.formats[k].height
-					t[i].width = tab.streamingData.formats[k].width
+					t[i].qualityLabel = tab.streamingData.formats[k].qualityLabel
+					t[i].height = tab.streamingData.formats[k].height
 					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 					t[i].isAdaptive = false
 					t[i].mimeType = tab.streamingData.formats[k].mimeType
-					t[i].Address= m_simpleTV.Common.fromPercentEncoding(t[i].Address)
+					t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
 					t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
 					k = k + 1
 					i = k
@@ -2177,9 +2176,8 @@ https://github.com/grafi-tt/lunaJson
 					if tab.streamingData.adaptiveFormats[k].contentLength then
 						t[i] = {}
 						t[i].itag = tab.streamingData.adaptiveFormats[k].itag
-						t[i].qlty = tab.streamingData.adaptiveFormats[k].height
-						t[i].width = tab.streamingData.adaptiveFormats[k].width
-						t[i].fps = tab.streamingData.adaptiveFormats[k].fps
+						t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
+						t[i].height = tab.streamingData.adaptiveFormats[k].height
 						t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
 						t[i].isAdaptive = true
 						t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
@@ -2215,62 +2213,53 @@ https://github.com/grafi-tt/lunaJson
 				captions = captions:gsub('://', '/subtitle://')
 			end
 		end
-			for i = 1, #t do
-				t[i].qlty = tonumber(t[i].qlty or '0')
-				t[i].width = tonumber(t[i].width or '0')
-				t[i].fps = tonumber(t[i].fps or '0')
-				t[i].itag = tonumber(t[i].itag or '0')
-				if (t[i].qlty > 340 and t[i].qlty < 500) and t[i].width > 640 then
-					t[i].qlty = 480
-				end
-				if (t[i].qlty > 250 and t[i].qlty < 300) and t[i].width > 600 then
-					t[i].qlty = 360
-				end
-				if (t[i].qlty > 760 and t[i].qlty < 1200) and t[i].width > 1600 then
-					t[i].qlty = 1080
-				end
-				if t[i].qlty > 0 and t[i].qlty <= 180 then
-					t[i].qlty = 144
-				elseif t[i].qlty > 180 and t[i].qlty <= 300 then
-					t[i].qlty = 240
-				elseif t[i].qlty > 300 and t[i].qlty <= 400 then
-					t[i].qlty = 360
-				elseif t[i].qlty > 400 and t[i].qlty <= 500 then
-					t[i].qlty = 480
-				elseif t[i].qlty > 500 and t[i].qlty <= 780 then
-					t[i].qlty = 720
-				elseif t[i].qlty > 780 and t[i].qlty <= 1200 then
-					t[i].qlty = 1080
-				elseif t[i].qlty > 1200 and t[i].qlty <= 1500 then
-					t[i].qlty = 1440
-				elseif t[i].qlty > 1500 and t[i].qlty <= 2800 then
-					t[i].qlty = 2160
-				elseif t[i].qlty > 2160 and t[i].qlty < 5000 then
-					t[i].qlty = 4320
-				else
-					t[i].qlty = 0
-				end
-				t[i].Name = t[i].qlty .. 'p'
-				if t[i].fps > 30 then
-					t[i].Name = t[i].Name .. ' ' .. t[i].fps .. ' FPS'
-					if t[i].itag == 334
-						or t[i].itag == 335
-						or t[i].itag == 336
-						or t[i].itag == 337
-					then
-						t[i].qlty = t[i].qlty + 7
-						t[i].Name = t[i].Name .. ' HDR'
+			for _, v in pairs(t) do
+				local qualityLabel = v.qualityLabel
+				local res
+				if qualityLabel then
+					local height = v.height
+					res = qualityLabel:match('%d+')
+					res = tonumber(res)
+					if res < height and tostring(height):match('0$')then
+						v.qualityLabel = qualityLabel:gsub('%d+p', height .. 'p')
 					else
-						t[i].qlty = t[i].qlty + 6
+						v = nil
 					end
 				end
 			end
+			for _, v in pairs(t) do
+				local qualityLabel = v.qualityLabel
+				local res
+				if qualityLabel then
+					res = qualityLabel:match('%d+')
+					res = tonumber(res)
+					if qualityLabel:match(' HDR') then
+						res = res + 7
+					elseif qualityLabel:match('%d+p(%d+)') then
+						res = res + 6
+					end
+				end
+				v.qlty = res or 0
+				v.Name = qualityLabel or ''
+			end
 		local aAdr, aItag, aItag_opus, aAdr_opus
 		local video_itags, audio_itags = ItagTab()
-		if audioTracks then
 			for i = 1, #audio_itags do
 				for z = 1, #t do
-					if t[z].audioIsDefault == true then
+					if audioTracks then
+						if t[z].audioIsDefault == true then
+							if audio_itags[i] == t[z].itag then
+								if audio_itags[i] == 251 then
+									aAdr_opus = t[z].Address
+									aItag_opus = t[z].itag
+								elseif not aItag then
+									aAdr = t[z].Address
+									aItag = t[z].itag
+								end
+							 break
+							end
+						end
+					else
 						if audio_itags[i] == t[z].itag then
 							if audio_itags[i] == 251 then
 								aAdr_opus = t[z].Address
@@ -2284,42 +2273,22 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		else
-			for i = 1, #audio_itags do
-				for z = 1, #t do
-					if audio_itags[i] == t[z].itag then
-						if audio_itags[i] == 251 then
-							aAdr_opus = t[z].Address
-							aItag_opus = t[z].itag
-						elseif not aItag then
-							aAdr = t[z].Address
-							aItag = t[z].itag
-						end
-					 break
-					end
-				end
-			end
-		end
 		local sort = {}
-		if audioTracks then
 			for i = 1, #video_itags do
 				for z = 1, #t do
-					if video_itags[i] == t[z].itag and t[z].isAdaptive == true then
-						sort[#sort + 1] = t[z]
-					 break
+					if audioTracks then
+						if video_itags[i] == t[z].itag and t[z].isAdaptive == true then
+							sort[#sort + 1] = t[z]
+						 break
+						end
+					else
+						if video_itags[i] == t[z].itag then
+							sort[#sort + 1] = t[z]
+						 break
+						end
 					end
 				end
 			end
-		else
-			for i = 1, #video_itags do
-				for z = 1, #t do
-					if video_itags[i] == t[z].itag then
-						sort[#sort + 1] = t[z]
-					 break
-					end
-				end
-			end
-		end
 		if #sort == 0 then
 			sort = t
 		end
