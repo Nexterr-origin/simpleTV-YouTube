@@ -21,7 +21,7 @@ local proxy = ''
 -- '' - нет
 -- 'http://127.0.0.1:12345' (пример)
 --------------------------------------------------------------------
-local infoInFile = false
+local infoInFile = true
 --------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -2159,6 +2159,7 @@ https://github.com/grafi-tt/lunaJson
 					t[i] = {}
 					t[i].itag = tab.streamingData.formats[k].itag
 					t[i].qualityLabel = tab.streamingData.formats[k].qualityLabel
+					t[i].width = tab.streamingData.formats[k].width
 					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 					t[i].isAdaptive = false
 					t[i].mimeType = tab.streamingData.formats[k].mimeType
@@ -2176,6 +2177,7 @@ https://github.com/grafi-tt/lunaJson
 						t[i] = {}
 						t[i].itag = tab.streamingData.adaptiveFormats[k].itag
 						t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
+						t[i].width = tab.streamingData.adaptiveFormats[k].width
 						t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
 						t[i].isAdaptive = true
 						t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
@@ -2262,6 +2264,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 		local sort = {}
+		local vert
 			for i = 1, #video_itags do
 				for z = 1, #t do
 					if audioTracks then
@@ -2270,7 +2273,7 @@ https://github.com/grafi-tt/lunaJson
 						 break
 						end
 					else
-						if video_itags[i] == t[z].itag then
+						if video_itags[i] == tonumber(t[z].itag) then
 							sort[#sort + 1] = t[z]
 						 break
 						end
@@ -2280,6 +2283,12 @@ https://github.com/grafi-tt/lunaJson
 		if #sort == 0 then
 			sort = t
 		end
+			for i = 1, #sort do
+				if sort[i].width < sort[i].qlty then
+					table.sort(sort, function(a, b) return a.qlty < b.qlty end)
+				 break
+				end
+			end
 		local hash, noDuplicate = {}, {}
 			for i = 1, #sort do
 				if not hash[sort[i].Name] then
