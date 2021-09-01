@@ -1715,19 +1715,19 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function ItagTab()
 		local video = {
-							394, 160, 278, -- 144
-							395, 133, 242, -- 240
-							18, 134, 243, -- 360
-							135, 244, -- 480
-							136, 247, 22, -- 720
-							298, -- 720 (50|60 fps)
-							302, 334, -- 720 (60 fps, HDR)
-							137, 248, -- 1080
-							299, 335, -- 1080 (60 fps, HDR)
-							271, 308, 336, -- 1440 (60 fps, HDR)
-							313, 315, 337, -- 2160 (60 fps, HDR)
-							272 -- 4320 (60 fps)
-						}
+						394, 160, 278, -- 144 - height (qlty)
+						395, 133, 242, -- 240
+						18, 134, 243, -- 360
+						135, 244, -- 480
+						136, 247, 22, -- 720
+						298, -- 720 (50|60 fps)
+						302, 334, -- 720 (60 fps, HDR)
+						137, 248, -- 1080
+						299, 335, -- 1080 (60 fps, HDR)
+						271, 308, 336, -- 1440 (60 fps, HDR)
+						313, 315, 337, -- 2160 (60 fps, HDR)
+						272 -- 4320 (60 fps)
+					}
 		local audio = {
 							258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 							327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
@@ -2215,44 +2215,52 @@ https://github.com/grafi-tt/lunaJson
 				captions = captions:gsub('://', '/subtitle://')
 			end
 		end
-			for i = 1, #t do
-				t[i].qlty = tonumber(t[i].qlty or '0')
-				t[i].width = tonumber(t[i].width or '0')
-				t[i].fps = tonumber(t[i].fps or '0')
-				t[i].itag = tonumber(t[i].itag or '0')
-				if t[i].qlty < t[i].width then
-					t[i].qlty, t[i].width = t[i].width, t[i].qlty
+			for _, v in pairs(t) do
+				local qlty = tonumber(v.qlty or 0)
+				local width = tonumber(v.width or 0)
+				local fps = tonumber(v.fps or 0)
+				if qlty > 340 and qlty < 500 and width > 640 then
+					qlty = 480
 				end
-				if t[i].qlty > 0 and t[i].qlty <= 180 then
-					t[i].qlty = 144
-				elseif t[i].qlty > 180 and t[i].qlty <= 300 then
-					t[i].qlty = 240
-				elseif t[i].qlty > 300 and t[i].qlty <= 400 then
-					t[i].qlty = 360
-				elseif t[i].qlty > 400 and t[i].qlty <= 500 then
-					t[i].qlty = 480
-				elseif t[i].qlty > 500 and t[i].qlty <= 780 then
-					t[i].qlty = 720
-				elseif t[i].qlty > 780 and t[i].qlty <= 1200 then
-					t[i].qlty = 1080
-				elseif t[i].qlty > 1200 and t[i].qlty <= 1500 then
-					t[i].qlty = 1440
-				elseif t[i].qlty > 1500 and t[i].qlty <= 2800 then
-					t[i].qlty = 2160
+				if qlty > 250 and qlty < 300 and width > 600 then
+					qlty = 360
 				end
-				t[i].Name = t[i].qlty .. 'p'
-				if t[i].fps > 30 then
-					t[i].Name = t[i].Name .. ' ' .. t[i].fps .. ' FPS'
-					if t[i].itag == 334
-						or t[i].itag == 335
-						or t[i].itag == 336
-						or t[i].itag == 337
+				if qlty > 760 and qlty < 1200 and width > 1600 then
+					qlty = 1080
+				end
+				if qlty > 0 and qlty <= 180 then
+					qlty = 144
+				elseif qlty > 180 and qlty <= 300 then
+					qlty = 240
+				elseif qlty > 300 and qlty <= 400 then
+					qlty = 360
+				elseif qlty > 400 and qlty <= 500 then
+					qlty = 480
+				elseif qlty > 500 and qlty <= 780 then
+					qlty = 720
+				elseif qlty > 780 and qlty <= 1200 then
+					qlty = 1080
+				elseif qlty > 1200 and qlty <= 1500 then
+					qlty = 1440
+				elseif qlty > 1500 and qlty <= 2800 then
+					qlty = 2160
+				end
+				if fps > 30 then
+					local itag = tonumber(v.itag or '0')
+					v.Name = qlty .. 'p ' .. fps .. ' FPS'
+					if itag == 334
+						or itag == 335
+						or itag == 336
+						or itag == 337
 					then
-						t[i].qlty = t[i].qlty + 7
-						t[i].Name = t[i].Name .. ' HDR'
+						v.qlty = qlty + 7
+						v.Name = v.Name .. ' HDR'
 					else
-						t[i].qlty = t[i].qlty + 6
+						v.qlty = qlty + 6
 					end
+				else
+					v.qlty = qlty
+					v.Name = qlty .. 'p'
 				end
 			end
 		local aAdr, aItag, aItag_opus, aAdr_opus
@@ -2291,25 +2299,21 @@ https://github.com/grafi-tt/lunaJson
 			end
 		end
 		local sort = {}
-		if audioTracks then
 			for i = 1, #video_itags do
 				for z = 1, #t do
-					if video_itags[i] == t[z].itag and t[z].isAdaptive == true then
-						sort[#sort + 1] = t[z]
-					 break
+					if audioTracks then
+						if video_itags[i] == t[z].itag and t[z].isAdaptive == true then
+							sort[#sort + 1] = t[z]
+						 break
+						end
+					else
+						if video_itags[i] == t[z].itag then
+							sort[#sort + 1] = t[z]
+						 break
+						end
 					end
 				end
 			end
-		else
-			for i = 1, #video_itags do
-				for z = 1, #t do
-					if video_itags[i] == t[z].itag then
-						sort[#sort + 1] = t[z]
-					 break
-					end
-				end
-			end
-		end
 		if #sort == 0 then
 			sort = t
 		end
