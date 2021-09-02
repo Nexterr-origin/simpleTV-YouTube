@@ -1477,9 +1477,9 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.isChapters == true then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.chapter
 		end
-		local fps = name:match('%d+ FPS')
+		local fps = name:match('^%d+p(%d+)')
 		if fps then
-			title = title .. '\n☑ ' .. fps
+			title = title .. '\n☑ FPS ' .. fps
 		end
 	 return title
 	end
@@ -2215,15 +2215,12 @@ https://github.com/grafi-tt/lunaJson
 		end
 			for _, v in pairs(t) do
 				local qualityLabel = v.qualityLabel
-				local res
 				if qualityLabel then
 					local height = v.height
-					res = qualityLabel:match('%d+')
+					local res = qualityLabel:match('%d+')
 					res = tonumber(res)
-					if res < height and tostring(height):match('0$')then
-						v.qualityLabel = qualityLabel:gsub('%d+p', height .. 'p')
-					else
-						v = nil
+					if res < height and tostring(height):match('0$') then
+						v.qualityLabel = qualityLabel:gsub('^%d+', height)
 					end
 				end
 			end
