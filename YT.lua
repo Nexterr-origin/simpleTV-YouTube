@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/9/21)
+-- видеоскрипт для сайта https://www.youtube.com (3/9/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1477,9 +1477,9 @@ https://github.com/grafi-tt/lunaJson
 		if m_simpleTV.User.YT.isChapters == true then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.chapter
 		end
-		local fps = name:match('%d+ FPS')
+		local fps = name:match('^%d+p(%d+)')
 		if fps then
-			title = title .. '\n☑ ' .. fps
+			title = title .. '\n☑ FPS ' .. fps
 		end
 	 return title
 	end
@@ -2159,6 +2159,7 @@ https://github.com/grafi-tt/lunaJson
 					t[i] = {}
 					t[i].itag = tab.streamingData.formats[k].itag
 					t[i].qualityLabel = tab.streamingData.formats[k].qualityLabel
+					t[i].height = tab.streamingData.formats[k].height
 					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 					t[i].isAdaptive = false
 					t[i].mimeType = tab.streamingData.formats[k].mimeType
@@ -2176,6 +2177,7 @@ https://github.com/grafi-tt/lunaJson
 						t[i] = {}
 						t[i].itag = tab.streamingData.adaptiveFormats[k].itag
 						t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
+						t[i].height = tab.streamingData.adaptiveFormats[k].height
 						t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
 						t[i].isAdaptive = true
 						t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
@@ -2213,6 +2215,17 @@ https://github.com/grafi-tt/lunaJson
 		end
 			for _, v in pairs(t) do
 				local qualityLabel = v.qualityLabel
+				if qualityLabel then
+					local height = v.height
+					local res = qualityLabel:match('%d+')
+					res = tonumber(res)
+					if res < height and tostring(height):match('0$') then
+						v.qualityLabel = qualityLabel:gsub('^%d+', height)
+					end
+				end
+			end
+			for _, v in pairs(t) do
+				local qualityLabel = v.qualityLabel
 				local res
 				if qualityLabel then
 					res = qualityLabel:match('%d+')
@@ -2228,10 +2241,22 @@ https://github.com/grafi-tt/lunaJson
 			end
 		local aAdr, aItag, aItag_opus, aAdr_opus
 		local video_itags, audio_itags = ItagTab()
-		if audioTracks then
 			for i = 1, #audio_itags do
 				for z = 1, #t do
-					if t[z].audioIsDefault == true then
+					if audioTracks then
+						if t[z].audioIsDefault == true then
+							if audio_itags[i] == t[z].itag then
+								if audio_itags[i] == 251 then
+									aAdr_opus = t[z].Address
+									aItag_opus = t[z].itag
+								elseif not aItag then
+									aAdr = t[z].Address
+									aItag = t[z].itag
+								end
+							 break
+							end
+						end
+					else
 						if audio_itags[i] == t[z].itag then
 							if audio_itags[i] == 251 then
 								aAdr_opus = t[z].Address
@@ -2245,22 +2270,6 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		else
-			for i = 1, #audio_itags do
-				for z = 1, #t do
-					if audio_itags[i] == t[z].itag then
-						if audio_itags[i] == 251 then
-							aAdr_opus = t[z].Address
-							aItag_opus = t[z].itag
-						elseif not aItag then
-							aAdr = t[z].Address
-							aItag = t[z].itag
-						end
-					 break
-					end
-				end
-			end
-		end
 		local sort = {}
 			for i = 1, #video_itags do
 				for z = 1, #t do
