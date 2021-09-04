@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (3/9/21)
+-- видеоскрипт для сайта https://www.youtube.com (4/9/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1919,7 +1919,7 @@ https://github.com/grafi-tt/lunaJson
 			if m_simpleTV.User.YT.vlc228 then
 				extOpt = '$OPT:no-ts-trust-pcr' .. extOpt
 			else
-				extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
+				extOpt = '$OPT:adaptive-use-access' .. extOpt
 			end
 		end
 		if proxy ~= '' then
