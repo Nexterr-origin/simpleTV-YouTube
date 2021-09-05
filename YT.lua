@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/9/21)
+-- видеоскрипт для сайта https://www.youtube.com (5/9/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1900,7 +1900,7 @@ https://github.com/grafi-tt/lunaJson
 				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=YouTube$OPT:marq-position=9$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', 0.025 * k, 0.03 * k, 0.03 * k, extOpt)
 			end
 		end
-		if not m_simpleTV.User.YT.isLive then
+		if not m_simpleTV.User.YT.isLive and not m_simpleTV.User.YT.isLiveContent then
 			url = DeCipherThrottleRate(url)
 			url = DeCipherSign(url)
 			extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
@@ -1919,7 +1919,11 @@ https://github.com/grafi-tt/lunaJson
 			if m_simpleTV.User.YT.vlc228 then
 				extOpt = '$OPT:no-ts-trust-pcr' .. extOpt
 			else
-				extOpt = '$OPT:adaptive-use-access' .. extOpt
+				if m_simpleTV.User.YT.isLiveContent then
+					extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
+				else
+					extOpt = '$OPT:adaptive-use-access' .. extOpt
+				end
 			end
 		end
 		if proxy ~= '' then
@@ -1980,6 +1984,7 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.pic = nil
 		m_simpleTV.User.YT.videostats = nil
 		m_simpleTV.User.YT.isLive = false
+		m_simpleTV.User.YT.isLiveContent = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
@@ -2074,6 +2079,11 @@ https://github.com/grafi-tt/lunaJson
 			if tab.videoDetails.lengthSeconds then
 				m_simpleTV.User.YT.duration = tonumber(tab.videoDetails.lengthSeconds)
 			end
+			if tab.videoDetails.isLiveContent == true
+				and tab.videoDetails.isPostLiveDvr == true
+			then
+				m_simpleTV.User.YT.isLiveContent = true
+			end
 		end
 		if tab.microformat
 			and tab.microformat.playerMicroformatRenderer
@@ -2149,7 +2159,7 @@ https://github.com/grafi-tt/lunaJson
 			Thumbs(tab.storyboards.playerStoryboardSpecRenderer.spec)
 		end
 			if tab.streamingData and tab.streamingData.hlsManifestUrl
-				and m_simpleTV.User.YT.isLive == true
+				and (m_simpleTV.User.YT.isLive or m_simpleTV.User.YT.isLiveContent)
 			then
 			 return Stream_Live(tab.streamingData.hlsManifestUrl, title)
 			end
