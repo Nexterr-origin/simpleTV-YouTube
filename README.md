@@ -17,8 +17,8 @@
 
 ---
 
-### ★ <span id="a1">[Скрипт YouTube](#1 "")</span>
-
+<!---### ★ <span id="a1">[Скрипт YouTube](#1 "")</span>--->
+### ★ Скрипт YouTube для simpleTV
 ---
 
 
