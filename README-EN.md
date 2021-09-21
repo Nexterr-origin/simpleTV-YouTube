@@ -16,7 +16,7 @@
 
 ---
 
-### ★ YouTube Script
+### ★ YouTube Script for simpleTV
 
 ---
 
