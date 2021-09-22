@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (5/9/21)
+-- видеоскрипт для сайта https://www.youtube.com (22/9/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2702,7 +2702,7 @@ https://github.com/grafi-tt/lunaJson
 		asynPlsLoaderHelper.Work(session, t0, params)
 		local tab = params.User.tab
 		rc = params.User.rc
-			if rc == 400 or rc == - 1 then
+			if rc == 400 or rc == - 1 or rc == 500 then
 				StopOnErr(8)
 			 return
 			end
@@ -3589,7 +3589,8 @@ https://github.com/grafi-tt/lunaJson
 					t1[3] = {}
 					t1[3].Id = 3
 					t1[3].Name = '🎵🔀 Music-Mix ' .. m_simpleTV.User.YT.Lng.plst
-					t1[3].Address = string.format('https://www.youtube.com/playlist?list=RD%s&isLogo=false', m_simpleTV.User.YT.vId)
+					-- t1[3].Address = string.format('https://www.youtube.com/playlist?list=RD%s&isLogo=false', m_simpleTV.User.YT.vId)
+					t1[3].Address = string.format('https://www.youtube.com/watch?v=%s&list=RD%s&isLogo=false',m_simpleTV.User.YT.vId, m_simpleTV.User.YT.vId)
 					m_simpleTV.User.YT.PlstsCh.chTitle = nil
 				end
 			end
@@ -4096,7 +4097,8 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('list=LL')
 		or inAdr:match('list=TL')
 		or inAdr:match('list=OL')
-		or (inAdr:match('list=RD') and not inAdr:match('isLogo=false'))
+		-- or (inAdr:match('list=RD') and not inAdr:match('isLogo=false'))
+		or inAdr:match('list=RD')
 		or inAdr:match('youtube%.com/[^/]+/videos')
 		or inAdr:match('search_query')
 	then
