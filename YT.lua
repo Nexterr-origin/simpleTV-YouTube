@@ -2746,7 +2746,7 @@ https://github.com/grafi-tt/lunaJson
 		if plstPos > 1 or inAdr:match('[?&]t=') or #tab == 1 then
 			pl = 32
 		end
-		local FilterType, AutoNumberFormat, Random, PlayMode, StopOnError
+		local FilterType, AutoNumberFormat, Random, PlayMode, StopOnError, StopAfterPlay
 		if #tab > 2 then
 			if #tab < 5 then
 				FilterType = 2
@@ -2766,10 +2766,12 @@ https://github.com/grafi-tt/lunaJson
 			Random = 1
 			PlayMode = 1
 			StopOnError = 0
+			StopAfterPlay = - 1
 		else
 			Random = - 1
 			PlayMode = 0
 			StopOnError = 0
+			StopAfterPlay = 1
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonOptions then
 			tab.ExtButton0 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOptions, ButtonScript = 'Qlty_YT()'}
@@ -2805,6 +2807,7 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.Random = Random
 		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.StopOnError = StopOnError
+		tab.ExtParams.StopAfterPlay = StopAfterPlay
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
@@ -3034,7 +3037,7 @@ https://github.com/grafi-tt/lunaJson
 		then
 			pl = 0
 		end
-		local ButtonScript1, Random, PlayMode, StopOnError
+		local ButtonScript1, Random, PlayMode, StopOnError, StopAfterPlay
 		if m_simpleTV.User.YT.isPlstsCh
 		then
 			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
@@ -3066,10 +3069,12 @@ https://github.com/grafi-tt/lunaJson
 			Random = 1
 			PlayMode = 1
 			StopOnError = 0
+			StopAfterPlay = - 1
 		else
 			Random = - 1
 			PlayMode = 0
 			StopOnError = 0
+			StopAfterPlay = 1
 		end
 		local retAdr
 		tab.ExtParams = {}
@@ -3078,6 +3083,7 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.Random = Random
 		tab.ExtParams.PlayMode = PlayMode
 		tab.ExtParams.StopOnError = StopOnError
+		tab.ExtParams.StopAfterPlay = StopAfterPlay
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
