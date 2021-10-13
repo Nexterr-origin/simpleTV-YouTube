@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/9/21)
+-- видеоскрипт для сайта https://www.youtube.com (12/10/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2746,7 +2746,7 @@ https://github.com/grafi-tt/lunaJson
 		if plstPos > 1 or inAdr:match('[?&]t=') or #tab == 1 then
 			pl = 32
 		end
-		local FilterType, AutoNumberFormat, Random, PlayMode
+		local FilterType, AutoNumberFormat, Random, PlayMode, StopOnError
 		if #tab > 2 then
 			if #tab < 5 then
 				FilterType = 2
@@ -2765,9 +2765,11 @@ https://github.com/grafi-tt/lunaJson
 			pl = 32
 			Random = 1
 			PlayMode = 1
+			StopOnError = 0
 		else
 			Random = - 1
-			PlayMode = - 1
+			PlayMode = 0
+			StopOnError = 0
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonOptions then
 			tab.ExtButton0 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOptions, ButtonScript = 'Qlty_YT()'}
@@ -2802,6 +2804,7 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.FilterType = FilterType
 		tab.ExtParams.Random = Random
 		tab.ExtParams.PlayMode = PlayMode
+		tab.ExtParams.StopOnError = StopOnError
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
@@ -3031,7 +3034,7 @@ https://github.com/grafi-tt/lunaJson
 		then
 			pl = 0
 		end
-		local ButtonScript1, Random, PlayMode
+		local ButtonScript1, Random, PlayMode, StopOnError
 		if m_simpleTV.User.YT.isPlstsCh
 		then
 			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
@@ -3062,9 +3065,11 @@ https://github.com/grafi-tt/lunaJson
 			pl = 32
 			Random = 1
 			PlayMode = 1
+			StopOnError = 0
 		else
 			Random = - 1
-			PlayMode = - 1
+			PlayMode = 0
+			StopOnError = 0
 		end
 		local retAdr
 		tab.ExtParams = {}
@@ -3072,6 +3077,7 @@ https://github.com/grafi-tt/lunaJson
 		tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 		tab.ExtParams.Random = Random
 		tab.ExtParams.PlayMode = PlayMode
+		tab.ExtParams.StopOnError = StopOnError
 		tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
