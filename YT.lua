@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/10/21)
+-- видеоскрипт для сайта https://www.youtube.com (15/10/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -3601,7 +3601,6 @@ https://github.com/grafi-tt/lunaJson
 					t1[3] = {}
 					t1[3].Id = 3
 					t1[3].Name = '🎵🔀 Music-Mix ' .. m_simpleTV.User.YT.Lng.plst
-					-- t1[3].Address = string.format('https://www.youtube.com/playlist?list=RD%s&isLogo=false', m_simpleTV.User.YT.vId)
 					t1[3].Address = string.format('https://www.youtube.com/watch?v=%s&list=RD%s&isLogo=false',m_simpleTV.User.YT.vId, m_simpleTV.User.YT.vId)
 					m_simpleTV.User.YT.PlstsCh.chTitle = nil
 				end
@@ -4109,7 +4108,6 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('list=LL')
 		or inAdr:match('list=TL')
 		or inAdr:match('list=OL')
-		-- or (inAdr:match('list=RD') and not inAdr:match('isLogo=false'))
 		or inAdr:match('list=RD')
 		or inAdr:match('youtube%.com/[^/]+/videos')
 		or inAdr:match('search_query')
