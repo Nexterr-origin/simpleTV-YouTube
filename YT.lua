@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/10/21)
+-- видеоскрипт для сайта https://www.youtube.com (19/10/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -366,7 +366,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:94.0) Gecko/20100101 Firefox/94.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -1754,11 +1754,11 @@ https://github.com/grafi-tt/lunaJson
 	return t
 	end
 	local function DeCipherThrottleRate(adr)
-		local n = adr:match('&n=([^&]+)')
+		local n = adr:match('[?&]n=([^&]+)')
 		if m_simpleTV.User.YT.throttleRateScr and n then
 			n = jsdecode.DoDecode('decipher("' .. n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
 			if n and #n > 0 then
-				adr = adr:gsub('&n=[^&]+', '&n=' .. n)
+				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. n)
 			end
 		end
 	 return adr
@@ -1798,7 +1798,7 @@ https://github.com/grafi-tt/lunaJson
 					end
 			 return table.concat(t)
 			end
-			for cipherSign in adr:gmatch('&s=([^&]+)') do
+			for cipherSign in adr:gmatch('[?&]s=([^&]+)') do
 					if not m_simpleTV.User.YT.sts
 						or not m_simpleTV.User.YT.signScr
 					then
@@ -1806,7 +1806,7 @@ https://github.com/grafi-tt/lunaJson
 					 return	'vlc://pause:5'
 					end
 				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
-				adr = adr:gsub('&s=[^&]+', '&sig=' .. signature, 1)
+				adr = adr:gsub('([?&])s=[^&]+', '%1sig=' .. signature, 1)
 			end
 	 return adr
 	end
