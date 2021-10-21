@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/10/21)
+-- видеоскрипт для сайта https://www.youtube.com (21/10/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -372,7 +372,7 @@ local infoInFile = false
 	m_simpleTV.Http.SetTimeout(session, 16000)
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.isChapters = false
-	local inf0, inf0_qlty, inf0_geo
+	local inf0, inf0_qlty, inf0_geo, throttle
 	local isInfoPanel = infoPanelCheck()
 	local videoId = inAdr:match('[?&/]v[=/](.+)')
 				or inAdr:match('/embed/(.+)')
@@ -1205,7 +1205,7 @@ https://github.com/grafi-tt/lunaJson
 		ShowMsg(msg)
 		m_simpleTV.Control.SetTitle(msg:gsub('\n', ' '))
 	end
-	local function debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
+	local function debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
 			if not infoInFile then return end
 		local scr_time = string.format('%.3f', (os.clock() - infoInFile))
 		local calc = scr_time - inf0
@@ -1217,10 +1217,6 @@ https://github.com/grafi-tt/lunaJson
 		local qlty = t[index].qlty
 		if qlty and qlty < 100 then
 			qlty = nil
-		end
-		local throttle
-		if m_simpleTV.User.YT.throttleRateScr then
-			throttle = true
 		end
 		infoInFile = os.date('%c') .. '\n'
 						.. string_rep
@@ -1753,12 +1749,175 @@ https://github.com/grafi-tt/lunaJson
 		t.InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
 	return t
 	end
+	local function DeScrambleParamThrottle(n)
+		local code = 'yt' .. m_simpleTV.User.YT.throttleRateScr
+		code = code:gsub('\n', '')
+		n = split_str(n)
+		local datac, script = string.match(code, 'c=%[(.*)%];.-;try{(.*)}catch%(')
+			if not datac or not script then return end
+			local function compound(ntab, str, alphabet, charcode)
+					if ntab ~= n or type(str) ~= 'string' then
+					 return true
+					end
+				local input = split_str(str)
+					for i, c in ipairs(ntab) do
+							if type(c ) ~= 'string' then
+							 return true
+							end
+						local pos1 = string.find(alphabet, c, 1, true)
+						local pos2 = string.find(alphabet, input[i], 1, true)
+							if not pos1 or not pos2 then
+							 return true
+							end
+						local pos = (pos1 - pos2 + charcode - 32) % #alphabet
+						local newc = string.sub(alphabet, pos + 1, pos + 1)
+						ntab[i] = newc
+						table.insert(input, newc)
+					end
+			end
+		local trans = {
+			reverse = {
+				func = function(tab)
+					local tmp = {}
+						for i, val in ipairs(tab) do
+							tmp[#tab - i + 1] = val
+						end
+						for i, val in ipairs(tmp) do
+							tab[i] = val
+						end
+				end,
+				match = {'^function%(d%)',}
+				},
+			append = {
+				func = function(tab, val)
+					table.insert(tab, val)
+				end,
+				match = {'^function%(d,e%){d%.push%(e%)},',}
+				},
+			remove = {
+				func = function(tab, i)
+						if type( i ) ~= 'number' then
+						 return true
+						end
+					i = i % #tab
+					table.remove(tab, i + 1)
+				end,
+				match = {'^[^}]-;d%.splice%(e,1%)},',}
+				},
+			swap = {
+				func = function(tab, i)
+						if type( i ) ~= 'number' then
+						 return true
+						end
+					i = i % #tab
+					local tmp = tab[1]
+					tab[1] = tab[i + 1]
+					tab[i + 1] = tmp
+				end,
+				match = {'^[^}]-;var f=d%[0%];d%[0%]=d%[e%];d%[e%]=f},','^[^}]-;d%.splice%(0,1,d%.splice%(e,1,d%[0%]%)%[0%]%)},',}
+				},
+			rotate = {
+				func = function(tab, shift)
+						if type(shift) ~= 'number' then
+						 return true
+						end
+					shift = shift % #tab
+					local tmp = {}
+						for i, val in ipairs(tab) do
+							tmp[(i - 1 + shift) % #tab + 1] = val
+						end
+						for i, val in ipairs(tmp) do
+							tab[i] = val
+						end
+				end,
+				match = {'^[^}]-d%.unshift%(d.pop%(%)%)},','^[^}]-d%.unshift%(f%)}%)},',}
+				},
+			compound1 = {
+				func = function(ntab, str)
+					return compound(ntab, str, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_', 96)
+					end,
+				match = {'^[^}]-case 58:f=96;',}
+				},
+			compound2 = {
+				func = function(ntab, str)
+					 return compound(ntab, str,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", 96)
+					end,
+				match = {'^[^}]-case 58:f%-=14;', '^[^}]-case 58:f=44;',}
+				},
+			unid = {
+				func = function()
+					 return true
+					end,
+				match = {}
+				},
+			}
+		local data = {}
+		datac = datac .. ','
+			while datac ~= '' do
+				local el = nil
+				if string.match(datac, '^function%(') then
+						for name, tr in pairs(trans) do
+							for i, match in ipairs(tr.match) do
+								if string.match(datac, match) then
+									el = tr.func
+								 break
+								end
+							end
+							if el then
+							 break
+							end
+						end
+					if not el then
+						el = trans.unid.func
+					end
+					if el == trans.compound1.func or el == trans.compound2.func then
+						datac = string.match(datac, '^.-},e%.split%(""%)%)},(.*)$')
+					else
+						datac = string.match( datac, "^.-},(.*)$" )
+					end
+				elseif string.match( datac, '^"[^"]*",' ) then
+					el, datac = string.match(datac, '^"([^"]*)",(.*)$')
+				elseif string.match(datac, '^-?%d+,') then
+					el, datac = string.match( datac, '^(.-),(.*)$')
+					el = tonumber(el)
+				elseif string.match(datac, '^b,') then
+					el = n
+					datac = string.match(datac, '^b,(.*)$')
+				elseif string.match(datac, '^null,') then
+					el = data
+					datac = string.match(datac, '^null,(.*)$')
+				else
+					el = false
+					datac = string.match(datac, '^[^,]-,(.*)$')
+				end
+				table.insert(data, el)
+			end
+			for ifunc, itab, iarg in string.gmatch(script, 'c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)' ) do
+				iarg = string.match(iarg, ',c%[(%d+)%]')
+				local func = data[tonumber(ifunc) + 1]
+				local tab = data[tonumber(itab) + 1]
+				local arg = iarg and data[tonumber(iarg) + 1]
+					if type(func) ~= 'function'
+						or type(tab) ~= 'table'
+						or func(tab, arg)
+					then
+					 break
+					end
+			end
+	 return table.concat(n)
+	end
 	local function DeCipherThrottleRate(adr)
 		local n = adr:match('[?&]n=([^&]+)')
 		if m_simpleTV.User.YT.throttleRateScr and n then
-			n = jsdecode.DoDecode('decipher("' .. n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
-			if n and #n > 0 then
-				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. n)
+			local new_n = DeScrambleParamThrottle(n)
+			if not new_n or new_n == n then
+				new_n = jsdecode.DoDecode('decipher("' .. n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
+			end
+			if new_n and #new_n > 0 then
+				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
+				if infoInFile then
+					throttle = n .. ' -> ' .. new_n
+				end
 			end
 		end
 	 return adr
@@ -1890,7 +2049,7 @@ https://github.com/grafi-tt/lunaJson
 			if url:match('$OPT:image') then
 			 return url
 			end
-		local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
+		local extOpt = string.format('$OPT:no-metadata-network-access$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
 			k = k:match('%d+') or 600
@@ -2842,7 +3001,7 @@ https://github.com/grafi-tt/lunaJson
 				title = title_is_no_infoPanel(title, t[index].Name)
 				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
-			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
+			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
 		end
 		if m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.User.YT.AddToBaseUrlinAdr = 'https://www.youtube.com/playlist?list=' .. plstId
@@ -3119,7 +3278,7 @@ https://github.com/grafi-tt/lunaJson
 				title = title_is_no_infoPanel(title, t[index].Name)
 				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
-			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
+			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
 		end
 		m_simpleTV.Control.CurrentAddress = retAdr
 		if m_simpleTV.User.YT.isPlstsCh then
@@ -3648,7 +3807,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		m_simpleTV.Http.Close(session)
 		m_simpleTV.Control.CurrentAddress = retAdr
-		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo)
+		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
 	end
 	function AsynPlsCallb_Plst_YT(session, rc, answer, userstring, params)
 		local ret = {}
