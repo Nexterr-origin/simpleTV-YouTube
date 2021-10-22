@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/10/21)
+-- видеоскрипт для сайта https://www.youtube.com (22/10/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -411,25 +411,7 @@ local infoInFile = false
 			end
 	end
 	local function lunaJson_decode(json_, pos_, nullv_, arraylen_)
---[[The MIT License (MIT)
-Copyright (c) 2015-2017 Shunsuke Shimizu (grafi)
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-https://github.com/grafi-tt/lunaJson
-]]
+-- https://github.com/grafi-tt/lunaJson
 		local setmetatable, tonumber, tostring = setmetatable, tonumber, tostring
 		local floor, inf = math.floor, math.huge
 		local mininteger, tointeger = math.mininteger or nil, math.tointeger or nil
@@ -1517,7 +1499,11 @@ https://github.com/grafi-tt/lunaJson
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		m_simpleTV.User.YT.throttleRateScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
+		local throttleRateScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
+		if throttleRateScr then
+			throttleRateScr = throttleRateScr:gsub('\n', '')
+			m_simpleTV.User.YT.throttleRateScr = 'throttleRateScr' .. throttleRateScr
+		end
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
@@ -1750,8 +1736,8 @@ https://github.com/grafi-tt/lunaJson
 	return t
 	end
 	local function DeScrambleParamThrottle(n)
-		local code = 'yt' .. m_simpleTV.User.YT.throttleRateScr
-		code = code:gsub('\n', '')
+-- https://github.com/videolan/vlc/blob/master/share/lua/playlist/youtube.lua
+		local code = m_simpleTV.User.YT.throttleRateScr
 		n = split_str(n)
 		local datac, script = string.match(code, 'c=%[(.*)%];.-;try{(.*)}catch%(')
 			if not datac or not script then return end
@@ -1910,8 +1896,8 @@ https://github.com/grafi-tt/lunaJson
 		local n = adr:match('[?&]n=([^&]+)')
 		if m_simpleTV.User.YT.throttleRateScr and n then
 			local new_n = DeScrambleParamThrottle(n)
-			if not new_n or new_n == n then
-				new_n = jsdecode.DoDecode('decipher("' .. n .. '")', false, 'decipher' .. m_simpleTV.User.YT.throttleRateScr, 0)
+			if not new_n then
+				new_n = jsdecode.DoDecode('throttleRateScr("' .. n .. '")', false, m_simpleTV.User.YT.throttleRateScr, 0)
 			end
 			if new_n and #new_n > 0 then
 				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
@@ -2049,7 +2035,7 @@ https://github.com/grafi-tt/lunaJson
 			if url:match('$OPT:image') then
 			 return url
 			end
-		local extOpt = string.format('$OPT:no-metadata-network-access$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
+		local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local k = t[index].Name
 		if k then
 			k = k:match('%d+') or 600
