@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/10/21)
+-- видеоскрипт для сайта https://www.youtube.com (24/10/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1896,7 +1896,7 @@ local infoInFile = false
 		local n = adr:match('[?&]n=([^&]+)')
 		if m_simpleTV.User.YT.throttleRateScr and n then
 			local new_n = DeScrambleParamThrottle(n)
-			if not new_n then
+			if not new_n or new_n == n then
 				new_n = jsdecode.DoDecode('throttleRateScr("' .. n .. '")', false, m_simpleTV.User.YT.throttleRateScr, 0)
 			end
 			if new_n and #new_n > 0 then
@@ -1948,7 +1948,7 @@ local infoInFile = false
 						or not m_simpleTV.User.YT.signScr
 					then
 						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
-					 return	'vlc://pause:5'
+					 return 'vlc://pause:5'
 					end
 				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
 				adr = adr:gsub('([?&])s=[^&]+', '%1sig=' .. signature, 1)
