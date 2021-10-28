@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (28/10/21)
+-- видеоскрипт для сайта https://www.youtube.com (29/10/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2916,10 +2916,11 @@ local infoInFile = false
 			Random = - 1
 			PlayMode = 0
 			StopOnError = 0
-			StopAfterPlay = 1
-		end
-		if m_simpleTV.Control.ChannelID ~= 268435455 and not m_simpleTV.User.YT.isPlstsCh then
-			StopAfterPlay = - 1
+			if m_simpleTV.Control.ChannelID ~= 268435455 and not m_simpleTV.User.YT.isPlstsCh then
+				StopAfterPlay = - 1
+			else
+				StopAfterPlay = 1
+			end
 		end
 		if m_simpleTV.User.paramScriptForSkin_buttonOptions then
 			tab.ExtButton0 = {ButtonEnable = true, ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOptions, ButtonScript = 'Qlty_YT()'}
@@ -3222,10 +3223,11 @@ local infoInFile = false
 			Random = - 1
 			PlayMode = 0
 			StopOnError = 0
-			StopAfterPlay = 1
-		end
-		if m_simpleTV.Control.ChannelID ~= 268435455 and not m_simpleTV.User.YT.isPlstsCh then
-			StopAfterPlay = - 1
+			if m_simpleTV.Control.ChannelID ~= 268435455 and not m_simpleTV.User.YT.isPlstsCh then
+				StopAfterPlay = - 1
+			else
+				StopAfterPlay = 1
+			end
 		end
 		local retAdr
 		tab.ExtParams = {}
