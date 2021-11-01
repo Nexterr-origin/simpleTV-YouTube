@@ -1465,20 +1465,16 @@ local infoInFile = false
 			local session_markWatch = m_simpleTV.Http.New(userAgent, proxy, false)
 				if not session_markWatch then return end
 			m_simpleTV.Http.SetTimeout(session_markWatch, 14000)
-			local cpn_alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
+			local alphabet = split_str('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_')
 			local t = {}
-			local math_random = math.random
-			local cpn_l = #cpn_alphabet
+			local len = #alphabet
+			local random = math.random
 				for i = 1, 16 do
-					local random_d = math_random(1, cpn_l)
-					t[i] = {}
-					t[i] = cpn_alphabet:sub(random_d, random_d)
+					t[i] = alphabet[random(1, len)]
 				end
-			local url = m_simpleTV.User.YT.videostats
-				.. '&ver=2&fs=0&volume=100&muted=0&cpn='
-				.. table.concat(t)
+			local url = string.format('%s&ver=2&fs=0&volume=100&muted=0&cpn=%s', m_simpleTV.User.YT.videostats, table.concat(t))
 			m_simpleTV.Http.SetCookies(session_markWatch, url, m_simpleTV.User.YT.cookies, '')
-			m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
+			local _ = m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
 	local function GetJsPlayer()
