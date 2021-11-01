@@ -839,8 +839,9 @@ local infoInFile = false
 	end
 	local function table_reversa(t)
 		local tab = {}
-			for i = 1, #t do
-				tab[i] = t[#t + 1 - i]
+		local len = #t
+			for i = 1, len do
+				tab[i] = t[len + 1 - i]
 			end
 	 return tab
 	end
@@ -1777,7 +1778,7 @@ local infoInFile = false
 				},
 			remove = {
 				func = function(tab, i)
-						if type( i ) ~= 'number' then
+						if type(i) ~= 'number' then
 						 return true
 						end
 					i = i % #tab
@@ -1787,7 +1788,7 @@ local infoInFile = false
 				},
 			swap = {
 				func = function(tab, i)
-						if type( i ) ~= 'number' then
+						if type(i) ~= 'number' then
 						 return true
 						end
 					i = i % #tab
@@ -1802,13 +1803,14 @@ local infoInFile = false
 						if type(shift) ~= 'number' then
 						 return true
 						end
-					shift = shift % #tab
-					local tmp = {}
-						for i, val in ipairs(tab) do
-							tmp[(i - 1 + shift) % #tab + 1] = val
+					local len = #tab
+					shift = shift % len
+					local t = {}
+						for i =1, len do
+							t[(i - 1 + shift) % len + 1] = tab[i]
 						end
-						for i, val in ipairs(tmp) do
-							tab[i] = val
+						for i = 1, #t do
+							tab[i] = t[i]
 						end
 				end,
 				match = {'^[^}]-d%.unshift%(d.pop%(%)%)},','^[^}]-d%.unshift%(f%)}%)},',}
@@ -1854,12 +1856,12 @@ local infoInFile = false
 					if el == trans.compound1.func or el == trans.compound2.func then
 						datac = string.match(datac, '^.-},e%.split%(""%)%)},(.*)$')
 					else
-						datac = string.match( datac, "^.-},(.*)$" )
+						datac = string.match(datac, '^.-},(.*)$')
 					end
-				elseif string.match( datac, '^"[^"]*",' ) then
+				elseif string.match(datac, '^"[^"]*",') then
 					el, datac = string.match(datac, '^"([^"]*)",(.*)$')
 				elseif string.match(datac, '^-?%d+,') then
-					el, datac = string.match( datac, '^(.-),(.*)$')
+					el, datac = string.match(datac, '^(.-),(.*)$')
 					el = tonumber(el)
 				elseif string.match(datac, '^b,') then
 					el = n
@@ -1891,7 +1893,7 @@ local infoInFile = false
 		local n = adr:match('[?&]n=([^&]+)')
 		if m_simpleTV.User.YT.throttleRateScr and n then
 			local new_n = DeScrambleParamThrottle(n)
-			if not new_n or new_n == n then
+			if not new_n then
 				new_n = jsdecode.DoDecode('throttleRateScr("' .. n .. '")', false, m_simpleTV.User.YT.throttleRateScr, 0)
 			end
 			if new_n and #new_n > 0 then
@@ -2841,12 +2843,13 @@ local infoInFile = false
 		end
 		asynPlsLoaderHelper.Work(session, t0, params)
 		local tab = params.User.tab
+		local len = #tab
 		rc = params.User.rc
 			if rc == 400 or rc == - 1 or rc == 500 then
 				StopOnErr(8)
 			 return
 			end
-			if #tab == 0 and rc then
+			if len == 0 and rc then
 				if rc == 404 and not inAdr:match('&isRestart=true') then
 					inAdr = inAdr .. '&index=1'
 				elseif (rc == 404 or rc == 403) and inAdr:match('&isRestart=true') then
@@ -2862,7 +2865,7 @@ local infoInFile = false
 				dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
 			 return
 			end
-			if #tab == 0 and not rc then
+			if len == 0 and not rc then
 				StopOnErr(9, m_simpleTV.User.YT.Lng.videoNotAvail)
 				if m_simpleTV.User.YT.isPlstsCh == true then
 					m_simpleTV.Common.Sleep(2000)
@@ -2883,12 +2886,12 @@ local infoInFile = false
 		m_simpleTV.User.YT.Plst = tab
 		local plstPos = m_simpleTV.User.YT.plstPos or 1
 		local pl = 0
-		if plstPos > 1 or inAdr:match('[?&]t=') or #tab == 1 then
+		if plstPos > 1 or inAdr:match('[?&]t=') or len == 1 then
 			pl = 32
 		end
 		local FilterType, AutoNumberFormat, Random, PlayMode, StopOnError, StopAfterPlay
-		if #tab > 2 then
-			if #tab < 5 then
+		if len > 2 then
+			if len < 5 then
 				FilterType = 2
 			else
 				FilterType = 1
@@ -2899,8 +2902,8 @@ local infoInFile = false
 			AutoNumberFormat = ''
 		end
 		if plstId:match('^RD') and urlAdr:match('isLogo=false') then
-			if #tab > 2 then
-				plstPos = math.random(3, #tab)
+			if len > 2 then
+				plstPos = math.random(3, len)
 			end
 			pl = 32
 			Random = 1
@@ -2957,7 +2960,7 @@ local infoInFile = false
 		tab.ExtParams.LuaOnOkFunName = 'OnMultiAddressOk_YT'
 		tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
 		local vId = tab[plstPos].Address:match('watch%?v=([^&]+)')
-		if (#tab > 1
+		if (len > 1
 			and plstPos == 1)
 			or m_simpleTV.User.YT.isPlstsCh
 		then
@@ -2977,7 +2980,7 @@ local infoInFile = false
 			MarkWatch_YT()
 			m_simpleTV.User.YT.QltyIndex = index
 			retAdr = Stream_Out(t, index)
-			if #tab == 1 then
+			if len == 1 then
 				retAdr = positionToContinue(retAdr)
 			else
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
@@ -3101,7 +3104,8 @@ local infoInFile = false
 		asynPlsLoaderHelper.Work(session, t0, params)
 		local header = params.User.Title
 		local tab = params.User.tab
-			if #tab == 0 then
+		local len = #tab
+			if len == 0 then
 					if url:match('&list=') and url:match('/watch?') then
 						m_simpleTV.Control.ChangeAddress = 'No'
 						m_simpleTV.Control.CurrentAddress = url:gsub('&list=.-$', '') .. '&isLogo=false'
@@ -3115,7 +3119,7 @@ local infoInFile = false
 				or params.User.typePlst == 'rssChannels'
 			then
 				local FilterType, SortOrder, AutoNumberFormat
-				if #tab > 1 then
+				if len > 1 then
 					FilterType = 1
 					SortOrder = 1
 					AutoNumberFormat = '%1. %2'
@@ -3157,11 +3161,11 @@ local infoInFile = false
 			tab.ExtButton0 = {ButtonEnable = true, ButtonName = '⚙', ButtonScript = 'Qlty_YT()'}
 		end
 		local FilterType, AutoNumberFormat, pl
-		if #tab > 10 then
+		if len > 10 then
 			FilterType = 1
 			AutoNumberFormat = '%1. %2'
 			pl = 0
-		elseif #tab > 1 then
+		elseif len > 1 then
 			FilterType = 2
 			AutoNumberFormat = '%1. %2'
 			pl = 0
@@ -3172,7 +3176,7 @@ local infoInFile = false
 		end
 		if plstPos > 1
 			or url:match('[?&]t=')
-			or #tab == 1
+			or len == 1
 		then
 			pl = 32
 		end
@@ -3206,8 +3210,8 @@ local infoInFile = false
 			tab.OkButton = {ButtonImageCx = 30, ButtonImageCy = 30, ButtonImage = m_simpleTV.User.paramScriptForSkin_buttonOk}
 		end
 		if inAdr:match('list=RD') and inAdr:match('isLogo=false') then
-			if #tab > 2 then
-				plstPos = math.random(3, #tab)
+			if len > 2 then
+				plstPos = math.random(3, len)
 			end
 			pl = 32
 			Random = 1
@@ -3238,7 +3242,7 @@ local infoInFile = false
 		local vId = tab[plstPos].Address:match('v=([^&]+)')
 		m_simpleTV.User.YT.AddToBaseUrlinAdr = url
 		m_simpleTV.User.YT.AddToBaseVideoIdPlst = vId
-		if #tab > 1
+		if len > 1
 			and plstPos == 1
 		then
 			m_simpleTV.User.YT.DelayedAddress = tab[1].Address
@@ -3258,7 +3262,7 @@ local infoInFile = false
 			MarkWatch_YT()
 			m_simpleTV.User.YT.QltyIndex = index
 			retAdr = retAdr or Stream_Out(t, index)
-			if #tab == 1 then
+			if len == 1 then
 				retAdr = positionToContinue(retAdr)
 			else
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
