@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/10/21)
+-- видеоскрипт для сайта https://www.youtube.com (1/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -838,13 +838,11 @@ local infoInFile = false
 		m_simpleTV.User.YT.apiKeyHeader = decode64('UmVmZXJlcjogaHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY')
 	end
 	local function table_reversa(t)
-		local tbl = {}
-		local p = #tbl
-			for i = #t, 1, -1 do
-				p = p + 1
-				tbl[p] = t[i]
+		local tab = {}
+			for i = 1, #t do
+				tab[i] = t[#t + 1 - i]
 			end
-	 return tbl
+	 return tab
 	end
 	local function urls_encode(str)
 		str = string.gsub(str, '([^%w:/=.&%-?_])',
@@ -1764,12 +1762,9 @@ local infoInFile = false
 		local trans = {
 			reverse = {
 				func = function(tab)
-					local tmp = {}
-						for i, val in ipairs(tab) do
-							tmp[#tab - i + 1] = val
-						end
-						for i, val in ipairs(tmp) do
-							tab[i] = val
+						local t = table_reversa(tab)
+						for i = 1, #t do
+							tab[i] = t[i]
 						end
 				end,
 				match = {'^function%(d%)',}
