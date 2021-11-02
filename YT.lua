@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (2/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -344,7 +344,7 @@ local infoInFile = false
 			end
 		local cookies = cookiesFromFile()
 			or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
-		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
+		m_simpleTV.User.YT.cookies = string.format('%s;expires=Fri, 01-Jan-2038 00:00:00 GMT;path=/;domain=.youtube.com;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&; ]+)') or m_simpleTV.User.YT.Lng.lang
 		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&; ]+)') or m_simpleTV.User.YT.Lng.country
 	end
@@ -844,6 +844,13 @@ local infoInFile = false
 				tab[i] = t[len + 1 - i]
 			end
 	 return tab
+	end
+	local function table_swap(t, a)
+		local c = t[1]
+		local p = (a % #t) + 1
+		t[1] = t[p]
+		t[p] = c
+	 return t
 	end
 	local function urls_encode(str)
 		str = string.gsub(str, '([^%w:/=.&%-?_])',
@@ -1759,9 +1766,9 @@ local infoInFile = false
 		local trans = {
 			reverse = {
 				func = function(tab)
-						local t = table_reversa(tab)
-						for i = 1, #t do
-							tab[i] = t[i]
+					local t = table_reversa(tab)
+						for i, val in ipairs(t) do
+							tab[i] = val
 						end
 				end,
 				match = {'^function%(d%)',}
@@ -1787,10 +1794,10 @@ local infoInFile = false
 						if type(i) ~= 'number' then
 						 return true
 						end
-					i = i % #tab
-					local tmp = tab[1]
-					tab[1] = tab[i + 1]
-					tab[i + 1] = tmp
+					local t = table_swap(tab, i)
+						for i, val in ipairs(t) do
+							tab[i] = val
+						end
 				end,
 				match = {'^[^}]-;var f=d%[0%];d%[0%]=d%[e%];d%[e%]=f},','^[^}]-;d%.splice%(0,1,d%.splice%(e,1,d%[0%]%)%[0%]%)},',}
 				},
@@ -1805,8 +1812,8 @@ local infoInFile = false
 						for i =1, len do
 							t[(i - 1 + shift) % len + 1] = tab[i]
 						end
-						for i = 1, #t do
-							tab[i] = t[i]
+						for i, val in ipairs(t) do
+							tab[i] = val
 						end
 				end,
 				match = {'^[^}]-d%.unshift%(d.pop%(%)%)},','^[^}]-d%.unshift%(f%)}%)},',}
@@ -1902,14 +1909,6 @@ local infoInFile = false
 	 return adr
 	end
 	local function DeCipherSign(adr)
-			local function table_swap(t, a)
-					if a >= #t then return end
-				local c = t[1]
-				local p = (a % #t) + 1
-				t[1] = t[p]
-				t[p] = c
-			 return t
-			end
 			local function table_slica(tbl, first, last, step)
 				local sliced = {}
 					for i = first or 1, last or #tbl, step or 1 do
@@ -1919,9 +1918,6 @@ local infoInFile = false
 			end
 			local function sign_decode(s, signScr)
 				local t = split_str(s)
-					if #t == 0 or not signScr then
-					 return s
-					end
 					for i = 1, #signScr do
 						local a = signScr[i]
 						if a == 0 then
