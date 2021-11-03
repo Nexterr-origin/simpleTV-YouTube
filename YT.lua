@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (2/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (4/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1748,6 +1748,7 @@ local infoInFile = false
 					 return true
 					end
 				local input = split_str(str)
+				local len = #alphabet
 					for i, c in ipairs(ntab) do
 							if type(c ) ~= 'string' then
 							 return true
@@ -1757,7 +1758,7 @@ local infoInFile = false
 							if not pos1 or not pos2 then
 							 return true
 							end
-						local pos = (pos1 - pos2 + charcode - 32) % #alphabet
+						local pos = (pos1 - pos2 + charcode - 32) % len
 						local newc = string.sub(alphabet, pos + 1, pos + 1)
 						ntab[i] = newc
 						table.insert(input, newc)
@@ -1794,10 +1795,7 @@ local infoInFile = false
 						if type(i) ~= 'number' then
 						 return true
 						end
-					local t = table_swap(tab, i)
-						for i, val in ipairs(t) do
-							tab[i] = val
-						end
+					tab = table_swap(tab, i)
 				end,
 				match = {'^[^}]-;var f=d%[0%];d%[0%]=d%[e%];d%[e%]=f},','^[^}]-;d%.splice%(0,1,d%.splice%(e,1,d%[0%]%)%[0%]%)},',}
 				},
