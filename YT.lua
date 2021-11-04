@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (5/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -410,8 +410,9 @@ local infoInFile = false
 				m_simpleTV.OSD.ShowMessageT({imageParam = imageParam, text = t[j], color = color, showTime = 1000 * 6, id = id, once = once})
 			end
 	end
+-- Based on the decoder.lua script from grafi-tt
+-- https://github.com/grafi-tt/lunajson/blob/master/src/lunajson/decoder.lua
 	local function lunaJson_decode(json_, pos_, nullv_, arraylen_)
--- https://github.com/grafi-tt/lunaJson
 		local setmetatable, tonumber, tostring = setmetatable, tonumber, tostring
 		local floor, inf = math.floor, math.huge
 		local mininteger, tointeger = math.mininteger or nil, math.tointeger or nil
@@ -1737,8 +1738,9 @@ local infoInFile = false
 		t.InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
 	return t
 	end
+-- Based on function [n_descramble] in the youtube.lua script from VLC
+-- https://code.videolan.org/videolan/vlc/-/blob/4fb284e5af69aa9ac2100ccbdd3b88debec9987f/share/lua/playlist/youtube.lua#L116
 	local function DeScrambleParamThrottle(n)
--- https://github.com/videolan/vlc/blob/master/share/lua/playlist/youtube.lua
 		local code = m_simpleTV.User.YT.throttleRateScr
 		n = split_str(n)
 		local datac, script = string.match(code, 'c=%[(.*)%];.-;try{(.*)}catch%(')
