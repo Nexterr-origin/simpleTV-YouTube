@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (5/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (7/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -3291,6 +3291,7 @@ local infoInFile = false
 				(inAdr:match('isPlstsCh=true') or (inAdr:match('&isRestart=true') and not inAdr:match('/youtubei/') and not inAdr:match('&sort=.-&isRestart=true')))
 			then
 				m_simpleTV.Control.Restart(-2.0, true)
+			 return
 			end
 		local url = inAdr
 		if url:match('/live$') or url:match('/embed/live_stream') then
