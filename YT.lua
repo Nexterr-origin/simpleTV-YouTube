@@ -52,7 +52,7 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.VersionCheck then
 		local ver = m_simpleTV.Common.GetVersion()
-		if ver < 910 then
+		if ver < 940 then
 			local msg = 'Your version of simpleTV is out of date'
 			local cpt = 'YouTube'
 			if ver < 870 then
@@ -3285,8 +3285,7 @@ local infoInFile = false
 				and
 				(inAdr:match('isPlstsCh=true') or (inAdr:match('&isRestart=true') and not inAdr:match('/youtubei/') and not inAdr:match('&sort=.-&isRestart=true')))
 			then
-				m_simpleTV.Control.ExecuteAction(63)
-			 return
+				m_simpleTV.Control.Restart(-2.0, true)
 			end
 		local url = inAdr
 		if url:match('/live$') or url:match('/embed/live_stream') then
@@ -4060,7 +4059,7 @@ local infoInFile = false
 			if m_simpleTV.Control.Reason == 'Stopped'
 				or m_simpleTV.Control.Reason == 'EndReached'
 			then
-				m_simpleTV.Control.ExecuteAction(63)
+				m_simpleTV.Control.Restart(-2.0, true)
 			 return
 			end
 		local tab = m_simpleTV.User.YT.PlstsChTab
