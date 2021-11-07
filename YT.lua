@@ -53,7 +53,12 @@ local infoInFile = false
 	if not m_simpleTV.User.YT.VersionCheck then
 		local ver = m_simpleTV.Common.GetVersion()
 		if ver < 940 then
-			local msg = 'Your version of simpleTV is out of date'
+			local msg
+			if m_simpleTV.Interface.GetLanguage() == 'ru' then
+				msg = 'Ваша версия simpleTV устарела'
+			else
+				msg = 'Your version of simpleTV is out of date'
+			end
 			local cpt = 'YouTube'
 			if ver < 870 then
 				m_simpleTV.Interface.MessageBox(msg, cpt, 0x10)
