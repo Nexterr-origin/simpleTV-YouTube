@@ -1507,10 +1507,7 @@ local infoInFile = false
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		local throttleRateScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
-		if throttleRateScr then
-			m_simpleTV.User.YT.throttleRateScr = 'throttleRateScr' .. throttleRateScr
-		end
+		m_simpleTV.User.YT.throttleParamScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
@@ -1753,10 +1750,11 @@ local infoInFile = false
 		t.InfoPanelShowTime = 10000
 	 return t
 	end
-	local function DeCipherThrottleRate(adr)
+	local function DeCipherThrottleParam(adr)
 		local n = adr:match('[?&]n=([^&]+)')
-		if m_simpleTV.User.YT.throttleRateScr and n then
-			local new_n = jsdecode.DoDecode('throttleRateScr("' .. n .. '")', false, m_simpleTV.User.YT.throttleRateScr, 0)
+		local throttleParamScr = m_simpleTV.User.YT.throttleParamScr
+		if throttleParamScr and n then
+			local new_n = jsdecode.DoDecode('func("' .. n .. '")', false, 'func' .. throttleParamScr, 0)
 			if new_n and #new_n > 0 then
 				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
 				if infoInFile then
@@ -1893,7 +1891,7 @@ local infoInFile = false
 			end
 		end
 		if not m_simpleTV.User.YT.isLive and not m_simpleTV.User.YT.isLiveContent then
-			url = DeCipherThrottleRate(url)
+			url = DeCipherThrottleParam(url)
 			url = DeCipherSign(url)
 			extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
 			if t[index].isAdaptive == true then
