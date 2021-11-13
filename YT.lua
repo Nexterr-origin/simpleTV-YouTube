@@ -1460,7 +1460,7 @@ local infoInFile = false
 			m_simpleTV.User.YT.PositionThumbsHandler = m_simpleTV.PositionThumbs.AddHandler(handlerInfo)
 		end
 	end
-	local function title_is_no_infoPanel(title, name)
+	local function title_no_iPanel(title, name)
 		if m_simpleTV.User.YT.isTrailer == true then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.preview
 		end
@@ -1509,7 +1509,6 @@ local infoInFile = false
 			if rc ~= 200 then return end
 		local throttleRateScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
 		if throttleRateScr then
-			throttleRateScr = throttleRateScr:gsub('\n', '')
 			m_simpleTV.User.YT.throttleRateScr = 'throttleRateScr' .. throttleRateScr
 		end
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
@@ -1753,22 +1752,6 @@ local infoInFile = false
 		end
 		t.InfoPanelShowTime = 10000
 	 return t
-	end
-	local function plstsCh_infoPanel(t, logo, name, count, chTitle)
-		logo = logo:gsub('^//', 'https://')
-		logo = logo:gsub('/vi_webp/', '/vi/')
-		logo = logo:gsub('movieposter%.webp', 'default.jpg')
-		logo = logo:gsub('hqdefault', 'default')
-		logo = logo:gsub('\\u0026', '&')
-		t.InfoPanelLogo = logo
-		t.InfoPanelShowTime = 10000
-		t.InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
-		t.InfoPanelDesc = desc_html(nil, logo, name, t.Address)
-		if count ~= '' then
-			count = ' (' .. count .. ' ' .. m_simpleTV.User.YT.Lng.video .. ')'
-		end
-		t.InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
-	return t
 	end
 	local function DeCipherThrottleRate(adr)
 		local n = adr:match('[?&]n=([^&]+)')
@@ -2845,7 +2828,7 @@ local infoInFile = false
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 			end
 			if infoPanelCheck() == false or retAdr:match('$OPT:image') then
-				title = title_is_no_infoPanel(title, t[index].Name)
+				title = title_no_iPanel(title, t[index].Name)
 				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
 			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
@@ -3127,7 +3110,7 @@ local infoInFile = false
 				retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 			end
 			if infoPanelCheck() == false or retAdr:match('$OPT:image') then
-				title = title_is_no_infoPanel(title, t[index].Name)
+				title = title_no_iPanel(title, t[index].Name)
 				ShowMsg(title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
 			debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
@@ -3407,7 +3390,7 @@ local infoInFile = false
 					tab[i].Address = string.format('https://www.youtube.com%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab[i] = plstsCh_infoPanel(tab[i], logo, name, count, chTitle)
+						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
 					j = j + 1
 					i = i + 1
@@ -3654,7 +3637,7 @@ local infoInFile = false
 		end
 		MarkWatch_YT()
 		if isInfoPanel == false then
-			title = title_is_no_infoPanel(title, t[index].Name)
+			title = title_no_iPanel(title, t[index].Name)
 			ShowMsg(title)
 		end
 		m_simpleTV.Http.Close(session)
