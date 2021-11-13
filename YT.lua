@@ -1727,6 +1727,33 @@ local infoInFile = false
 						}
 	 return video, audio
 	end
+	local function iPanel(type_iPanel, t, logo, name, v_id, count, chTitle, desc)
+		if type_iPanel == 'plstsCh' then
+			logo = logo:gsub('^//', 'https://')
+			logo = logo:gsub('/vi_webp/', '/vi/')
+			logo = logo:gsub('movieposter%.webp', 'default.jpg')
+			logo = logo:gsub('hqdefault', 'default')
+			logo = logo:gsub('\\u0026', '&')
+			t.InfoPanelLogo = logo
+			t.InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
+			t.InfoPanelDesc = desc_html(nil, logo, name, t.Address)
+			if count ~= '' then
+				count = ' (' .. count .. ' ' .. m_simpleTV.User.YT.Lng.video .. ')'
+			end
+			t.InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
+		elseif type_iPanel == 'plstApi' then
+			t.InfoPanelLogo = string.format('https://i.ytimg.com/vi/%s/default.jpg', v_id)
+			t.InfoPanelName = name
+			local panelDescName
+			if desc and desc ~= '' then
+				panelDescName = m_simpleTV.User.YT.Lng.desc
+			end
+			t.InfoPanelDesc = desc_html(desc, t.InfoPanelLogo, name, t.Address)
+			t.InfoPanelTitle = (panelDescName or ' ')
+		end
+		t.InfoPanelShowTime = 10000
+	 return t
+	end
 	local function plstsCh_infoPanel(t, logo, name, count, chTitle)
 		logo = logo:gsub('^//', 'https://')
 		logo = logo:gsub('/vi_webp/', '/vi/')
@@ -1743,167 +1770,10 @@ local infoInFile = false
 		t.InfoPanelTitle = ' | ' .. m_simpleTV.User.YT.Lng.plst .. ': ' .. name .. count
 	return t
 	end
-	local function DeScrambleParamThrottle(n)
--- Based on function [n_descramble] in the youtube.lua script from VLC
--- https://code.videolan.org/videolan/vlc/-/blob/4fb284e5af69aa9ac2100ccbdd3b88debec9987f/share/lua/playlist/youtube.lua#L116
-		local code = m_simpleTV.User.YT.throttleRateScr
-		n = split_str(n)
-		local datac, script = string.match(code, 'c=%[(.*)%];.-;try{(.*)}catch%(')
-			if not datac or not script then return end
-			local function compound(ntab, str, alphabet, charcode)
-					if ntab ~= n or type(str) ~= 'string' then
-					 return true
-					end
-				local input = split_str(str)
-				local len = #alphabet
-					for i, c in ipairs(ntab) do
-							if type(c ) ~= 'string' then
-							 return true
-							end
-						local pos1 = string.find(alphabet, c, 1, true)
-						local pos2 = string.find(alphabet, input[i], 1, true)
-							if not pos1 or not pos2 then
-							 return true
-							end
-						local pos = (pos1 - pos2 + charcode - 32) % len
-						local newc = string.sub(alphabet, pos + 1, pos + 1)
-						ntab[i] = newc
-						table.insert(input, newc)
-					end
-			end
-		local trans = {
-			reverse = {
-				func = function(tab)
-					local t = table_reversa(tab)
-						for i, val in ipairs(t) do
-							tab[i] = val
-						end
-				end,
-				match = {'^function%(d%)',}
-				},
-			append = {
-				func = function(tab, val)
-					table.insert(tab, val)
-				end,
-				match = {'^function%(d,e%){d%.push%(e%)},',}
-				},
-			remove = {
-				func = function(tab, i)
-						if type(i) ~= 'number' then
-						 return true
-						end
-					i = i % #tab
-					table.remove(tab, i + 1)
-				end,
-				match = {'^[^}]-;d%.splice%(e,1%)},',}
-				},
-			swap = {
-				func = function(tab, i)
-						if type(i) ~= 'number' then
-						 return true
-						end
-					tab = table_swap(tab, i)
-				end,
-				match = {'^[^}]-;var f=d%[0%];d%[0%]=d%[e%];d%[e%]=f},','^[^}]-;d%.splice%(0,1,d%.splice%(e,1,d%[0%]%)%[0%]%)},',}
-				},
-			rotate = {
-				func = function(tab, shift)
-						if type(shift) ~= 'number' then
-						 return true
-						end
-					local len = #tab
-					shift = shift % len
-					local t = {}
-						for i =1, len do
-							t[(i - 1 + shift) % len + 1] = tab[i]
-						end
-						for i, val in ipairs(t) do
-							tab[i] = val
-						end
-				end,
-				match = {'^[^}]-d%.unshift%(d.pop%(%)%)},','^[^}]-d%.unshift%(f%)}%)},',}
-				},
-			compound1 = {
-				func = function(ntab, str)
-					return compound(ntab, str, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_', 96)
-					end,
-				match = {'^[^}]-case 58:f=96;',}
-				},
-			compound2 = {
-				func = function(ntab, str)
-					 return compound(ntab, str,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", 96)
-					end,
-				match = {'^[^}]-case 58:f%-=14;', '^[^}]-case 58:f=44;',}
-				},
-			unid = {
-				func = function()
-					 return true
-					end,
-				match = {}
-				},
-			}
-		local data = {}
-		datac = datac .. ','
-			while datac ~= '' do
-				local el = nil
-				if string.match(datac, '^function%(') then
-						for name, tr in pairs(trans) do
-							for i, match in ipairs(tr.match) do
-								if string.match(datac, match) then
-									el = tr.func
-								 break
-								end
-							end
-							if el then
-							 break
-							end
-						end
-					if not el then
-						el = trans.unid.func
-					end
-					if el == trans.compound1.func or el == trans.compound2.func then
-						datac = string.match(datac, '^.-},e%.split%(""%)%)},(.*)$')
-					else
-						datac = string.match(datac, '^.-},(.*)$')
-					end
-				elseif string.match(datac, '^"[^"]*",') then
-					el, datac = string.match(datac, '^"([^"]*)",(.*)$')
-				elseif string.match(datac, '^-?%d+,') then
-					el, datac = string.match(datac, '^(.-),(.*)$')
-					el = tonumber(el)
-				elseif string.match(datac, '^b,') then
-					el = n
-					datac = string.match(datac, '^b,(.*)$')
-				elseif string.match(datac, '^null,') then
-					el = data
-					datac = string.match(datac, '^null,(.*)$')
-				else
-					el = false
-					datac = string.match(datac, '^[^,]-,(.*)$')
-				end
-				table.insert(data, el)
-			end
-			for ifunc, itab, iarg in string.gmatch(script, 'c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)' ) do
-				iarg = string.match(iarg, ',c%[(%d+)%]')
-				local func = data[tonumber(ifunc) + 1]
-				local tab = data[tonumber(itab) + 1]
-				local arg = iarg and data[tonumber(iarg) + 1]
-					if type(func) ~= 'function'
-						or type(tab) ~= 'table'
-						or func(tab, arg)
-					then
-					 break
-					end
-			end
-	 return table.concat(n)
-	end
 	local function DeCipherThrottleRate(adr)
 		local n = adr:match('[?&]n=([^&]+)')
 		if m_simpleTV.User.YT.throttleRateScr and n then
-			local new_n = DeScrambleParamThrottle(n)
-			if not new_n or n == new_n then
-				new_n = jsdecode.DoDecode('throttleRateScr("' .. n .. '")', false, m_simpleTV.User.YT.throttleRateScr, 0)
-			end
+			local new_n = jsdecode.DoDecode('throttleRateScr("' .. n .. '")', false, m_simpleTV.User.YT.throttleRateScr, 0)
 			if new_n and #new_n > 0 then
 				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
 				if infoInFile then
@@ -2773,15 +2643,7 @@ local infoInFile = false
 					end
 					tab[i].Name = name
 					if isInfoPanel == true then
-						tab[i].InfoPanelLogo = string.format('https://i.ytimg.com/vi/%s/default.jpg', id)
-						tab[i].InfoPanelName = name
-						local panelDescName
-						if desc and desc ~= '' then
-							panelDescName = m_simpleTV.User.YT.Lng.desc
-						end
-						tab[i].InfoPanelDesc = desc_html(desc, tab[i].InfoPanelLogo, name, tab[i].Address)
-						tab[i].InfoPanelTitle = (panelDescName or ' ')
-						tab[i].InfoPanelShowTime = 10000
+						tab[i] = iPanel('plstApi', tab[i], logo, name, id, count, chTitle, desc)
 					end
 					i = i + 1
 					ret = true
@@ -3466,7 +3328,7 @@ local infoInFile = false
 					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab0[i] = plstsCh_infoPanel(tab0[i], logo, name, count, chTitle)
+						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
 					j = j + 1
 					i = i + 1
@@ -3488,7 +3350,7 @@ local infoInFile = false
 					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab0[i] = plstsCh_infoPanel(tab0[i], logo, name, count, chTitle)
+						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
 					j = j + 1
 					i = i + 1
@@ -3510,7 +3372,7 @@ local infoInFile = false
 					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
 					if isInfoPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
-						tab0[i] = plstsCh_infoPanel(tab0[i], logo, name, count, chTitle)
+						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
 					j = j + 1
 					i = i + 1
