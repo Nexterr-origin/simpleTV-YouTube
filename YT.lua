@@ -1768,14 +1768,17 @@ local infoInFile = false
 		n = split_str(n)
 		local datac, script = string.match(throttleParamScr, 'c=%[(.*)%];.-;try{(.*)}catch%(')
 			if not datac or not script then return end
-			local function compound(ntab, str, alphabet, charcode)
-					if ntab ~= n or type(str) ~= 'string' then
+			local function compound(ntab, str, alphabet)
+				if ntab ~= n
+					or type(str) ~= 'string'
+					or type(alphabet) ~= 'string'
+				then
 					 return true
 					end
 				local input = split_str(str)
 				local len = #alphabet
 					for i, c in ipairs(ntab) do
-							if type(c ) ~= 'string' then
+							if type(c) ~= 'string' then
 							 return true
 							end
 						local pos1 = string.find(alphabet, c, 1, true)
@@ -1783,7 +1786,7 @@ local infoInFile = false
 							if not pos1 or not pos2 then
 							 return true
 							end
-						local pos = (pos1 - pos2 + charcode - 32) % len
+						local pos = (pos1 - pos2) % len
 						local newc = string.sub(alphabet, pos + 1, pos + 1)
 						ntab[i] = newc
 						table.insert(input, newc)
@@ -1841,17 +1844,29 @@ local infoInFile = false
 				end,
 				match = {'^[^}]-d%.unshift%(d.pop%(%)%)},','^[^}]-d%.unshift%(f%)}%)},',}
 				},
+			alphabet1 = {
+				func = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_',
+				match = {'^function%(%){[^}]-case 58:d=96;',}
+				},
+			alphabet2 = {
+				func = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+				match = {'^function%(%){[^}]-case 58:d%-=14;', '^function%(%){[^}]-case 58:d=44;',}
+				},
+			compound = {
+				func = compound,
+				match = {'^function%(d,e,f%)',}
+				},
 			compound1 = {
 				func = function(ntab, str)
-					return compound(ntab, str, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_', 96)
+					 return compound(ntab, str, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_')
 					end,
-				match = {'^[^}]-case 58:f=96;',}
+				match = {'^function%(d,e%){[^}]-case 58:f=96;',}
 				},
 			compound2 = {
 				func = function(ntab, str)
-					 return compound(ntab, str,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", 96)
+					 return compound(ntab, str,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_')
 					end,
-				match = {'^[^}]-case 58:f%-=14;', '^[^}]-case 58:f=44;',}
+				match = {'^function%(d,e%){[^}]-case 58:f%-=14;', '^function%(d,e%){[^}]-case 58:f=44;',}
 				},
 			unid = {
 				func = function()
@@ -1879,7 +1894,10 @@ local infoInFile = false
 					if not el then
 						el = trans.unid.func
 					end
-					if el == trans.compound1.func or el == trans.compound2.func then
+					if el == trans.compound.func
+						or el == trans.compound1.func
+						or el == trans.compound2.func
+					then
 						datac = string.match(datac, '^.-},e%.split%(""%)%)},(.*)$')
 					else
 						datac = string.match(datac, '^.-},(.*)$')
@@ -1901,14 +1919,16 @@ local infoInFile = false
 				end
 				table.insert(data, el)
 			end
-			for ifunc, itab, iarg in string.gmatch(script, 'c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)' ) do
-				iarg = string.match(iarg, ',c%[(%d+)%]')
+			for ifunc, itab, args in string.gmatch(script, 'c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)') do
+				local iarg1 = string.match(args, '^,c%[(%d+)%]')
+				local iarg2 = string.match(args, '^,[^,]-,c%[(%d+)%]')
 				local func = data[tonumber(ifunc) + 1]
 				local tab = data[tonumber(itab) + 1]
-				local arg = iarg and data[tonumber(iarg) + 1]
+				local arg1 = iarg1 and data[tonumber(iarg1) + 1]
+				local arg2 = iarg2 and data[tonumber(iarg2) + 1]
 					if type(func) ~= 'function'
 						or type(tab) ~= 'table'
-						or func(tab, arg)
+						or func(tab, arg1, arg2)
 					then
 					 break
 					end
@@ -1920,8 +1940,9 @@ local infoInFile = false
 		local throttleParamScr = m_simpleTV.User.YT.throttleParamScr
 		if throttleParamScr and n then
 			local new_n = DeScrambleParam_N(n, throttleParamScr)
-			if not new_n or n == new_n then
-				new_n = jsdecode.DoDecode('func("' .. n .. '")', false, throttleParamScr, 0)
+			if not new_n or new_n == n then
+				local func = string.format('func("%s")', n)
+				new_n = jsdecode.DoDecode(func, false, throttleParamScr, 0)
 			end
 			if new_n and #new_n > 0 then
 				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
