@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (16/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -376,7 +376,7 @@ local infoInFile = false
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
 	m_simpleTV.User.YT.DelayedAddress = nil
-	m_simpleTV.User.YT.isChapters = false
+	m_simpleTV.User.YT.Chapters = nil
 	local inf0, inf0_qlty, inf0_geo, throttle
 	local isInfoPanel = infoPanelCheck()
 	local videoId = inAdr:match('[?&/]v[=/](.+)')
@@ -1025,7 +1025,7 @@ local infoInFile = false
 		end
 		adr = adr:gsub('&is%a+=%a+', '')
 		local link = string.format('<a href="%s" style="color:#154C9C; font-size:small; text-decoration:none">🌎 %s</a>', adr, m_simpleTV.User.YT.Lng.link)
-		if m_simpleTV.User.YT.isVideo == true and m_simpleTV.User.YT.isChapters then
+		if m_simpleTV.User.YT.isVideo == true and m_simpleTV.User.YT.Chapters then
 			link = string.format('%s<br><a href="simpleTVLua:m_simpleTV.Control.ExecuteAction(37) m_simpleTV.Control.ExecuteAction(116)" style="color:#436FAF; font-size: small; text-decoration:none">🕜 %s</a>', link, m_simpleTV.User.YT.Lng.chapter)
 		end
 		desc = string.format('<html><body bgcolor="#181818"><table width="99%%"><tr><td style="padding: 10px 10px 10px;"><a href="%s"><img src="%s" height="100" </a></td><td style="padding: 10px 10px 10px; color:#ebebeb; vertical-align:middle;"><h4><font color="#ebeb00">%s</h4><hr>%s%s</td></tr></table></body></html>', adr, logo, name, link, desc)
@@ -1420,7 +1420,7 @@ local infoInFile = false
 				chaptersT.chapters[i].name = title
 			end
 		m_simpleTV.Control.SetChaptersDesc(chaptersT)
-		m_simpleTV.User.YT.isChapters = true
+		m_simpleTV.User.YT.Chapters = chaptersT
 	end
 	local function Thumbs(storyboards)
 			if m_simpleTV.Control.MainMode ~= 0 then return end
@@ -1472,7 +1472,7 @@ local infoInFile = false
 		if m_simpleTV.User.YT.isTrailer == true then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.preview
 		end
-		if m_simpleTV.User.YT.isChapters == true then
+		if m_simpleTV.User.YT.Chapters then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.chapter
 		end
 		local fps = name:match('^%d+p(%d+)')
@@ -4072,6 +4072,9 @@ local infoInFile = false
 			m_simpleTV.Control.SetNewAddressT({address = retAdr, position = m_simpleTV.Control.GetPosition()})
 			if m_simpleTV.Control.GetState() == 0 then
 				m_simpleTV.Control.Restart(false)
+			end
+			if m_simpleTV.User.YT.Chapters then
+				m_simpleTV.Control.SetChaptersDesc(m_simpleTV.User.YT.Chapters)
 			end
 		end
 		if ret == 2
