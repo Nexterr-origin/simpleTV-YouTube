@@ -1515,11 +1515,7 @@ local infoInFile = false
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		local throttleParamScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
-		if throttleParamScr then
-			throttleParamScr = throttleParamScr:gsub('\n', '')
-			m_simpleTV.User.YT.throttleParamScr = 'func' .. throttleParamScr
-		end
+		m_simpleTV.User.YT.throttleParamScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
@@ -1715,7 +1711,7 @@ local infoInFile = false
 		local video = {
 						394, 160, 278, -- 144 - height (qlty)
 						395, 133, 242, -- 240
-						134, 243, 18, -- 360
+						18, 134, 243, -- 360
 						135, 244, -- 480
 						136, 247, 22, -- 720
 						298, -- 720 (50|60 fps)
@@ -1762,188 +1758,13 @@ local infoInFile = false
 		t.InfoPanelShowTime = 10000
 	 return t
 	end
-	local function DeScrambleParam_N(n, throttleParamScr)
--- Based on [n_descramble] function in the youtube.lua script from VLC
--- https://code.videolan.org/videolan/vlc/-/blob/4fb284e5af69aa9ac2100ccbdd3b88debec9987f/share/lua/playlist/youtube.lua#L116
-		n = split_str(n)
-		local datac, script = string.match(throttleParamScr, 'c=%[(.*)%];.-;try{(.*)}catch%(')
-			if not datac or not script then return end
-			local function compound(ntab, str, alphabet)
-				if ntab ~= n
-					or type(str) ~= 'string'
-					or type(alphabet) ~= 'string'
-				then
-					 return true
-					end
-				local input = split_str(str)
-				local len = #alphabet
-					for i, c in ipairs(ntab) do
-							if type(c) ~= 'string' then
-							 return true
-							end
-						local pos1 = string.find(alphabet, c, 1, true)
-						local pos2 = string.find(alphabet, input[i], 1, true)
-							if not pos1 or not pos2 then
-							 return true
-							end
-						local pos = (pos1 - pos2) % len
-						local newc = string.sub(alphabet, pos + 1, pos + 1)
-						ntab[i] = newc
-						table.insert(input, newc)
-					end
-			end
-		local trans = {
-			reverse = {
-				func = function(tab)
-					local t = table_reversa(tab)
-						for i, val in ipairs(t) do
-							tab[i] = val
-						end
-				end,
-				match = {'^function%(d%)',}
-				},
-			append = {
-				func = function(tab, val)
-					table.insert(tab, val)
-				end,
-				match = {'^function%(d,e%){d%.push%(e%)},',}
-				},
-			remove = {
-				func = function(tab, i)
-						if type(i) ~= 'number' then
-						 return true
-						end
-					i = i % #tab
-					table.remove(tab, i + 1)
-				end,
-				match = {'^[^}]-;d%.splice%(e,1%)},',}
-				},
-			swap = {
-				func = function(tab, i)
-						if type(i) ~= 'number' then
-						 return true
-						end
-					tab = table_swap(tab, i)
-				end,
-				match = {'^[^}]-;var f=d%[0%];d%[0%]=d%[e%];d%[e%]=f},','^[^}]-;d%.splice%(0,1,d%.splice%(e,1,d%[0%]%)%[0%]%)},',}
-				},
-			rotate = {
-				func = function(tab, shift)
-						if type(shift) ~= 'number' then
-						 return true
-						end
-					local len = #tab
-					shift = shift % len
-					local t = {}
-						for i =1, len do
-							t[(i - 1 + shift) % len + 1] = tab[i]
-						end
-						for i, val in ipairs(t) do
-							tab[i] = val
-						end
-				end,
-				match = {'^[^}]-d%.unshift%(d.pop%(%)%)},','^[^}]-d%.unshift%(f%)}%)},',}
-				},
-			alphabet1 = {
-				func = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_',
-				match = {'^function%(%){[^}]-case 58:d=96;',}
-				},
-			alphabet2 = {
-				func = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-				match = {'^function%(%){[^}]-case 58:d%-=14;', '^function%(%){[^}]-case 58:d=44;',}
-				},
-			compound = {
-				func = compound,
-				match = {'^function%(d,e,f%)',}
-				},
-			compound1 = {
-				func = function(ntab, str)
-					 return compound(ntab, str, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_')
-					end,
-				match = {'^function%(d,e%){[^}]-case 58:f=96;',}
-				},
-			compound2 = {
-				func = function(ntab, str)
-					 return compound(ntab, str,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_')
-					end,
-				match = {'^function%(d,e%){[^}]-case 58:f%-=14;', '^function%(d,e%){[^}]-case 58:f=44;',}
-				},
-			unid = {
-				func = function()
-					 return true
-					end,
-				match = {}
-				},
-			}
-		local data = {}
-		datac = datac .. ','
-			while datac ~= '' do
-				local el = nil
-				if string.match(datac, '^function%(') then
-						for name, tr in pairs(trans) do
-							for i, match in ipairs(tr.match) do
-								if string.match(datac, match) then
-									el = tr.func
-								 break
-								end
-							end
-							if el then
-							 break
-							end
-						end
-					if not el then
-						el = trans.unid.func
-					end
-					if el == trans.compound.func
-						or el == trans.compound1.func
-						or el == trans.compound2.func
-					then
-						datac = string.match(datac, '^.-},e%.split%(""%)%)},(.*)$')
-					else
-						datac = string.match(datac, '^.-},(.*)$')
-					end
-				elseif string.match(datac, '^"[^"]*",') then
-					el, datac = string.match(datac, '^"([^"]*)",(.*)$')
-				elseif string.match(datac, '^-?%d+,') then
-					el, datac = string.match(datac, '^(.-),(.*)$')
-					el = tonumber(el)
-				elseif string.match(datac, '^b,') then
-					el = n
-					datac = string.match(datac, '^b,(.*)$')
-				elseif string.match(datac, '^null,') then
-					el = data
-					datac = string.match(datac, '^null,(.*)$')
-				else
-					el = false
-					datac = string.match(datac, '^[^,]-,(.*)$')
-				end
-				table.insert(data, el)
-			end
-			for ifunc, itab, args in string.gmatch(script, 'c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)') do
-				local iarg1 = string.match(args, '^,c%[(%d+)%]')
-				local iarg2 = string.match(args, '^,[^,]-,c%[(%d+)%]')
-				local func = data[tonumber(ifunc) + 1]
-				local tab = data[tonumber(itab) + 1]
-				local arg1 = iarg1 and data[tonumber(iarg1) + 1]
-				local arg2 = iarg2 and data[tonumber(iarg2) + 1]
-					if type(func) ~= 'function'
-						or type(tab) ~= 'table'
-						or func(tab, arg1, arg2)
-					then
-					 break
-					end
-			end
-	 return table.concat(n)
-	end
 	local function DeCipherThrottleParam(adr)
 		local n = adr:match('[?&]n=([^&]+)')
 		local throttleParamScr = m_simpleTV.User.YT.throttleParamScr
 		if throttleParamScr and n then
-			local new_n = DeScrambleParam_N(n, throttleParamScr)
-			if not new_n or new_n == n then
-				local func = string.format('func("%s")', n)
-				new_n = jsdecode.DoDecode(func, false, throttleParamScr, 0)
-			end
+			throttleParamScr = 'func' .. throttleParamScr
+			local p = string.format('func("%s")', n)
+			local new_n = jsdecode.DoDecode(p, false, throttleParamScr, 0)
 			if new_n and #new_n > 0 then
 				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
 				if infoInFile then
