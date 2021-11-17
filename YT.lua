@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (16/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (17/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1713,7 +1713,7 @@ local infoInFile = false
 						395, 133, 242, -- 240
 						18, 134, 243, -- 360
 						135, 244, -- 480
-						136, 247, 22, -- 720
+						22, 136, 247, -- 720
 						298, -- 720 (50|60 fps)
 						302, 334, -- 720 (60 fps, HDR)
 						137, 248, -- 1080
