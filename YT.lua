@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (16/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (18/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -378,7 +378,7 @@ local infoInFile = false
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.Chapters = nil
 	local inf0, inf0_qlty, inf0_geo, throttle
-	local isInfoPanel = infoPanelCheck()
+	local isIPanel = infoPanelCheck()
 	local videoId = inAdr:match('[?&/]v[=/](.+)')
 				or inAdr:match('/embed/(.+)')
 				or inAdr:match('/watch/(.+)')
@@ -1314,7 +1314,7 @@ local infoInFile = false
 						t[i].Id = i
 						t[i].Name = name
 						t[i].Address = 'https://www.youtube.com/' .. yt .. (tab.items[k].id.videoId or tab.items[k].id.playlistId or tab.items[k].id.channelId)
-						if isInfoPanel == true then
+						if isIPanel == true then
 							if tab.items[k].snippet
 								and tab.items[k].snippet.thumbnails
 								and tab.items[k].snippet.thumbnails.default
@@ -1713,7 +1713,7 @@ local infoInFile = false
 						395, 133, 242, -- 240
 						18, 134, 243, -- 360
 						135, 244, -- 480
-						136, 247, 22, -- 720
+						22, 136, 247, -- 720
 						298, -- 720 (50|60 fps)
 						302, 334, -- 720 (60 fps, HDR)
 						137, 248, -- 1080
@@ -1723,11 +1723,11 @@ local infoInFile = false
 						272, 571, 703 -- 4320 (60 fps, HDR)
 					}
 		local audio = {
-							258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
-							327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
-							141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
-							140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
-							251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
+						258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
+						327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
+						141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
+						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
+						140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
 						}
 	 return video, audio
 	end
@@ -1841,7 +1841,7 @@ local infoInFile = false
 			t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
 			t[#t].Address = hls
 		end
-		if m_simpleTV.User.YT.isLive == true and not isInfoPanel then
+		if m_simpleTV.User.YT.isLive == true and not isIPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
 		end
 	 return t, title
@@ -1924,31 +1924,17 @@ local infoInFile = false
 		end
 	 return url .. extOpt
 	end
-	local function Stream(v, aAdr, aItag, aAdr_opus, aItag_opus, captions)
-		if v.isAdaptive == true and aItag then
-			local extOpt_demux, adr_audio, itag_audio, adr_captions
-			if (captions and aItag_opus)
-				and not v.mimeType:match('video/webm')
-			then
-				adr_audio = aAdr_opus
-				itag_audio = aItag_opus
-				adr_captions = captions
-			else
-				adr_audio = aAdr
-				itag_audio = aItag
-				extOpt_demux = '$OPT:demux=avcodec'
-			end
-			v.aItag = itag_audio
-			v.Address = v.Address .. '$OPT:input-slave=' .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
+	local function Stream(t, aAdr, aItag, captions)
+		if t.isAdaptive then
+			t.Address = t.Address .. '$OPT:input-slave=' .. aAdr .. (captions or '')
+			t.aItag = aItag
 		else
 			if captions then
-				v.Address = v.Address .. '$OPT:input-slave=' .. captions
-			end
-			if m_simpleTV.User.YT.vlc228 then
-				v.Address = v.Address .. '$OPT:demux=avcodec'
+				t.Address = t.Address .. '$OPT:input-slave=' .. captions
 			end
 		end
-	 return v
+		t.Address = t.Address .. '$OPT:demux=avformat'
+	 return t
 	end
 	local function GetVideoInfo(clientScreen)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
@@ -1959,7 +1945,7 @@ local infoInFile = false
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, sts)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
@@ -2141,67 +2127,69 @@ local infoInFile = false
 			end
 		end
 		local title = title_clean(m_simpleTV.User.YT.title)
-		if tab.multicamera and not isInfoPanel then
+		if tab.multicamera and not isIPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.camera
 		end
 		local t, i = {}, 1
+		local audioTracks
 		if tab.storyboards
 			and tab.storyboards.playerStoryboardSpecRenderer
 			and tab.storyboards.playerStoryboardSpecRenderer.spec
 		then
 			Thumbs(tab.storyboards.playerStoryboardSpecRenderer.spec)
 		end
-			if tab.streamingData and tab.streamingData.hlsManifestUrl
-				and (m_simpleTV.User.YT.isLive or m_simpleTV.User.YT.isLiveContent)
-			then
-			 return Stream_Live(tab.streamingData.hlsManifestUrl, title)
-			end
-		if tab.streamingData and tab.streamingData.formats then
-			local k = 1
-				while tab.streamingData.formats[k] do
-					t[i] = {}
-					t[i].itag = tab.streamingData.formats[k].itag
-					t[i].qualityLabel = tab.streamingData.formats[k].qualityLabel
-					t[i].height = tab.streamingData.formats[k].height
-					t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
-					t[i].isAdaptive = false
-					t[i].mimeType = tab.streamingData.formats[k].mimeType
-					t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
-					t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
-					k = k + 1
-					i = k
+		if tab.streamingData then
+				if tab.streamingData.hlsManifestUrl
+					and (m_simpleTV.User.YT.isLive or m_simpleTV.User.YT.isLiveContent)
+				then
+				 return Stream_Live(tab.streamingData.hlsManifestUrl, title)
 				end
-		end
-		local audioTracks
-		if tab.streamingData and tab.streamingData.adaptiveFormats and not m_simpleTV.User.YT.vlc228 then
-			local k = 1
-				while tab.streamingData.adaptiveFormats[k] do
-					if tab.streamingData.adaptiveFormats[k].contentLength then
+			if tab.streamingData.formats then
+				local k = 1
+					while tab.streamingData.formats[k] do
 						t[i] = {}
-						t[i].itag = tab.streamingData.adaptiveFormats[k].itag
-						t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
-						t[i].height = tab.streamingData.adaptiveFormats[k].height
-						t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
-						t[i].isAdaptive = true
-						t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
-						if tab.streamingData.adaptiveFormats[k].audioTrack
-							and tab.streamingData.adaptiveFormats[k].audioTrack.audioIsDefault == true
-						then
-							t[i].audioIsDefault = true
-							if not audioTracks then
-								audioTracks = true
-							end
-						end
-						t[i].Address= m_simpleTV.Common.fromPercentEncoding(t[i].Address)
+						t[i].itag = tab.streamingData.formats[k].itag
+						t[i].qualityLabel = tab.streamingData.formats[k].qualityLabel
+						t[i].height = tab.streamingData.formats[k].height
+						t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
+						t[i].isAdaptive = false
+						t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
 						t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
-						i = i + 1
+						k = k + 1
+						i = k
 					end
-					k = k + 1
-				end
+			end
+			if tab.streamingData.adaptiveFormats
+				and not m_simpleTV.User.YT.vlc228
+			then
+				local k = 1
+					while tab.streamingData.adaptiveFormats[k] do
+						if tab.streamingData.adaptiveFormats[k].contentLength then
+							t[i] = {}
+							t[i].itag = tab.streamingData.adaptiveFormats[k].itag
+							t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
+							t[i].height = tab.streamingData.adaptiveFormats[k].height
+							t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
+							t[i].isAdaptive = true
+							if tab.streamingData.adaptiveFormats[k].audioTrack
+								and tab.streamingData.adaptiveFormats[k].audioTrack.audioIsDefault == true
+							then
+								t[i].audioIsDefault = true
+								if not audioTracks then
+									audioTracks = true
+								end
+							end
+							t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
+							t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
+							i = i + 1
+						end
+						k = k + 1
+					end
+			end
 		end
 			if #t == 0 then
 					if urlAdr:match('PARAMS=psevdotv') then return end
-				isInfoPanel = false
+				isIPanel = false
 			 return Stream_Error(tab, title)
 			end
 		local captions, captions_title
@@ -2212,8 +2200,15 @@ local infoInFile = false
 			and subtitle_config == 'true'
 		then
 			captions, captions_title = Subtitle(tab)
-			if captions and m_simpleTV.User.YT.vlc228 then
-				captions = captions:gsub('://', '/subtitle://')
+			if captions then
+				local demux
+				if m_simpleTV.User.YT.vlc228 then
+					demux = 'subtitle'
+				else
+					demux = 'webvtt'
+				end
+				demux = string.format('/%s://', demux)
+				captions = captions:gsub('://', demux)
 			end
 		end
 			for _, v in pairs(t) do
@@ -2242,36 +2237,27 @@ local infoInFile = false
 				v.qlty = res or 0
 				v.Name = qualityLabel or ''
 			end
-		local aAdr, aItag, aItag_opus, aAdr_opus
+		local aAdr, aItag
 		local video_itags, audio_itags = ItagTab()
 			for i = 1, #audio_itags do
 				for z = 1, #t do
 					if audioTracks then
 						if t[z].audioIsDefault == true then
 							if audio_itags[i] == t[z].itag then
-								if audio_itags[i] == 251 then
-									aAdr_opus = t[z].Address
-									aItag_opus = t[z].itag
-								elseif not aItag then
-									aAdr = t[z].Address
-									aItag = t[z].itag
-								end
+								aAdr = t[z].Address
+								aItag = t[z].itag
 							 break
 							end
 						end
 					else
 						if audio_itags[i] == t[z].itag then
-							if audio_itags[i] == 251 then
-								aAdr_opus = t[z].Address
-								aItag_opus = t[z].itag
-							elseif not aItag then
-								aAdr = t[z].Address
-								aItag = t[z].itag
-							end
+							aAdr = t[z].Address
+							aItag = t[z].itag
 						 break
 						end
 					end
 				end
+				if aAdr then break end
 			end
 		local sort = {}
 			for i = 1, #video_itags do
@@ -2302,40 +2288,32 @@ local infoInFile = false
 		t = {}
 			for i = 1, #noDuplicate do
 				if noDuplicate[i].qlty > 300 then
-					t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, aAdr_opus, aItag_opus, captions)
+					t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, captions)
 				end
 			end
 		if #t == 0 then
 			for i = 1, #noDuplicate do
-				t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, aAdr_opus, aItag_opus, captions)
+				t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, captions)
 			end
 		end
 			if #t == 0 then
 			 return nil, 'GetStreamsTab Error'
 			end
+		local aAdrName, audioId, audioItag
 		if aAdr then
-			local audioItag = tonumber(aAdr:match('itag=(%d+)') or 0)
-			if audioItag == 258 then
-				aAdr_opus = aAdr
-			elseif audioItag == 327 then
-				aAdr_opus = aAdr .. '$OPT:demux=avcodec,any'
+			audioItag = tonumber(aAdr:match('itag=(%d+)') or 0)
+			if audioItag == 327 then
+				aAdr = aAdr .. '$OPT:demux=avformat,any'
 			end
-		end
-		local aAdrName, audioId, itag_a
-		if aAdr_opus or aAdr then
-			aAdr = aAdr_opus or aAdr
 			aAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
-			if infoInFile then
-				itag_a = aAdr:match('itag=(%d+)')
-			end
 		else
 			aAdr = 'vlc://pause:5'
 			aAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
 		if not m_simpleTV.User.YT.vlc228 then
-			t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = itag_a}
+			t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = audioItag}
 		end
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
 			for i = 1, #t do
@@ -2349,22 +2327,22 @@ local infoInFile = false
 			inf0_qlty = table.concat(inf0_qlty, '\n')
 		end
 		if m_simpleTV.User.YT.qlty < 100 then
-			if audioId == 99 and not isInfoPanel then
-				title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.audio
-			else
-				title = title .. '\n☐ ' .. m_simpleTV.User.YT.Lng.noAudio
-			end
-			if not m_simpleTV.User.YT.DelayedAddress then
-				local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
-				if visual == 'none'
-					or visual == ''
-				then
-					SetBackground(m_simpleTV.User.YT.pic or m_simpleTV.User.YT.logoPicFromDisk)
-				else
-					SetBackground()
+			if not isIPanel then
+				if audioId == 99 then
+					title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.audio
+				elseif audioId == 10 then
+					title = title .. '\n☐ ' .. m_simpleTV.User.YT.Lng.noAudio
 				end
 			end
-		elseif captions_title and not isInfoPanel then
+			local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
+			if visual == 'none'
+				or visual == ''
+			then
+				SetBackground(m_simpleTV.User.YT.pic or m_simpleTV.User.YT.logoPicFromDisk)
+			else
+				SetBackground()
+			end
+		elseif captions_title and not isIPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.sub .. captions_title
 		end
 		if m_simpleTV.User.YT.isAuth
@@ -2378,7 +2356,6 @@ local infoInFile = false
 		end
 		if m_simpleTV.User.YT.duration
 			and m_simpleTV.User.YT.duration > 120
-			and m_simpleTV.User.YT.desc ~= ''
 			and m_simpleTV.User.YT.desc:match('%d+:%d+')
 		then
 			Chapters()
@@ -2402,7 +2379,7 @@ local infoInFile = false
 					end
 					name = title_clean(name)
 					tab[i].Name = name
-					if isInfoPanel == true then
+					if isIPanel == true then
 						desc = g:match('"descriptionSnippet":{"runs":%[{"text":"([^"]+)')
 						count, count2 = g:match('"videoCountText":{"runs":%[{"text":"([^"]+)"},{"text":"([^"]+)')
 						subCount = g:match('"subscriberCountText":{"simpleText":"([^"]+)')
@@ -2451,7 +2428,7 @@ local infoInFile = false
 					published = os.date('%y %d %m %H %M', tonumber(published))
 					local year, day, month, hour, min = published:match('(%d+) (%d+) (%d+) (%d+) (%d+)')
 					published = string.format('%d/%d/%02d %d:%02d', day, month, year, hour, min)
-					if isInfoPanel == false then
+					if isIPanel == false then
 						tab[i].Name = name .. ' (' .. published .. ')'
 					else
 						tab[i].Name = name
@@ -2528,7 +2505,7 @@ local infoInFile = false
 					if livenow then
 						livenow = m_simpleTV.User.YT.Lng.live
 					end
-					if isInfoPanel == false then
+					if isIPanel == false then
 						if (times or livenow) and not embed then
 							tab[i].Name = string.format('%s [%s]', name, times or livenow)
 						else
@@ -2626,7 +2603,7 @@ local infoInFile = false
 						tab[i].Address = tab[i].Address .. '&isPlstsCh=true'
 					end
 					tab[i].Name = name
-					if isInfoPanel == true then
+					if isIPanel == true then
 						tab[i] = iPanel('plstApi', tab[i], logo, name, id, count, chTitle, desc)
 					end
 					i = i + 1
@@ -3272,7 +3249,7 @@ local infoInFile = false
 								t[1].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', plstId)
 								t[1].Name = string.format('🔺 %s (%s)', m_simpleTV.User.YT.Lng.upLoadOnCh, plstTotalResults)
 								t[1].count = plstTotalResults
-								if isInfoPanel == true then
+								if isIPanel == true then
 									t[1].InfoPanelLogo = channel_avatar or channel_banner or m_simpleTV.User.YT.logoPicFromDisk
 									t[1].InfoPanelShowTime = 10000
 									t[1].InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
@@ -3310,7 +3287,7 @@ local infoInFile = false
 						tab0[i].Name = j .. '. ' .. name
 					end
 					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
-					if isInfoPanel == true then
+					if isIPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
 						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
@@ -3332,7 +3309,7 @@ local infoInFile = false
 						tab0[i].Name = j .. '. ' .. name
 					end
 					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
-					if isInfoPanel == true then
+					if isIPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
 						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
@@ -3354,7 +3331,7 @@ local infoInFile = false
 						tab0[i].Name = j .. '. ' .. name
 					end
 					tab0[i].Address = string.format('https://www.youtube.com/playlist?list=%s&isPlstsCh=true', adr)
-					if isInfoPanel == true then
+					if isIPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
 						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
@@ -3389,7 +3366,7 @@ local infoInFile = false
 						tab[i].Name = j .. '. ' .. name
 					end
 					tab[i].Address = string.format('https://www.youtube.com%s&isPlstsCh=true', adr)
-					if isInfoPanel == true then
+					if isIPanel == true then
 						local logo = w:match('"thumbnails":%s*%[%s*{%s*"url":%s*"([^"]+)') or ''
 						tab0[i] = iPanel('plstsCh', tab0[i], logo, name, nil, count, chTitle, nil)
 					end
@@ -3532,7 +3509,7 @@ local infoInFile = false
 				name_header = ''
 			end
 			if m_simpleTV.User.YT.isLive == true then
-				if isInfoPanel == false then
+				if isIPanel == false then
 					ap_header = ' (' .. m_simpleTV.User.YT.Lng.live .. ')'
 				else
 					if m_simpleTV.User.YT.actualStartTime then
@@ -3544,7 +3521,7 @@ local infoInFile = false
 					end
 				end
 			else
-				if isInfoPanel == false then
+				if isIPanel == false then
 					if m_simpleTV.User.YT.duration and m_simpleTV.User.YT.duration > 2 then
 						ap_header = ' (' .. secondsToClock(m_simpleTV.User.YT.duration) .. ')'
 					end
@@ -3555,7 +3532,7 @@ local infoInFile = false
 			t1[1].Id = 1
 			t1[1].Address = 'https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId
 			t1[1].Name = name
-			if isInfoPanel == false then
+			if isIPanel == false then
 				header = name_header .. (ap_header or '')
 			else
 				if m_simpleTV.User.YT.isTrailer == true then
@@ -3637,7 +3614,7 @@ local infoInFile = false
 			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 		end
 		MarkWatch_YT()
-		if isInfoPanel == false then
+		if isIPanel == false then
 			title = title_no_iPanel(title, t[index].Name)
 			ShowMsg(title)
 		end
@@ -3885,7 +3862,7 @@ local infoInFile = false
 				SetBackground()
 			end
 			m_simpleTV.User.YT.QltyIndex = id
-			if isInfoPanel == false then
+			if isIPanel == false then
 				ShowMsg(t[id].Name, nil, true)
 			end
 			local retAdr = Stream_Out(t, id)
