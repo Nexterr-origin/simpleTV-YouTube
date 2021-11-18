@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (18/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (19/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2191,6 +2191,20 @@ local infoInFile = false
 					if urlAdr:match('PARAMS=psevdotv') then return end
 				isIPanel = false
 			 return Stream_Error(tab, title)
+			end
+		local qlty2D
+			for i = #t, 1, -1 do
+				if t[i].qualityLabel then
+					if not qlty2D and t[i].qualityLabel:match('%d+p') then
+						qlty2D = true
+					end
+					if t[i].qualityLabel:match('%d+s') then
+						table.remove(t, i)
+					end
+				end
+			end
+			if not qlty2D then
+			 return nil, '2D video not found'
 			end
 		local captions, captions_title
 		local subtitle_config = m_simpleTV.Config.GetValue('subtitle/disableAtStart', 'simpleTVConfig') or 'true'
