@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (20/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1758,6 +1758,22 @@ local infoInFile = false
 		t.InfoPanelShowTime = 10000
 	 return t
 	end
+	local function sign_decode(s, signScr)
+		local t = split_str(s)
+			for i = 1, #signScr do
+				local a = signScr[i]
+				if a == 0 then
+					t = table_reversa(t)
+				else
+					if a > 0 then
+						t = table_swap(t, a)
+					else
+						t = table_slica(t, math.abs(a) + 1)
+					end
+				end
+			end
+	 return table.concat(t)
+	end
 	local function DeCipherThrottleParam(adr)
 		local n = adr:match('[?&]n=([^&]+)')
 		local throttleParamScr = m_simpleTV.User.YT.throttleParamScr
@@ -1775,30 +1791,16 @@ local infoInFile = false
 	 return adr
 	end
 	local function DeCipherSign(adr)
-			local function sign_decode(s, signScr)
-				local t = split_str(s)
-					for i = 1, #signScr do
-						local a = signScr[i]
-						if a == 0 then
-							t = table_reversa(t)
-						else
-							if a > 0 then
-								t = table_swap(t, a)
-							else
-								t = table_slica(t, math.abs(a) + 1)
-							end
-						end
-					end
-			 return table.concat(t)
-			end
 			for cipherSign in adr:gmatch('[?&]s=([^&]+)') do
-					if not m_simpleTV.User.YT.sts
-						or not m_simpleTV.User.YT.signScr
+				local signScr = m_simpleTV.User.YT.signScr
+				local sts = m_simpleTV.User.YT.sts
+					if not sts
+						or not signScr
 					then
 						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
 					 return 'vlc://pause:5'
 					end
-				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
+				local signature = sign_decode(cipherSign, signScr)
 				adr = adr:gsub('([?&])s=[^&]+', '%1sig=' .. signature, 1)
 			end
 	 return adr
@@ -1896,7 +1898,7 @@ local infoInFile = false
 		if not m_simpleTV.User.YT.isLive and not m_simpleTV.User.YT.isLiveContent then
 			url = DeCipherThrottleParam(url)
 			url = DeCipherSign(url)
-			extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
+			extOpt = '$OPT:demux=avformat$OPT:NO-STIMESHIFT' .. extOpt
 			if t[index].isAdaptive == true then
 				extOpt = '$OPT:sub-track-id=1' .. extOpt
 			elseif t[index].isAdaptive == false then
@@ -1924,8 +1926,8 @@ local infoInFile = false
 		end
 	 return url .. extOpt
 	end
-	local function Stream(t, aAdr, aItag, captions)
-		if t.isAdaptive then
+	local function Stream_Adr(t, aAdr, aItag, captions)
+		if t.isAdaptive == true then
 			t.Address = t.Address .. '$OPT:input-slave=' .. aAdr .. (captions or '')
 			t.aItag = aItag
 		else
@@ -1933,7 +1935,6 @@ local infoInFile = false
 				t.Address = t.Address .. '$OPT:input-slave=' .. captions
 			end
 		end
-		t.Address = t.Address .. '$OPT:demux=avformat'
 	 return t
 	end
 	local function GetVideoInfo(clientScreen)
@@ -2302,12 +2303,12 @@ local infoInFile = false
 		t = {}
 			for i = 1, #noDuplicate do
 				if noDuplicate[i].qlty > 300 then
-					t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, captions)
+					t[#t + 1] = Stream_Adr(noDuplicate[i], aAdr, aItag, captions)
 				end
 			end
 		if #t == 0 then
 			for i = 1, #noDuplicate do
-				t[#t + 1] = Stream(noDuplicate[i], aAdr, aItag, captions)
+				t[#t + 1] = Stream_Adr(noDuplicate[i], aAdr, aItag, captions)
 			end
 		end
 			if #t == 0 then
