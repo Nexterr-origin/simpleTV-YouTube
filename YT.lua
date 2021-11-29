@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (29/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -308,7 +308,7 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.cookies then
 			local function cookiesFromFile()
-				local tab = m_simpleTV.Common.DirectoryEntryList(m_simpleTV.Common.GetMainPath(1), '*cookies.txt','Files')
+				local tab = m_simpleTV.Common.DirectoryEntryList(m_simpleTV.Common.GetMainPath(1), '*cookies.txt', 'Files')
 					if #tab == 0 then return end
 				local prioTab = {'youtube.com_cookies', 'cookies'}
 				local f
@@ -324,7 +324,7 @@ local infoInFile = false
 					if not f then return end
 				local fhandle = io.open(f, 'r')
 					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF', 'VISITOR_INFO1_LIVE'}
+				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF', 'LOGIN_INFO', 'VISITOR_INFO1_LIVE'}
 				local cookie_SAPISID
 				local t = {}
 					for line in fhandle:lines() do
@@ -340,16 +340,16 @@ local infoInFile = false
 								end
 							end
 						end
-							if #t == 7 then break end
+							if #t == 8 then break end
 					end
 				fhandle:close()
-					if #t < 7 then return end
+					if #t < 8 then return end
 				m_simpleTV.User.YT.isAuth = cookie_SAPISID
 			 return table.concat(t, ';')
 			end
 		local cookies = cookiesFromFile()
 			or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
-		m_simpleTV.User.YT.cookies = string.format('%s;expires=Fri, 01-Jan-2038 00:00:00 GMT;path=/;domain=.youtube.com;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
+		m_simpleTV.User.YT.cookies = string.format('%s;yt-dev.storage-integrity=true;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&; ]+)') or m_simpleTV.User.YT.Lng.lang
 		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&; ]+)') or m_simpleTV.User.YT.Lng.country
 	end
