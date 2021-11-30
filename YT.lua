@@ -205,7 +205,6 @@ local infoInFile = false
 			if not f then return end
 		local fhandle = io.open(f, 'r')
 			if not fhandle then return end
-		local cookie_SAPISID
 		local t = {}
 			for line in fhandle:lines() do
 				local timestamp, name, val = line:match('%.youtube%.com.-(%d+)%s+(%S+)%s+(%S+)')
