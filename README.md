@@ -26,7 +26,7 @@
 - поместить **`YT.lua`** в папку _`..\luaScr\user\video`_
 
 📌 **Авторизация**
-- файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_, получить файл можно в расширении браузера Firefox - [cookies.txt](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") или Chrome - [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
+- файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_, получить файл можно в расширении браузера Firefox - [cookies.txt One Click](https://addons.mozilla.org/en-US/firefox/addon/cookies-txt-one-click/ "расширение cookies.txt One Click") или Chrome - [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
 
 📌 **Поиск из окна "Открыть URL" _Ctrl+N_**
 
