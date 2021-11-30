@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/11/21)
+-- видеоскрипт для сайта https://www.youtube.com (30/11/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -14,7 +14,7 @@
 ]]
 -- UTF-8 without BOM
 -- поиск из окна "Открыть URL" (Ctrl+N), префиксы: - (видео), -- (плейлисты), --- (каналы), -+ (прямые трансляции)
--- авторизаця: файл формата "Netscape HTTP Cookie File" - cookies.txt поместить в папку 'work'
+-- авторизаця: файл формата "Netscape HTTP Cookie File" - *cookies.txt поместить в папку 'work'
 -- показать на OSD плейлист / выбор качества: Ctrl+M
 -- Прокси ---------------------------------------------------------
 local proxy = ''
@@ -188,6 +188,47 @@ local infoInFile = false
 			end
 	 return false
 	end
+	local function cookiesFromFile()
+		local tab = m_simpleTV.Common.DirectoryEntryList(m_simpleTV.Common.GetMainPath(1), '*cookies.txt', 'Files')
+			if #tab == 0 then return end
+		local prioTab = {'youtube.com', 'cookies'}
+		local f
+			for i = 1, #prioTab do
+				for j = 1, #tab do
+					if tab[j].completeBaseName:match(prioTab[i]) then
+						f = tab[j].absoluteFilePath
+					 break
+					end
+				end
+				if f then break end
+			end
+			if not f then return end
+		local fhandle = io.open(f, 'r')
+			if not fhandle then return end
+		local cookie_SAPISID
+		local t, cookie_name = {}, {}
+			for line in fhandle:lines() do
+				local name, val = line:match('%.youtube%.com.+%s(%S+)%s+(%S+)')
+				if name and val and not name:match('__Secure') then
+					t[#t + 1] = string.format('%s=%s', name, val)
+					cookie_name[#t] = name
+					if not cookie_SAPISID and name == 'SAPISID' then
+						cookie_SAPISID = val
+					end
+				end
+			end
+		fhandle:close()
+			if #t < 7 then return end
+		local hash, noDuplicate = {}, {}
+			for i = 1, #t do
+				if not hash[cookie_name[i]] then
+					noDuplicate[#noDuplicate + 1] = t[i]
+					hash[cookie_name[i]] = true
+				end
+			end
+		m_simpleTV.User.YT.isAuth = cookie_SAPISID
+	 return table.concat(noDuplicate, ';')
+	end
 	if inAdr:match('https?://')
 		and not inAdr:match('&is%a+=%a+')
 	then
@@ -307,49 +348,9 @@ local infoInFile = false
 		m_simpleTV.User.YT.OpenUrlHelpCheck = true
 	end
 	if not m_simpleTV.User.YT.cookies then
-			local function cookiesFromFile()
-				local tab = m_simpleTV.Common.DirectoryEntryList(m_simpleTV.Common.GetMainPath(1), '*cookies.txt', 'Files')
-					if #tab == 0 then return end
-				local prioTab = {'youtube.com_cookies', 'cookies'}
-				local f
-					for i = 1, #prioTab do
-							for j = 1, #tab do
-								if prioTab[i] == tab[j].completeBaseName then
-									f = tab[j].absoluteFilePath
-								 break
-								end
-							end
-							if f then break end
-					end
-					if not f then return end
-				local fhandle = io.open(f, 'r')
-					if not fhandle then return end
-				local YT_Cookies = {'SID', 'HSID', 'SSID', 'SAPISID', 'APISID', 'PREF', 'LOGIN_INFO', 'VISITOR_INFO1_LIVE'}
-				local cookie_SAPISID
-				local t = {}
-					for line in fhandle:lines() do
-						local name, val = line:match('youtube%.com.+%s(%S+)%s+(%S+)')
-						if name and val then
-							for i = 1, #YT_Cookies do
-								if name == YT_Cookies[i] then
-									t[#t + 1] = string.format('%s=%s', name, val)
-									if not cookie_SAPISID and name == 'SAPISID' then
-										cookie_SAPISID = val
-									end
-								 break
-								end
-							end
-						end
-							if #t == 8 then break end
-					end
-				fhandle:close()
-					if #t < 8 then return end
-				m_simpleTV.User.YT.isAuth = cookie_SAPISID
-			 return table.concat(t, ';')
-			end
-		local cookies = cookiesFromFile()
-			or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
-		m_simpleTV.User.YT.cookies = string.format('%s;yt-dev.storage-integrity=true;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
+		local cookies = cookiesFromFile() or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
+		cookies = cookies:gsub('&amp;', '&')
+		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
 		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&; ]+)') or m_simpleTV.User.YT.Lng.lang
 		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&; ]+)') or m_simpleTV.User.YT.Lng.country
 	end
@@ -1174,7 +1175,7 @@ local infoInFile = false
 		q.top = 5
 		q.glow = 1
 		q.glowcolor = ARGB(144, 0, 0, 0)
-		addElement(q,'YT_DIV_CR')
+		addElement(q, 'YT_DIV_CR')
 			local function elementsRemove()
 				removeElement('YT_TEXT_INFO')
 				removeElement('YT_DIV_CR')
