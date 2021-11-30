@@ -191,7 +191,7 @@ local infoInFile = false
 	local function cookiesFromFile()
 		local tab = m_simpleTV.Common.DirectoryEntryList(m_simpleTV.Common.GetMainPath(1), '*cookies.txt', 'Files')
 			if #tab == 0 then return end
-		local prioTab = {'youtube.com', 'cookies'}
+		local prioTab = {'youtube%.com', '^cookies'}
 		local f
 			for i = 1, #prioTab do
 				for j = 1, #tab do
@@ -206,26 +206,30 @@ local infoInFile = false
 		local fhandle = io.open(f, 'r')
 			if not fhandle then return end
 		local cookie_SAPISID
-		local t, cookie_name = {}, {}
+		local t = {}
 			for line in fhandle:lines() do
-				local name, val = line:match('%.youtube%.com.+%s(%S+)%s+(%S+)')
-				if name and val and not name:match('__Secure') then
-					t[#t + 1] = string.format('%s=%s', name, val)
-					cookie_name[#t] = name
-					if not cookie_SAPISID and name == 'SAPISID' then
-						cookie_SAPISID = val
-					end
+				local timestamp, name, val = line:match('%.youtube%.com.-(%d+)%s+(%S+)%s+(%S+)')
+				if name and not name:match('__Secure') and val and timestamp then
+					t[#t + 1] = {}
+					t[#t].name = name
+					t[#t].val = val
+					t[#t].timestamp = tonumber(timestamp)
 				end
 			end
 		fhandle:close()
-			if #t < 7 then return end
+		table.sort(t, function(a, b) return a.timestamp > b.timestamp end)
 		local hash, noDuplicate = {}, {}
+		local cookie_SAPISID
 			for i = 1, #t do
-				if not hash[cookie_name[i]] then
-					noDuplicate[#noDuplicate + 1] = t[i]
-					hash[cookie_name[i]] = true
+				if not hash[t[i].name] then
+					noDuplicate[#noDuplicate + 1] = t[i].name .. '=' .. t[i].val
+					hash[t[i].name] = true
+					if not cookie_SAPISID and t[i].name == 'SAPISID' then
+						cookie_SAPISID = t[i].val
+					end
 				end
 			end
+			if #noDuplicate < 7 or not cookie_SAPISID then return end
 		m_simpleTV.User.YT.isAuth = cookie_SAPISID
 	 return table.concat(noDuplicate, ';')
 	end
@@ -351,8 +355,8 @@ local infoInFile = false
 		local cookies = cookiesFromFile() or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
 		cookies = cookies:gsub('&amp;', '&')
 		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
-		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&; ]+)') or m_simpleTV.User.YT.Lng.lang
-		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&; ]+)') or m_simpleTV.User.YT.Lng.country
+		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&;]+)') or m_simpleTV.User.YT.Lng.lang
+		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&;]+)') or m_simpleTV.User.YT.Lng.country
 	end
 	if not m_simpleTV.User.YT.PlstsCh then
 		m_simpleTV.User.YT.PlstsCh = {}
