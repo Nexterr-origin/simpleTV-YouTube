@@ -1224,7 +1224,7 @@ local infoInFile = false
 		if qlty and qlty < 100 then
 			qlty = nil
 		end
-		infoInFile = os.date('%c') .. '\n'
+		infoInFile = os.date('%c'):gsub('(%d+)/(%d+)', '%2/%1', 1) .. '\n'
 						.. string_rep
 						.. 'title: ' .. title:gsub('%c', ' ') .. '\n'
 						.. string_rep
@@ -4029,7 +4029,7 @@ local infoInFile = false
 			end
 		end
 		m_simpleTV.Control.ExecuteAction(37)
-		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('⚙ ' .. m_simpleTV.User.YT.Lng.qlty, m_simpleTV.User.YT.QltyIndex - 1, t, 5000, 1 + 4 + 2)
+		local ret, id = m_simpleTV.OSD.ShowSelect_UTF8('⚙ ' .. m_simpleTV.User.YT.Lng.qlty, m_simpleTV.User.YT.QltyIndex - 1, t, 10000, 1 + 4 + 2)
 		if m_simpleTV.Control.GetState() == 0 and ret == 0 then
 			m_simpleTV.Control.ExecuteAction(108)
 		end
