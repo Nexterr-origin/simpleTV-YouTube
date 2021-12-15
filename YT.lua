@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (15/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1239,8 +1239,8 @@ local infoInFile = false
 						.. ' + calc: ' .. calc .. ' s.)\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(retAdr:match('&sp=(%a+)'))
-						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts)
-						.. ' | throttle: ' .. tostring(throttle) .. '\n'
+						.. ' | signTimestamp: ' .. tostring(m_simpleTV.User.YT.signTs)
+						.. ' | throttleParam: ' .. tostring(throttle) .. '\n'
 						.. string_rep
 						.. 'Qlty table:\n\n'
 						.. (inf0_qlty or '') .. '\n'
@@ -1519,27 +1519,27 @@ local infoInFile = false
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		local throttleParamScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
-		if throttleParamScr then
-			throttleParamScr = throttleParamScr:gsub('\n', '')
-			m_simpleTV.User.YT.throttleParamScr = 'func' .. throttleParamScr
+		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
+		if throttleFunc then
+			throttleFunc = throttleFunc:gsub('\n', '')
+			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
-		local alg = answer:match('var ' .. var .. '.-};')
+		local alg = answer:match(var .. '={.-};')
 		local signScr = {}
 			for param in f:gmatch(var .. '%p([^)]+)') do
 				local func, p = param:match('([^(]+)%(a,(%d+)')
 				func = alg:match('[%p%s]' .. func .. ':function([^}]+)')
-				if func:match('a%.reverse') then
+				if func:match('reverse') then
 					p = 0
-				elseif func:match('a%.splice') then
+				elseif func:match('splice') then
 					p = '-' .. p
 				end
 				signScr[#signScr + 1] = tonumber(p)
 			end
-		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
+		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		m_simpleTV.User.YT.signScr = signScr
 	end
 	local function Subtitle(tab)
@@ -1782,10 +1782,10 @@ local infoInFile = false
 			end
 	 return table.concat(t)
 	end
-	local function DeScrambleParam_N(n, throttleParamScr)
+	local function DeScrambleParam_N(n, throttleFunc)
 -- https://github.com/videolan/vlc/blob/master/share/lua/playlist/youtube.lua
 		n = split_str(n)
-		local datac, script = string.match(throttleParamScr, 'c=%[(.*)%];.-;try{(.*)}catch%(')
+		local datac, script = string.match(throttleFunc, 'c=%[(.*)%];.-;try{(.*)}catch%(')
 			if not datac or not script then return end
 			local function compound(ntab, str, alphabet)
 				if ntab ~= n
@@ -1956,11 +1956,11 @@ local infoInFile = false
 	end
 	local function DeCipherThrottleParam(adr)
 		local n = adr:match('[?&]n=([^&]+)')
-		local throttleParamScr = m_simpleTV.User.YT.throttleParamScr
-		if throttleParamScr and n then
-			local new_n = DeScrambleParam_N(n, throttleParamScr)
+		local throttleFunc = m_simpleTV.User.YT.throttleFunc
+		if throttleFunc and n then
+			local new_n = DeScrambleParam_N(n, throttleFunc)
 			if not new_n or new_n == n then
-				new_n = jsdecode.DoDecode(string.format('func("%s")', n), false, throttleParamScr, 0)
+				new_n = jsdecode.DoDecode(string.format('nameFunc("%s")', n), false, throttleFunc, 0)
 			end
 			if new_n and #new_n > 0 then
 				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
@@ -1974,8 +1974,8 @@ local infoInFile = false
 	local function DeCipherSign(adr)
 			for cipherSign in adr:gmatch('[?&]s=([^&]+)') do
 				local signScr = m_simpleTV.User.YT.signScr
-				local sts = m_simpleTV.User.YT.sts
-					if not sts
+				local signTs = m_simpleTV.User.YT.signTs
+					if not signTs
 						or not signScr
 					then
 						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
@@ -2123,11 +2123,11 @@ local infoInFile = false
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
 		clientScreen = clientScreen or 'WATCH'
-		local sts = m_simpleTV.User.YT.sts or 0
+		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "2.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
