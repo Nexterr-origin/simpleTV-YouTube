@@ -828,21 +828,23 @@ local infoInFile = false
 		end
 	 return decode
 	end
-	local function webApiKey()
-		local session_getKey = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_getKey then return end
-		m_simpleTV.Http.SetTimeout(session_getKey, 14000)
-		local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2VfemRzLmVuX1VTLi1KcDN1bDRMbzBZLk8vYW09SW9BQVFnQUUvcnQ9ai9kPTEvZGc9MC9jdD16Z21zL3JzPUFOalJoVmtmazRsbnFhWXlZX05MTzV4QmhpTGdXYkYzMGcvbT1iYXNl')
-		local rc, answer = m_simpleTV.Http.Request(session_getKey, {url = url})
-		m_simpleTV.Http.Close(session_getKey)
+	local function checkApiKey(key)
+		local rc, answer = m_simpleTV.Http.Request(session, {url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=&maxResults=0&fields=kind&key=' .. key})
 			if rc ~= 200 then return end
-	 return answer:match('ya%("INNERTUBE_API_KEY","([^"]+)')
+	 return true
+	end
+	local function webApiKey()
+		local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2VfemRzLmVuX1VTLi1KcDN1bDRMbzBZLk8vYW09SW9BQVFnQUUvcnQ9ai9kPTEvZGc9MC9jdD16Z21zL3JzPUFOalJoVmtmazRsbnFhWXlZX05MTzV4QmhpTGdXYkYzMGcvbT1iYXNl')
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
+			if rc ~= 200 then return end
+		local key = answer:match('ya%("INNERTUBE_API_KEY","([^"]+)')
+			if key and not checkApiKey(key) then return end
+	 return key
 	end
 	local function getApiKey()
 		local key = m_simpleTV.User.YT.apiKey
 		if key then
-			local rc, answer = m_simpleTV.Http.Request(session, {url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=&maxResults=0&fields=kind&key=' .. key})
-			if rc ~= 200 then
+			if not checkApiKey(key) then
 				key = webApiKey()
 			end
 		else
