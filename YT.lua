@@ -829,7 +829,7 @@ local infoInFile = false
 	 return decode
 	end
 	local function checkApiKey(key)
-		local rc, answer = m_simpleTV.Http.Request(session, {url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=&maxResults=0&fields=kind&key=' .. key})
+		local rc, answer = m_simpleTV.Http.Request(session, {url = 'https://www.googleapis.com/youtube/v3/i18nLanguages?part=snippet&fields=kind&key=' .. key})
 			if rc ~= 200 then return end
 	 return true
 	end
@@ -2159,7 +2159,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
 		if not m_simpleTV.User.YT.checkJsPlayer
-			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 3600
+			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		then
 			pcall(GetJsPlayer)
 		end
