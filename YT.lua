@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (17/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (18/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2818,11 +2818,11 @@ local infoInFile = false
 	 return ret
 	end
 	local function PlstApi(inAdr)
-			if not getApiKey() then return end
 		local plstId = inAdr:match('list=([^&]*)')
 		m_simpleTV.User.YT.plstPos = nil
 		m_simpleTV.User.YT.isVideo = false
 		if not m_simpleTV.User.YT.isPlstsCh then
+				if not getApiKey() then return end
 			m_simpleTV.User.YT.PlstsCh.chTitle = nil
 		end
 		m_simpleTV.Control.ExecuteAction(37)
