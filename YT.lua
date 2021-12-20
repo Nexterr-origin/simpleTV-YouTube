@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (19/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -375,7 +375,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:95.0) Gecko/20100101 Firefox/95.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:96.0) Gecko/20100101 Firefox/96.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 18000)
@@ -828,24 +828,35 @@ local infoInFile = false
 		end
 	 return decode
 	end
-	local function GetApiKey()
-			local function webApiKey()
-				local session_getKey = m_simpleTV.Http.New(userAgent, proxy, false)
-					if not session_getKey then return end
-				m_simpleTV.Http.SetTimeout(session_getKey, 14000)
-				local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2VfemRzLmVuX1VTLi1KcDN1bDRMbzBZLk8vYW09SW9BQVFnQUUvcnQ9ai9kPTEvZGc9MC9jdD16Z21zL3JzPUFOalJoVmtmazRsbnFhWXlZX05MTzV4QmhpTGdXYkYzMGcvbT1iYXNl')
-				local rc, answer = m_simpleTV.Http.Request(session_getKey, {url = url})
-				m_simpleTV.Http.Close(session_getKey)
-					if rc ~= 200 then return end
-		 	 return answer:match('ya%("INNERTUBE_API_KEY","([^"]+)')
+	local function checkApiKey(key)
+		local rc, answer = m_simpleTV.Http.Request(session, {url = 'https://www.googleapis.com/youtube/v3/i18nLanguages?part=snippet&fields=kind&key=' .. key})
+			if rc ~= 200 then return end
+	 return true
+	end
+	local function webApiKey()
+		local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2VfemRzLmVuX1VTLi1KcDN1bDRMbzBZLk8vYW09SW9BQVFnQUUvcnQ9ai9kPTEvZGc9MC9jdD16Z21zL3JzPUFOalJoVmtmazRsbnFhWXlZX05MTzV4QmhpTGdXYkYzMGcvbT1iYXNl')
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
+			if rc ~= 200 then return end
+		local key = answer:match('ya%("INNERTUBE_API_KEY","([^"]+)')
+			if key and not checkApiKey(key) then return end
+	 return key
+	end
+	local function getApiKey()
+		local key = m_simpleTV.User.YT.apiKey
+		if key then
+			if not checkApiKey(key) then
+				key = webApiKey()
 			end
-		local key = webApiKey()
-		if not key then
-			ShowMsg(m_simpleTV.User.YT.Lng.error .. '\nAPI Key not found')
-			m_simpleTV.Common.Sleep(2000)
+		else
+			key = webApiKey()
 		end
-		m_simpleTV.User.YT.apiKey = key or ''
-		m_simpleTV.User.YT.apiKeyHeader = decode64('UmVmZXJlcjogaHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY')
+			if not key then
+				ShowMsg(m_simpleTV.User.YT.Lng.error .. '\nAPI Key not found')
+				m_simpleTV.Common.Sleep(2000)
+			 return false
+			end
+		m_simpleTV.User.YT.apiKey = key
+	 return true
 	end
 	local function table_reversa(t)
 		local tab = {}
@@ -1239,8 +1250,8 @@ local infoInFile = false
 						.. ' + calc: ' .. calc .. ' s.)\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(retAdr:match('&sp=(%a+)'))
-						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts)
-						.. ' | throttle: ' .. tostring(throttle) .. '\n'
+						.. ' | signTimestamp: ' .. tostring(m_simpleTV.User.YT.signTs)
+						.. ' | throttleParam: ' .. tostring(throttle) .. '\n'
 						.. string_rep
 						.. 'Qlty table:\n\n'
 						.. (inf0_qlty or '') .. '\n'
@@ -1284,9 +1295,6 @@ local infoInFile = false
 			header = m_simpleTV.User.YT.Lng.video
 			yt = 'watch?v='
 		end
-		if not m_simpleTV.User.YT.apiKey then
-			GetApiKey()
-		end
 		if types == 'related' then
 			url = url:gsub('%-related=', '')
 			url = '&items/snippet/title,items/id/videoId,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&type=video&maxResults=100&relatedToVideoId=' .. url .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
@@ -1298,7 +1306,7 @@ local infoInFile = false
 		end
 		local t, i, k = {}, 1, 1
 		url = 'https://www.googleapis.com/youtube/v3/search?part=snippet' .. url
-		local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = m_simpleTV.User.YT.apiKeyHeader})
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
 			local err, tab = pcall(lunaJson_decode, answer)
 				if err == false
@@ -1519,27 +1527,27 @@ local infoInFile = false
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		local throttleParamScr = answer:match('=function%(a%){var b=a%.split%(""%),c=%[.-};')
-		if throttleParamScr then
-			throttleParamScr = throttleParamScr:gsub('\n', '')
-			m_simpleTV.User.YT.throttleParamScr = 'func' .. throttleParamScr
+		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
+		if throttleFunc then
+			throttleFunc = throttleFunc:gsub('\n', '')
+			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
 		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
 			if not f or not var then return end
 		f = f:gsub('%]', '')
-		local alg = answer:match('var ' .. var .. '.-};')
+		local alg = answer:match(var .. '={.-};')
 		local signScr = {}
 			for param in f:gmatch(var .. '%p([^)]+)') do
 				local func, p = param:match('([^(]+)%(a,(%d+)')
 				func = alg:match('[%p%s]' .. func .. ':function([^}]+)')
-				if func:match('a%.reverse') then
+				if func:match('reverse') then
 					p = 0
-				elseif func:match('a%.splice') then
+				elseif func:match('splice') then
 					p = '-' .. p
 				end
 				signScr[#signScr + 1] = tonumber(p)
 			end
-		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
+		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		m_simpleTV.User.YT.signScr = signScr
 	end
 	local function Subtitle(tab)
@@ -1782,10 +1790,11 @@ local infoInFile = false
 			end
 	 return table.concat(t)
 	end
-	local function DeScrambleParam_N(n, throttleParamScr)
+	local function DeScrambleParam_N(n, throttleFunc)
+-- based on n_descramble function in the youtube.lua script from VLC
 -- https://github.com/videolan/vlc/blob/master/share/lua/playlist/youtube.lua
 		n = split_str(n)
-		local datac, script = string.match(throttleParamScr, 'c=%[(.*)%];.-;try{(.*)}catch%(')
+		local datac, script = string.match(throttleFunc, 'c=%[(.*)%];.-;try{(.*)}catch%(')
 			if not datac or not script then return end
 			local function compound(ntab, str, alphabet)
 				if ntab ~= n
@@ -1956,11 +1965,11 @@ local infoInFile = false
 	end
 	local function DeCipherThrottleParam(adr)
 		local n = adr:match('[?&]n=([^&]+)')
-		local throttleParamScr = m_simpleTV.User.YT.throttleParamScr
-		if throttleParamScr and n then
-			local new_n = DeScrambleParam_N(n, throttleParamScr)
+		local throttleFunc = m_simpleTV.User.YT.throttleFunc
+		if throttleFunc and n then
+			local new_n = DeScrambleParam_N(n, throttleFunc)
 			if not new_n or new_n == n then
-				new_n = jsdecode.DoDecode(string.format('func("%s")', n), false, throttleParamScr, 0)
+				new_n = jsdecode.DoDecode(string.format('nameFunc("%s")', n), false, throttleFunc, 0)
 			end
 			if new_n and #new_n > 0 then
 				adr = adr:gsub('([?&])n=[^&]+', '%1n=' .. new_n)
@@ -1974,8 +1983,8 @@ local infoInFile = false
 	local function DeCipherSign(adr)
 			for cipherSign in adr:gmatch('[?&]s=([^&]+)') do
 				local signScr = m_simpleTV.User.YT.signScr
-				local sts = m_simpleTV.User.YT.sts
-					if not sts
+				local signTs = m_simpleTV.User.YT.signTs
+					if not signTs
 						or not signScr
 					then
 						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
@@ -2096,9 +2105,9 @@ local infoInFile = false
 				extOpt = '$OPT:no-ts-trust-pcr' .. extOpt
 			else
 				if m_simpleTV.User.YT.isLiveContent then
-					extOpt = '$OPT:NO-STIMESHIFT$OPT:adaptive-use-access' .. extOpt
+					extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
 				else
-					extOpt = '$OPT:adaptive-use-access' .. extOpt
+					extOpt = '$OPT:adaptive-minbuffer=30000$OPT:adaptive-livedelay=60000' .. extOpt
 				end
 			end
 		end
@@ -2123,11 +2132,11 @@ local infoInFile = false
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
 		clientScreen = clientScreen or 'WATCH'
-		local sts = m_simpleTV.User.YT.sts or 0
+		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "2.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, sts)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
@@ -2150,7 +2159,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
 		if not m_simpleTV.User.YT.checkJsPlayer
-			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 3600
+			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		then
 			pcall(GetJsPlayer)
 		end
@@ -2809,6 +2818,7 @@ local infoInFile = false
 	 return ret
 	end
 	local function PlstApi(inAdr)
+			if not getApiKey() then return end
 		local plstId = inAdr:match('list=([^&]*)')
 		m_simpleTV.User.YT.plstPos = nil
 		m_simpleTV.User.YT.isVideo = false
@@ -2816,11 +2826,8 @@ local infoInFile = false
 			m_simpleTV.User.YT.PlstsCh.chTitle = nil
 		end
 		m_simpleTV.Control.ExecuteAction(37)
-		if not m_simpleTV.User.YT.apiKey then
-			GetApiKey()
-		end
 		local url = 'https://www.googleapis.com/youtube/v3/playlists?part=snippet&fields=items/snippet/localized/title&id=' .. plstId .. '&hl=' .. m_simpleTV.User.YT.Lng.lang .. '&key=' .. m_simpleTV.User.YT.apiKey
-		local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = m_simpleTV.User.YT.apiKeyHeader})
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 		if rc ~= 200 then
 			answer = ''
 		end
@@ -2829,7 +2836,7 @@ local infoInFile = false
 		header = title_clean(header)
 		m_simpleTV.User.YT.plstHeader = header
 		url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&fields=pageInfo&playlistId=' .. plstId .. '&key=' .. m_simpleTV.User.YT.apiKey
-		rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = m_simpleTV.User.YT.apiKeyHeader})
+		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 		if rc ~= 200 then
 			answer = ''
 		end
@@ -2843,7 +2850,6 @@ local infoInFile = false
 		local t0 = {}
 		t0.url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&fields=nextPageToken,items(snippet/title,snippet/resourceId/videoId,snippet/description)&playlistId=' .. plstId .. '&key=' .. m_simpleTV.User.YT.apiKey
 		t0.method = 'get'
-		t0.headers = m_simpleTV.User.YT.apiKeyHeader
 		local params = {}
 		params.Message = '⇩ ' .. m_simpleTV.User.YT.Lng.loading
 		params.Callback = AsynPlsCallb_PlstApi_YT
@@ -3059,7 +3065,7 @@ local infoInFile = false
 		params.ProgressColor = ARGB(128, 255, 0, 0)
 		params.User = {}
 		params.User.tab = {}
-		params.delayedShow = 3000
+		params.delayedShow = 2000
 		params.User.Title = ''
 		params.User.First = true
 		params.User.setTitle = true
@@ -3312,6 +3318,7 @@ local infoInFile = false
 				m_simpleTV.Control.Restart(-2.0, true)
 			 return
 			end
+			if not getApiKey() then return end
 		local url = inAdr
 		if url:match('/live$') or url:match('/embed/live_stream') then
 			local rc, answer = m_simpleTV.Http.Request(session, {url = url})
@@ -3428,14 +3435,10 @@ local infoInFile = false
 		local tab0, i = {}, 1
 		local j = 1 + tonumber(num)
 		if chId and isPlstCh then
-			if not m_simpleTV.User.YT.apiKey then
-				GetApiKey()
-			end
-			if m_simpleTV.User.YT.apiKey then
 					local function PlstTotalResults()
 						local plstId = string.format('UU%s', chId:sub(3))
 						local url = string.format('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&fields=pageInfo&playlistId=%s&key=%s', plstId, m_simpleTV.User.YT.apiKey)
-						local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = m_simpleTV.User.YT.apiKeyHeader})
+						local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 							if rc ~= 200 then return end
 						local plstTotalResults = tonumber(answer:match('"totalResults": (%d+)') or '0')
 							if plstTotalResults > 0 then
@@ -3458,12 +3461,11 @@ local infoInFile = false
 							end
 					 return
 					end
-				local plstTotalResults = PlstTotalResults()
-				if plstTotalResults then
-					tab0 = plstTotalResults
-					i = 2
-					m_simpleTV.User.YT.upLoadOnCh = true
-				end
+			local plstTotalResults = PlstTotalResults()
+			if plstTotalResults then
+				tab0 = plstTotalResults
+				i = 2
+				m_simpleTV.User.YT.upLoadOnCh = true
 			end
 		end
 		if m_simpleTV.User.YT.upLoadOnCh and j > 1 then
@@ -3912,7 +3914,6 @@ local infoInFile = false
 			end
 		ret.request = {}
 		ret.request.url = string.format('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&fields=nextPageToken,items(snippet/title,snippet/resourceId/videoId,snippet/description)&playlistId=%s&key=%s&pageToken=%s', params.User.plstId, m_simpleTV.User.YT.apiKey, nextPageToken)
-		ret.request.headers = m_simpleTV.User.YT.apiKeyHeader
 		ret.Count = #params.User.tab
 		ret.Progress = ret.Count / params.User.plstTotalResults
 	 return ret
@@ -4215,6 +4216,7 @@ local infoInFile = false
 	 return
 	end
 	if inAdr:match('^%-') then
+			if not getApiKey() then return end
 		if m_simpleTV.Control.MainMode == 0 then
 			if not inAdr:match('^%-related=') then
 				m_simpleTV.Control.ChangeChannelLogo('https://s.ytimg.com/yts/img/reporthistory/land-img-vfl_eF5BA.png', m_simpleTV.Control.ChannelID)
