@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (24/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (25/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1571,7 +1571,7 @@ local infoInFile = false
 					languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].languageCode
 					kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].kind
 						if languageCode
-							and (not kind or kind ~= 'asr')
+							-- and (not kind or kind ~= 'asr')
 							and languageCode == subt[r]
 						then
 							subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].baseUrl .. '&fmt=vtt'
@@ -1581,10 +1581,11 @@ local infoInFile = false
 				end
 				r = r + 1
 			end
-		local subtAdr_base = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[1].baseUrl .. '&fmt=vtt'
+		local defaultCaptionTrackIndex = tab.captions.playerCaptionsTracklistRenderer.audioTracks[1].defaultCaptionTrackIndex or 0
+		local subtAdr_base = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[defaultCaptionTrackIndex + 1].baseUrl .. '&fmt=vtt'
 			if subtAdr then
 					if subtAdr == subtAdr_base then
-					 return subtAdr, ''
+					 return subtAdr_base, ''
 					end
 				m_simpleTV.User.YT.subTrackId = 2
 			 return subtAdr_base .. subtAdr, ''
@@ -1592,7 +1593,7 @@ local infoInFile = false
 			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
 				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
 			then
-			 return
+			 return subtAdr_base, ''
 			end
 		r = 1
 		local lngCodeTr
@@ -1637,7 +1638,7 @@ local infoInFile = false
 				languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].languageCode
 				kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].kind
 					if languageCode
-						and (not kind or kind ~= 'asr')
+						-- and (not kind or kind ~= 'asr')
 						and languageCode ~= 'na'
 					then
 						subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl .. '&tlang=' .. lngCodeTr .. '&fmt=vtt'
@@ -1645,7 +1646,9 @@ local infoInFile = false
 					end
 				r = r + 1
 			end
-			if not subtAdr then return end
+			if not subtAdr then
+			 return subtAdr_base, ''
+			end
 		m_simpleTV.User.YT.subTrackId = 2
 	 return subtAdr_base .. subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
