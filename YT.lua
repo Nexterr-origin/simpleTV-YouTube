@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (24/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1581,8 +1581,13 @@ local infoInFile = false
 				end
 				r = r + 1
 			end
+		local subtAdr_base = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[1].baseUrl .. '&fmt=vtt'
 			if subtAdr then
-			 return subtAdr, ''
+					if subtAdr == subtAdr_base then
+					 return subtAdr, ''
+					end
+				m_simpleTV.User.YT.subTrackId = 2
+			 return subtAdr_base .. subtAdr, ''
 			end
 			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
 				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
@@ -1641,7 +1646,8 @@ local infoInFile = false
 				r = r + 1
 			end
 			if not subtAdr then return end
-	 return subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
+		m_simpleTV.User.YT.subTrackId = 2
+	 return subtAdr_base .. subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
 	local function positionToContinue(p)
 		if m_simpleTV.User.YT.duration then
@@ -1654,6 +1660,9 @@ local infoInFile = false
 	 return p
 	end
 	local function Stream_Start(adrStart)
+			if not m_simpleTV.User.YT.duration then
+			 return ''
+			end
 		local h = adrStart:match('(%d+)h') or 0
 		local m = adrStart:match('(%d+)m') or 0
 		local s = adrStart:match('(%d+)s') or 0
@@ -1664,6 +1673,9 @@ local infoInFile = false
 		else
 			adrStart = d
 		end
+			if m_simpleTV.User.YT.duration - 5 < adrStart then
+			 return ''
+			end
 	 return '$OPT:start-time=' .. adrStart
 	end
 	local function Stream_Error(tab, title)
@@ -2090,16 +2102,16 @@ local infoInFile = false
 			url = DeCipherSign(url)
 			extOpt = '$OPT:demux=avformat$OPT:NO-STIMESHIFT' .. extOpt
 			if t[index].isAdaptive == true then
-				extOpt = '$OPT:sub-track-id=1' .. extOpt
+				extOpt = '$OPT:sub-track-id=' .. (m_simpleTV.User.YT.subTrackId or 1) .. extOpt
 			elseif t[index].isAdaptive == false then
 				extOpt = '$OPT:sub-track-id=2' .. extOpt
 			end
+			url = url:gsub('#https', '#http')
 			local adrStart = inAdr:match('[?&]t=[^&]+')
 			if adrStart and videoId == m_simpleTV.User.YT.vId then
 				extOpt = Stream_Start(adrStart) .. extOpt
 			end
 			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
-			url = url:gsub('#https', '#http')
 		else
 			if m_simpleTV.User.YT.vlc228 then
 				extOpt = '$OPT:no-ts-trust-pcr' .. extOpt
@@ -2158,6 +2170,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
+		m_simpleTV.User.YT.subTrackId = nil
 		if not m_simpleTV.User.YT.checkJsPlayer
 			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		then
