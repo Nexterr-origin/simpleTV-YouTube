@@ -1571,7 +1571,7 @@ local infoInFile = false
 					languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].languageCode
 					kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].kind
 						if languageCode
-							-- and (not kind or kind ~= 'asr')
+							and (not kind or kind ~= 'asr')
 							and languageCode == subt[r]
 						then
 							subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].baseUrl .. '&fmt=vtt'
@@ -1582,18 +1582,18 @@ local infoInFile = false
 				r = r + 1
 			end
 		local defaultCaptionTrackIndex = tab.captions.playerCaptionsTracklistRenderer.audioTracks[1].defaultCaptionTrackIndex or 0
-		local subtAdr_base = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[defaultCaptionTrackIndex + 1].baseUrl .. '&fmt=vtt'
+		local subtAdr_def = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[defaultCaptionTrackIndex + 1].baseUrl .. '&fmt=vtt'
 			if subtAdr then
-					if subtAdr == subtAdr_base then
-					 return subtAdr_base, ''
+					if subtAdr == subtAdr_def then
+					 return subtAdr_def, ''
 					end
 				m_simpleTV.User.YT.subTrackId = 2
-			 return subtAdr_base .. subtAdr, ''
+			 return subtAdr_def .. subtAdr, ''
 			end
 			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
 				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
 			then
-			 return subtAdr_base, ''
+			 return subtAdr_def, ''
 			end
 		r = 1
 		local lngCodeTr
@@ -1638,7 +1638,7 @@ local infoInFile = false
 				languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].languageCode
 				kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].kind
 					if languageCode
-						-- and (not kind or kind ~= 'asr')
+						and (not kind or kind ~= 'asr')
 						and languageCode ~= 'na'
 					then
 						subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl .. '&tlang=' .. lngCodeTr .. '&fmt=vtt'
@@ -1647,10 +1647,10 @@ local infoInFile = false
 				r = r + 1
 			end
 			if not subtAdr then
-			 return subtAdr_base, ''
+			 return subtAdr_def, ''
 			end
 		m_simpleTV.User.YT.subTrackId = 2
-	 return subtAdr_base .. subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
+	 return subtAdr_def .. subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
 	local function positionToContinue(p)
 		if m_simpleTV.User.YT.duration then
