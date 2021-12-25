@@ -1581,19 +1581,13 @@ local infoInFile = false
 				end
 				r = r + 1
 			end
-		local defaultCaptionTrackIndex = tab.captions.playerCaptionsTracklistRenderer.audioTracks[1].defaultCaptionTrackIndex or 0
-		local subtAdr_def = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[defaultCaptionTrackIndex + 1].baseUrl .. '&fmt=vtt'
 			if subtAdr then
-					if subtAdr == subtAdr_def then
-					 return subtAdr_def, ''
-					end
-				m_simpleTV.User.YT.subTrackId = 2
-			 return subtAdr_def .. subtAdr, ''
+			 return subtAdr, ''
 			end
 			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
 				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
 			then
-			 return subtAdr_def, ''
+			 return
 			end
 		r = 1
 		local lngCodeTr
@@ -1646,11 +1640,8 @@ local infoInFile = false
 					end
 				r = r + 1
 			end
-			if not subtAdr then
-			 return subtAdr_def, ''
-			end
-		m_simpleTV.User.YT.subTrackId = 2
-	 return subtAdr_def .. subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
+			if not subtAdr then return end
+	 return subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
 	local function positionToContinue(p)
 		if m_simpleTV.User.YT.duration then
@@ -2105,7 +2096,7 @@ local infoInFile = false
 			url = DeCipherSign(url)
 			extOpt = '$OPT:demux=avformat$OPT:NO-STIMESHIFT' .. extOpt
 			if t[index].isAdaptive == true then
-				extOpt = '$OPT:sub-track-id=' .. (m_simpleTV.User.YT.subTrackId or 1) .. extOpt
+				extOpt = '$OPT:sub-track-id=1' .. extOpt
 			elseif t[index].isAdaptive == false then
 				extOpt = '$OPT:sub-track-id=2' .. extOpt
 			end
@@ -2173,7 +2164,6 @@ local infoInFile = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-		m_simpleTV.User.YT.subTrackId = nil
 		if not m_simpleTV.User.YT.checkJsPlayer
 			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		then
