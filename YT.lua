@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (25/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (27/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -2002,11 +2002,7 @@ local infoInFile = false
 	 return adr
 	end
 	local function Stream_Live(hls, title)
-		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_live then return end
-		m_simpleTV.Http.SetTimeout(session_live, 14000)
-		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
-		m_simpleTV.Http.Close(session_live)
+		local rc, answer = m_simpleTV.Http.Request(session, {url = hls})
 			if rc ~= 200 then
 			 return nil, 'GetStreamsTab live Error 1'
 			end
@@ -2134,19 +2130,14 @@ local infoInFile = false
 	 return t
 	end
 	local function GetVideoInfo(clientScreen)
-		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not session_videoInfo then return end
-		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
 		clientScreen = clientScreen or 'WATCH'
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
-		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. visitorData
+		local headers = string.format('%sContent-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: %s\nCookie: %s', GetHeader_Auth(), visitorData, m_simpleTV.User.YT.cookies)
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
-		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
-		m_simpleTV.Http.Close(session_videoInfo)
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url, method = 'post', body = body, headers = headers})
 	 return rc, answer
 	end
 	local function GetStreamsTab(vId)
@@ -2169,7 +2160,6 @@ local infoInFile = false
 		then
 			pcall(GetJsPlayer)
 		end
-		m_simpleTV.Http.Close(session)
 		if infoInFile then
 			inf0 = os.clock()
 		end
