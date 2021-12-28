@@ -3404,9 +3404,9 @@ local infoInFile = false
 			if channel_avatar then
 				channel_avatar = channel_avatar:gsub('^//', 'https://')
 			end
-			channel_banner = answer:match('"tvBanner":{"thumbnails":%[.-:480},{"url":"(.-)%-fcrop')
+			channel_banner = answer:match('"tvBanner":{"thumbnails":%[{"url":"([^=]+)')
 			if channel_banner then
-				channel_banner = channel_banner:gsub('^//', 'https://')
+				channel_banner = channel_banner:gsub('^//', 'https://') .. '=w1280'
 			end
 			m_simpleTV.User.YT.channel_banner = channel_banner
 			if not inAdr:match('&isRestart=true') then
