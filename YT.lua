@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (28/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1209,9 +1209,6 @@ local infoInFile = false
 	end
 	local function StopOnErr(n, msg)
 			if urlAdr:match('PARAMS=psevdotv') then return end
-		if session then
-			m_simpleTV.Http.Close(session)
-		end
 		m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.logoPicFromDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
 		if msg then
 			msg = '⚠️ ' .. msg
@@ -2090,7 +2087,7 @@ local infoInFile = false
 		if not m_simpleTV.User.YT.isLive and not m_simpleTV.User.YT.isLiveContent then
 			url = DeCipherThrottleParam(url)
 			url = DeCipherSign(url)
-			extOpt = '$OPT:demux=avformat$OPT:NO-STIMESHIFT' .. extOpt
+			extOpt = '$OPT:demux=avdemux$OPT:NO-STIMESHIFT' .. extOpt
 			if t[index].isAdaptive == true then
 				extOpt = '$OPT:sub-track-id=1' .. extOpt
 			elseif t[index].isAdaptive == false then
@@ -2217,8 +2214,7 @@ local infoInFile = false
 				local metadataList = tab.multicamera.playerLegacyMulticameraRenderer.metadataList
 				metadataList = m_simpleTV.Common.fromPercentEncoding(metadataList)
 					for vId in metadataList:gmatch('/vi/([^/]+)') do
-						t[#t + 1] = {}
-						t[#t] = vId
+						t[#t + 1] = vId
 					end
 					if #t == 0 then
 					 return nil, 'no list multicamers'
@@ -2504,7 +2500,7 @@ local infoInFile = false
 		if aAdr then
 			audioItag = tonumber(aAdr:match('itag=(%d+)') or 0)
 			if audioItag == 327 then
-				aAdr = aAdr .. '$OPT:demux=avformat,any'
+				aAdr = aAdr .. '$OPT:demux=avdemux,avformat,any'
 			end
 			aAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
@@ -2873,7 +2869,6 @@ local infoInFile = false
 				elseif (rc == 404 or rc == 403) and inAdr:match('&isRestart=true') then
 					inAdr = inAdr:gsub('[?&]list=[%w_%-]+', '')
 				end
-				m_simpleTV.Http.Close(session)
 				m_simpleTV.Control.ChangeAddress = 'No'
 				inAdr = inAdr .. '&isRestart=true'
 				if urlAdr:match('&isLogo=false') then
@@ -2895,7 +2890,6 @@ local infoInFile = false
 			end
 			if not m_simpleTV.User.YT.plstPos and videoId and inAdr:match('[?&]t=') then
 				inAdr = inAdr:gsub('[?&]list=[%w_%-]+', '')
-				m_simpleTV.Http.Close(session)
 				m_simpleTV.Control.ChangeAddress = 'No'
 				m_simpleTV.Control.CurrentAddress = inAdr .. '&isRestart=true'
 				dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
@@ -3328,7 +3322,6 @@ local infoInFile = false
 				liveId = answer:match('"watchEndpoint\\":{\\"videoId\\":\\"([^\\]+)')
 			end
 				if liveId then
-					m_simpleTV.Http.Close(session)
 					m_simpleTV.Control.ChangeAddress = 'No'
 					m_simpleTV.Control.CurrentAddress = 'https://www.youtube.com/watch?v=' .. liveId .. '&isRestart=true'
 					dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
@@ -3641,7 +3634,6 @@ local infoInFile = false
 		end
 			if not id then
 				m_simpleTV.Control.ExecuteAction(37)
-				m_simpleTV.Http.Close(session)
 			 return
 			end
 			if ret == 1 then
@@ -3812,7 +3804,6 @@ local infoInFile = false
 			title = title_no_iPanel(title, t[index].Name)
 			ShowMsg(title)
 		end
-		m_simpleTV.Http.Close(session)
 		m_simpleTV.Control.CurrentAddress = retAdr
 		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
 	end
@@ -4207,7 +4198,6 @@ local infoInFile = false
 				StopOnErr(0.8)
 			 return
 			end
-		m_simpleTV.Http.Close(session)
 		PlayAddressT_YT(inAdr)
 	 return
 	end
@@ -4221,7 +4211,6 @@ local infoInFile = false
 			end
 		end
 		local t, types, header = Search(inAdr)
-		m_simpleTV.Http.Close(session)
 			if not t or #t == 0 then
 				StopOnErr(5.1, m_simpleTV.User.YT.Lng.notFound)
 			 return
