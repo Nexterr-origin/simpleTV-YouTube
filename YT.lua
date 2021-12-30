@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (28/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (30/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1209,6 +1209,9 @@ local infoInFile = false
 	end
 	local function StopOnErr(n, msg)
 			if urlAdr:match('PARAMS=psevdotv') then return end
+		if session then
+			m_simpleTV.Http.Close(session)
+		end
 		m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.logoPicFromDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
 		if msg then
 			msg = '⚠️ ' .. msg
@@ -1999,7 +2002,11 @@ local infoInFile = false
 	 return adr
 	end
 	local function Stream_Live(hls, title)
-		local rc, answer = m_simpleTV.Http.Request(session, {url = hls})
+		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_live then return end
+		m_simpleTV.Http.SetTimeout(session_live, 14000)
+		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
+		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
 			 return nil, 'GetStreamsTab live Error 1'
 			end
@@ -2127,14 +2134,19 @@ local infoInFile = false
 	 return t
 	end
 	local function GetVideoInfo(clientScreen)
+		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not session_videoInfo then return end
+		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
 		clientScreen = clientScreen or 'WATCH'
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
-		local headers = string.format('%sContent-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: %s\nCookie: %s', GetHeader_Auth(), visitorData, m_simpleTV.User.YT.cookies)
+		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. visitorData
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player'
-		local rc, answer = m_simpleTV.Http.Request(session, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
 	end
 	local function GetStreamsTab(vId)
@@ -2157,6 +2169,7 @@ local infoInFile = false
 		then
 			pcall(GetJsPlayer)
 		end
+		m_simpleTV.Http.Close(session)
 		if infoInFile then
 			inf0 = os.clock()
 		end
@@ -2214,7 +2227,8 @@ local infoInFile = false
 				local metadataList = tab.multicamera.playerLegacyMulticameraRenderer.metadataList
 				metadataList = m_simpleTV.Common.fromPercentEncoding(metadataList)
 					for vId in metadataList:gmatch('/vi/([^/]+)') do
-						t[#t + 1] = vId
+						t[#t + 1] = {}
+						t[#t] = vId
 					end
 					if #t == 0 then
 					 return nil, 'no list multicamers'
@@ -2869,6 +2883,7 @@ local infoInFile = false
 				elseif (rc == 404 or rc == 403) and inAdr:match('&isRestart=true') then
 					inAdr = inAdr:gsub('[?&]list=[%w_%-]+', '')
 				end
+				m_simpleTV.Http.Close(session)
 				m_simpleTV.Control.ChangeAddress = 'No'
 				inAdr = inAdr .. '&isRestart=true'
 				if urlAdr:match('&isLogo=false') then
@@ -2890,6 +2905,7 @@ local infoInFile = false
 			end
 			if not m_simpleTV.User.YT.plstPos and videoId and inAdr:match('[?&]t=') then
 				inAdr = inAdr:gsub('[?&]list=[%w_%-]+', '')
+				m_simpleTV.Http.Close(session)
 				m_simpleTV.Control.ChangeAddress = 'No'
 				m_simpleTV.Control.CurrentAddress = inAdr .. '&isRestart=true'
 				dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
@@ -3322,6 +3338,7 @@ local infoInFile = false
 				liveId = answer:match('"watchEndpoint\\":{\\"videoId\\":\\"([^\\]+)')
 			end
 				if liveId then
+					m_simpleTV.Http.Close(session)
 					m_simpleTV.Control.ChangeAddress = 'No'
 					m_simpleTV.Control.CurrentAddress = 'https://www.youtube.com/watch?v=' .. liveId .. '&isRestart=true'
 					dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
@@ -3404,9 +3421,9 @@ local infoInFile = false
 			if channel_avatar then
 				channel_avatar = channel_avatar:gsub('^//', 'https://')
 			end
-			channel_banner = answer:match('"tvBanner":{"thumbnails":%[.-:480},{"url":"(.-)%-fcrop')
+ 			channel_banner = answer:match('"tvBanner":{"thumbnails":%[{"url":"([^=]+)')
 			if channel_banner then
-				channel_banner = channel_banner:gsub('^//', 'https://')
+ 				channel_banner = channel_banner:gsub('^//', 'https://') .. '=w1280'
 			end
 			m_simpleTV.User.YT.channel_banner = channel_banner
 			if not inAdr:match('&isRestart=true') then
@@ -3634,6 +3651,7 @@ local infoInFile = false
 		end
 			if not id then
 				m_simpleTV.Control.ExecuteAction(37)
+				m_simpleTV.Http.Close(session)
 			 return
 			end
 			if ret == 1 then
@@ -3804,6 +3822,7 @@ local infoInFile = false
 			title = title_no_iPanel(title, t[index].Name)
 			ShowMsg(title)
 		end
+		m_simpleTV.Http.Close(session)
 		m_simpleTV.Control.CurrentAddress = retAdr
 		debug_InfoInFile(infoInFile, retAdr, index, t, inf0_qlty, inf0, title, inf0_geo, throttle)
 	end
@@ -4198,6 +4217,7 @@ local infoInFile = false
 				StopOnErr(0.8)
 			 return
 			end
+		m_simpleTV.Http.Close(session)
 		PlayAddressT_YT(inAdr)
 	 return
 	end
@@ -4211,6 +4231,7 @@ local infoInFile = false
 			end
 		end
 		local t, types, header = Search(inAdr)
+		m_simpleTV.Http.Close(session)
 			if not t or #t == 0 then
 				StopOnErr(5.1, m_simpleTV.User.YT.Lng.notFound)
 			 return
