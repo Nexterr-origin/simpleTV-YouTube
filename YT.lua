@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (30/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (31/12/21)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2021 Nexterr
@@ -1667,7 +1667,7 @@ local infoInFile = false
 		else
 			adrStart = d
 		end
-			if m_simpleTV.User.YT.duration - 5 < adrStart then
+			if m_simpleTV.User.YT.duration - 5 < tonumber(adrStart) then
 			 return ''
 			end
 	 return '$OPT:start-time=' .. adrStart
