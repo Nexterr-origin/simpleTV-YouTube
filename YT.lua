@@ -1,7 +1,7 @@
--- видеоскрипт для сайта https://www.youtube.com (31/12/21)
+-- видеоскрипт для сайта https://www.youtube.com (1/1/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
-	Copyright © 2017-2021 Nexterr
+	Copyright © 2017-2022 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
@@ -383,6 +383,7 @@ local infoInFile = false
 	m_simpleTV.User.YT.Chapters = nil
 	local inf0, inf0_qlty, inf0_geo, throttle
 	local isIPanel = infoPanelCheck()
+	local isDescInfoAsWin = m_simpleTV.Config.GetValue('mainOsd/showEpgInfoAsWindow', 'simpleTVConfig')
 	local videoId = inAdr:match('[?&/]v[=/](.+)')
 				or inAdr:match('/embed/(.+)')
 				or inAdr:match('/watch/(.+)')
@@ -1043,7 +1044,11 @@ local infoInFile = false
 		if m_simpleTV.User.YT.isVideo == true and m_simpleTV.User.YT.Chapters then
 			link = string.format('%s<br><a href="simpleTVLua:m_simpleTV.Control.ExecuteAction(37) m_simpleTV.Control.ExecuteAction(116)" style="color:#436FAF; font-size: small; text-decoration:none">🕜 %s</a>', link, m_simpleTV.User.YT.Lng.chapter)
 		end
-		desc = string.format('<html><body bgcolor="#181818"><table width="99%%"><tr><td style="padding: 10px 10px 10px;"><a href="%s"><img src="%s" height="100" </a></td><td style="padding: 10px 10px 10px; color:#ebebeb; vertical-align:middle;"><h4><font color="#ebeb00">%s</h4><hr>%s%s</td></tr></table></body></html>', adr, logo, name, link, desc)
+		if isDescInfoAsWin then
+			desc = string.format('<html><body><table width="99%%"><tr><td style="padding: 10px 10px 10px;"><a href="%s"><img src="%s" height="100" </a></td><td style="padding: 10px 10px 10px; color:#ebebeb; vertical-align:middle;"><h4><font color="#ebeb00">%s</h4></td></tr></table><hr>%s%s</body></html>', adr, logo, name, link, desc)
+		else
+			desc = string.format('<html><body bgcolor="#181818"><table width="99%%"><tr><td style="padding: 10px 10px 10px;"><a href="%s"><img src="%s" height="100" </a></td><td style="padding: 10px 10px 10px; color:#ebebeb; vertical-align:middle;"><h4><font color="#ebeb00">%s</h4><hr>%s%s</td></tr></table></body></html>', adr, logo, name, link, desc)
+		end
 	 return desc
 	end
 	local function ShowInfo(info, bcolor, txtparm, color)
