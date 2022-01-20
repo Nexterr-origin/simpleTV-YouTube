@@ -1537,17 +1537,13 @@ local infoInFile = false
 			throttleFunc = throttleFunc:gsub('\n', '')
 			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
-		local descrambler = answer:match('[=%(,&|](...?)%(decodeURIComponent%(.%.s%)%)')
-			if not descrambler then return end
-		local rules = answer:match(descrambler .. '=function%([^)]*%){(.-)};')
-			if not rules then return end
-		local helper = rules:match(';(..)%...%(')
-			if not helper then return end
-		local transformations = answer:match('[ ,]' .. helper .. '={(.-)};')
+		local rules, helper = answer:match('=%a%.split%(""%);(([%$%w]+)%p%S+)')
+			if not rules or not helper then return end
+		local transformations = answer:match(helper .. '={.-};')
 			if not transformations then return end
 		local signScr = {}
 			for param in rules:gmatch(helper .. '[^)]+') do
-				local func, p = param:match('([^%p(]+)%(a,(%d+)')
+				local func, p = param:match('([^%p(]+)%(%a,(%d+)')
 				func = transformations:match(func .. ':function([^}]+)')
 				if func:match('reverse') then
 					p = 0
