@@ -1532,18 +1532,13 @@ local infoInFile = false
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
-		if throttleFunc then
-			throttleFunc = throttleFunc:gsub('\n', '')
-			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
-		end
-		local rules, helper = answer:match('=%a%.split%(""%);(([%$%w]+)%p%S+)')
+		local rules, helper = answer:match('=%a%.split%(""%);(([^%.]+)%.%w+%(%S+)')
 			if not rules or not helper then return end
-		local transformations = answer:match(helper .. '={.-};')
+		local transformations = answer:match('[; ]' .. helper .. '={.-};')
 			if not transformations then return end
 		local signScr = {}
 			for param in rules:gmatch(helper .. '[^)]+') do
-				local func, p = param:match('([^%p(]+)%(%a,(%d+)')
+				local func, p = param:match('([^%.]+)%(%a,(%d+)')
 				func = transformations:match(func .. ':function([^}]+)')
 				if func:match('reverse') then
 					p = 0
@@ -1554,6 +1549,11 @@ local infoInFile = false
 			end
 		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		m_simpleTV.User.YT.signScr = signScr
+		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
+		if throttleFunc then
+			throttleFunc = throttleFunc:gsub('\n', '')
+			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
+		end
 	end
 	local function Subtitle(tab)
 		local subt = {}
