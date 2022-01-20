@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/1/22)
+-- видеоскрипт для сайта https://www.youtube.com (20/1/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1537,14 +1537,18 @@ local infoInFile = false
 			throttleFunc = throttleFunc:gsub('\n', '')
 			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
-		local f, var = answer:match('=%a%.split%(""%);((%a%w)%p%S+)')
-			if not f or not var then return end
-		f = f:gsub('%]', '')
-		local alg = answer:match(var .. '={.-};')
+		local descrambler = answer:match('[=%(,&|](...?)%(decodeURIComponent%(.%.s%)%)')
+			if not descrambler then return end
+		local rules = answer:match(descrambler .. '=function%([^)]*%){(.-)};')
+			if not rules then return end
+		local helper = rules:match(';(..)%...%(')
+			if not helper then return end
+		local transformations = answer:match('[ ,]' .. helper .. '={(.-)};')
+			if not transformations then return end
 		local signScr = {}
-			for param in f:gmatch(var .. '%p([^)]+)') do
-				local func, p = param:match('([^(]+)%(a,(%d+)')
-				func = alg:match('[%p%s]' .. func .. ':function([^}]+)')
+			for param in rules:gmatch(helper .. '[^)]+') do
+				local func, p = param:match('([^%p(]+)%(a,(%d+)')
+				func = transformations:match(func .. ':function([^}]+)')
 				if func:match('reverse') then
 					p = 0
 				elseif func:match('splice') then
