@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/1/22)
+-- видеоскрипт для сайта https://www.youtube.com (27/1/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1532,6 +1532,12 @@ local infoInFile = false
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
+		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
+		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
+		if throttleFunc then
+			throttleFunc = throttleFunc:gsub('\n', '')
+			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
+		end
 		local rules, helper = answer:match('=%a%.split%(""%);(([^%.]+)%.%w+%(%S+)')
 			if not rules or not helper then return end
 		local transformations = answer:match('[; ]' .. helper .. '={.-};')
@@ -1547,13 +1553,7 @@ local infoInFile = false
 				end
 				signScr[#signScr + 1] = tonumber(p)
 			end
-		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		m_simpleTV.User.YT.signScr = signScr
-		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
-		if throttleFunc then
-			throttleFunc = throttleFunc:gsub('\n', '')
-			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
-		end
 	end
 	local function Subtitle(tab)
 		local subt = {}
