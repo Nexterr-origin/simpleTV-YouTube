@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (31/1/22)
+-- видеоскрипт для сайта https://www.youtube.com (32/1/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1521,14 +1521,16 @@ local infoInFile = false
 			if not sessionJsPlayer then return end
 		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 20000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
+		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
 			if rc ~= 200 then
 				m_simpleTV.Http.Close(sessionJsPlayer)
 			 return
 			end
 		url = answer:match('[^"\']+base%.js')
-			if not url
-				or tostring(m_simpleTV.User.YT.verJsPlayer) == url
+			if not url then return end
+			if m_simpleTV.User.YT.signScr
+				and tostring(m_simpleTV.User.YT.verJsPlayer) == url
 			then
 				m_simpleTV.Http.Close(sessionJsPlayer)
 			 return
@@ -1539,12 +1541,12 @@ local infoInFile = false
 		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
 		m_simpleTV.Http.Close(sessionJsPlayer)
 			if rc ~= 200 then return end
-		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
 		if throttleFunc then
 			throttleFunc = throttleFunc:gsub('\n', '')
 			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
+		local signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		local rules, helper = answer:match('=%a%.split%(""%);(([^%.]+)%.%w+%(%S+)')
 			if not rules or not helper then return end
 		local transformations = answer:match('[; ]' .. helper .. '={.-};')
@@ -1560,7 +1562,10 @@ local infoInFile = false
 				end
 				signScr[#signScr + 1] = tonumber(p)
 			end
-		m_simpleTV.User.YT.signScr = signScr
+		if #signScr > 0 and signTs then
+			m_simpleTV.User.YT.signTs = signTs
+			m_simpleTV.User.YT.signScr = signScr
+		end
 	end
 	local function Subtitle(tab)
 		local subt = {}
@@ -2001,10 +2006,7 @@ local infoInFile = false
 	local function DeCipherSign(adr)
 			for cipherSign in adr:gmatch('[?&]s=([^&]+)') do
 				local signScr = m_simpleTV.User.YT.signScr
-				local signTs = m_simpleTV.User.YT.signTs
-					if not signTs
-						or not signScr
-					then
+					if not signScr then
 						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
 					 return 'vlc://pause:5'
 					end
@@ -2176,7 +2178,8 @@ local infoInFile = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-		if not m_simpleTV.User.YT.checkJsPlayer
+		if not m_simpleTV.User.YT.signScr
+			or not m_simpleTV.User.YT.checkJsPlayer
 			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		then
 			pcall(GetJsPlayer)
