@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/1/22)
+-- видеоскрипт для сайта https://www.youtube.com (30/1/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -55,9 +55,9 @@ local infoInFile = false
 		if ver < 940 then
 			local msg
 			if m_simpleTV.Interface.GetLanguage() == 'ru' then
-				msg = 'Ваша версия simpleTV устарела'
+				msg = 'Этв версия simpleTV устаревшая, обновите'
 			else
-				msg = 'Your version of simpleTV is out of date'
+				msg = 'This versions of simpleTV is out of dates, need update'
 			end
 			local cpt = 'YouTube'
 			if ver < 870 then
