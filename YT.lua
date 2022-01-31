@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (32/1/22)
+-- видеоскрипт для сайта https://www.youtube.com (33/1/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1536,6 +1536,7 @@ local infoInFile = false
 			 return
 			end
 		m_simpleTV.User.YT.verJsPlayer = url
+		m_simpleTV.User.YT.signScr = false
 		m_simpleTV.User.YT.visitorData = answer:match('visitorData":"([^"]+)')
 		url = 'https://www.youtube.com' .. url
 		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
