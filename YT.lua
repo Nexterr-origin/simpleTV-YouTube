@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (2/2/22)
+-- видеоскрипт для сайта https://www.youtube.com (3/2/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -206,31 +206,20 @@ local infoInFile = false
 		local fhandle = io.open(f, 'r')
 			if not fhandle then return end
 		local t = {}
-			for line in fhandle:lines() do
-				local timestamp, name, val = line:match('%.youtube%.com.-(%d+)%s+(%S+)%s+(%S+)')
-				if name and not name:match('__Secure') and val and timestamp then
-					t[#t + 1] = {}
-					t[#t].name = name
-					t[#t].val = val
-					t[#t].timestamp = tonumber(timestamp)
-				end
-			end
-		fhandle:close()
-		table.sort(t, function(a, b) return a.timestamp > b.timestamp end)
-		local hash, noDuplicate = {}, {}
 		local cookie_SAPISID
-			for i = 1, #t do
-				if not hash[t[i].name] then
-					noDuplicate[#noDuplicate + 1] = t[i].name .. '=' .. t[i].val
-					hash[t[i].name] = true
-					if not cookie_SAPISID and t[i].name == 'SAPISID' then
-						cookie_SAPISID = t[i].val
+			for line in fhandle:lines() do
+				local name, val = line:match('%.youtube%.com[^%d+]+%d+%s+(%S+)%s+(%S+)')
+				if name and not name:match('__Secure') and not name:match('ST%-') and val then
+					t[#t + 1] = string.format('%s=%s', name, val)
+					if not cookie_SAPISID and name == 'SAPISID' then
+						cookie_SAPISID = val
 					end
 				end
 			end
-			if #noDuplicate < 7 or not cookie_SAPISID then return end
+		fhandle:close()
+			if #t < 7 or not cookie_SAPISID then return end
 		m_simpleTV.User.YT.isAuth = cookie_SAPISID
-	 return table.concat(noDuplicate, ';')
+	 return table.concat(t, ';')
 	end
 	if inAdr:match('https?://')
 		and not inAdr:match('&is%a+=%a+')
@@ -352,8 +341,11 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.cookies then
 		local cookies = cookiesFromFile() or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
+		if not cookies:match('CONSENT=') then
+			cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
+		end
 		cookies = cookies:gsub('&amp;', '&')
-		m_simpleTV.User.YT.cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
+		m_simpleTV.User.YT.cookies = cookies
 		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&;]+)') or m_simpleTV.User.YT.Lng.lang
 		m_simpleTV.User.YT.Lng.country = cookies:match('gl=([^&;]+)') or m_simpleTV.User.YT.Lng.country
 	end
@@ -375,10 +367,10 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:96.0) Gecko/20100101 Firefox/96.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:97.0) Gecko/20100101 Firefox/97.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
-	m_simpleTV.Http.SetTimeout(session, 18000)
+	m_simpleTV.Http.SetTimeout(session, 16000)
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.Chapters = nil
 	local inf0, inf0_qlty, inf0_geo, throttle
@@ -1539,7 +1531,7 @@ local infoInFile = false
 			throttleFunc = throttleFunc:gsub('\n', '')
 			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
-		local signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
+		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		local rules, helper = answer:match('=%a%.split%(""%);(([^%.]+)%.%w+%(%S+)')
 			if not rules or not helper then return end
 		local transformations = answer:match('[; ]' .. helper .. '={.-};')
@@ -1555,8 +1547,7 @@ local infoInFile = false
 				end
 				signScr[#signScr + 1] = tonumber(p)
 			end
-		if #signScr > 0 and signTs then
-			m_simpleTV.User.YT.signTs = signTs
+		if #signScr > 0 then
 			m_simpleTV.User.YT.signScr = signScr
 		end
 	end
@@ -2172,7 +2163,6 @@ local infoInFile = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
 		if not m_simpleTV.User.YT.signScr
-			or not m_simpleTV.User.YT.checkJsPlayer
 			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		then
 			pcall(GetJsPlayer)
