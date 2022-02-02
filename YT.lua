@@ -367,10 +367,10 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:97.0) Gecko/20100101 Firefox/97.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
-	m_simpleTV.Http.SetTimeout(session, 16000)
+	m_simpleTV.Http.SetTimeout(session, 14000)
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.Chapters = nil
 	local inf0, inf0_qlty, inf0_geo, throttle
@@ -1368,7 +1368,7 @@ local infoInFile = false
 	local function GetUrlWatchVideos(url)
 		local session_watchVideos = m_simpleTV.Http.New(userAgent, proxy, true)
 			if not session_watchVideos then return end
-		m_simpleTV.Http.SetTimeout(session_watchVideos, 14000)
+		m_simpleTV.Http.SetTimeout(session_watchVideos, 8000)
 		m_simpleTV.Http.SetRedirectAllow(session_watchVideos, false)
 		m_simpleTV.Http.SetCookies(session_watchVideos, url, m_simpleTV.User.YT.cookies, '')
 		m_simpleTV.Http.Request(session_watchVideos, {url = url})
@@ -1494,7 +1494,7 @@ local infoInFile = false
 		if m_simpleTV.User.YT.videostats and not inAdr:match('&isPlst=history') then
 			local session_markWatch = m_simpleTV.Http.New(userAgent, proxy, false)
 				if not session_markWatch then return end
-			m_simpleTV.Http.SetTimeout(session_markWatch, 14000)
+			m_simpleTV.Http.SetTimeout(session_markWatch, 8000)
 			local alphabet = split_str('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_')
 			local t = {}
 			local len = #alphabet
@@ -2002,7 +2002,7 @@ local infoInFile = false
 	local function Stream_Live(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
-		m_simpleTV.Http.SetTimeout(session_live, 14000)
+		m_simpleTV.Http.SetTimeout(session_live, 8000)
 		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
 		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
@@ -2134,7 +2134,7 @@ local infoInFile = false
 	local function GetVideoInfo(clientScreen)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_videoInfo then return end
-		m_simpleTV.Http.SetTimeout(session_videoInfo, 14000)
+		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		clientScreen = clientScreen or 'WATCH'
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
