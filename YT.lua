@@ -1361,7 +1361,7 @@ local infoInFile = false
 			local ostime = os.time()
 			local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.isAuth, origin)
 			local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
-			m_simpleTV.User.YT.headerAuth = string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0\nX-Origin:%s\n', ostime, hash, origin)
+			m_simpleTV.User.YT.headerAuth = string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0\nX-Origin: %s\n', ostime, hash, origin)
 		end
 	 return m_simpleTV.User.YT.headerAuth or ''
 	end
@@ -1989,12 +1989,7 @@ local infoInFile = false
 	end
 	local function DeCipherSign(adr)
 			for cipherSign in adr:gmatch('[?&]s=([^&]+)') do
-				local signScr = m_simpleTV.User.YT.signScr
-					if not signScr then
-						ShowInfo('error DeCipherSign', ARGB(255, 153, 0, 0), nil, nil, 0x0102)
-					 return 'vlc://pause:5'
-					end
-				local signature = sign_decode(cipherSign, signScr)
+				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
 				adr = adr:gsub('([?&])s=[^&]+', '%1sig=' .. signature, 1)
 			end
 	 return adr
@@ -2139,9 +2134,9 @@ local infoInFile = false
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
-		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Api-Key: AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8\nX-Goog-Visitor-Id: ' .. visitorData
+		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData .. '\nOrigin: https://www.youtube.com\nAlt-Used: www.youtube.com\nConnection: keep-alive\nSec-Fetch-Dest: empty\nSec-Fetch-Mode: same-origin\nSec-Fetch-Site: same-origin\nReferer: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
-		local url = 'https://www.youtube.com/youtubei/v1/player'
+		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
@@ -2326,7 +2321,7 @@ local infoInFile = false
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.camera
 		end
 		local t, i = {}, 1
-		local audioTracks
+		local audioTracks, signatureCipher
 		if tab.storyboards
 			and tab.storyboards.playerStoryboardSpecRenderer
 			and tab.storyboards.playerStoryboardSpecRenderer.spec
@@ -2350,6 +2345,9 @@ local infoInFile = false
 						t[i].isAdaptive = false
 						t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
 						t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
+						if not signatureCipher and tab.streamingData.formats[k].signatureCipher then
+							signatureCipher = true
+						end
 						k = k + 1
 						i = k
 					end
@@ -2376,15 +2374,23 @@ local infoInFile = false
 							end
 							t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
 							t[i].Address = t[i].Address:gsub('^(.-)url=(.+)', '%2&%1')
+							if not signatureCipher and tab.streamingData.adaptiveFormats[k].signatureCipher then
+								signatureCipher = true
+							end
 							i = i + 1
 						end
 						k = k + 1
 					end
 			end
 		end
-			if #t == 0 then
+			if #t == 0
+				or (signatureCipher and not m_simpleTV.User.YT.signScr)
+			then
 					if urlAdr:match('PARAMS=psevdotv') then return end
 				isIPanel = false
+				if signatureCipher then
+					title = title .. '\nno parameters to decrypt'
+				end
 			 return Stream_Error(tab, title)
 			end
 		local qlty2D
