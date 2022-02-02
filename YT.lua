@@ -1509,22 +1509,35 @@ local infoInFile = false
 	end
 	local function GetJsPlayer()
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
+		local sessionJsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not sessionJsPlayer then return end
+		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 18000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
-			if rc ~= 200 then return end
-		url = answer:match('[^"\']+base%.js')
-			if not url
-				or (m_simpleTV.User.YT.signScr
-				and tostring(m_simpleTV.User.YT.verJsPlayer) == url)
-			then
+		local headers = 'Alt-Used: www.youtube.com\nConnection: keep-alive\nSec-Fetch-Dest: document\nSec-Fetch-Mode: navigate\nSec-Fetch-Site: none\nSec-Fetch-User: ?1\nCache-Control: max-age=0'
+		m_simpleTV.Http.SetCookies(sessionJsPlayer, url, m_simpleTV.User.YT.cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url, headers = headers})
+			if rc ~= 200 then
+				m_simpleTV.Http.Close(sessionJsPlayer)
 			 return
 			end
-		m_simpleTV.User.YT.verJsPlayer = url
+		local urlJs = answer:match('[^"\']+base%.js')
+			if not urlJs
+				or (m_simpleTV.User.YT.signScr
+				and tostring(m_simpleTV.User.YT.verJsPlayer) == urlJs)
+			then
+				m_simpleTV.Http.Close(sessionJsPlayer)
+			 return
+			end
+		m_simpleTV.User.YT.verJsPlayer = urlJs
 		m_simpleTV.User.YT.signScr = nil
 		m_simpleTV.User.YT.visitorData = answer:match('visitorData":"([^"]+)')
-		url = 'https://www.youtube.com' .. url
-		rc, answer = m_simpleTV.Http.Request(session, {url = url})
+		urlJs = 'https://www.youtube.com' .. urlJs
+		if infoInFile then
+			debug_in_file(urlJs .. '\n', m_simpleTV.Common.GetMainPath(2) .. 'YT_JsPlayer.txt', true)
+		end
+		headers = 'Sec-Fetch-Dest: script\nSec-Fetch-Mode: no-cors\nSec-Fetch-Site: same-origin\nSec-Fetch-Site: same-origin\nCache-Control: max-age=0\nAlt-Used: www.youtube.com\nConnection: keep-alive\nReferer: ' .. url
+		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = urlJs, headers = headers})
+		m_simpleTV.Http.Close(sessionJsPlayer)
 			if rc ~= 200 then return end
 		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
 		if throttleFunc then
