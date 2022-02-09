@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (5/2/22)
+-- видеоскрипт для сайта https://www.youtube.com (9/2/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1513,9 +1513,8 @@ local infoInFile = false
 			if not sessionJsPlayer then return end
 		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 18000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		local headers = 'Alt-Used: www.youtube.com\nConnection: keep-alive\nSec-Fetch-Dest: document\nSec-Fetch-Mode: navigate\nSec-Fetch-Site: none\nSec-Fetch-User: ?1\nTE: trailers'
 		m_simpleTV.Http.SetCookies(sessionJsPlayer, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url, headers = headers})
+		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
 			if rc ~= 200 then
 				m_simpleTV.Http.Close(sessionJsPlayer)
 			 return
@@ -1535,8 +1534,7 @@ local infoInFile = false
 		if infoInFile then
 			debug_in_file(urlJs .. '\n', m_simpleTV.Common.GetMainPath(2) .. 'YT_JsPlayer.txt', true)
 		end
-		headers = 'Sec-Fetch-Dest: script\nSec-Fetch-Mode: no-cors\nSec-Fetch-Site: same-origin\nTE: trailers\nAlt-Used: www.youtube.com\nConnection: keep-alive\nReferer: ' .. url
-		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = urlJs, headers = headers})
+		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = urlJs})
 		m_simpleTV.Http.Close(sessionJsPlayer)
 			if rc ~= 200 then return end
 		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
@@ -2147,8 +2145,8 @@ local infoInFile = false
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
-		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData .. '\nOrigin: https://www.youtube.com\nAlt-Used: www.youtube.com\nConnection: keep-alive\nSec-Fetch-Dest: empty\nSec-Fetch-Mode: same-origin\nSec-Fetch-Site: same-origin\nTE: trailers\nReferer: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
+		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion": "1.20220206.00.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
