@@ -2146,7 +2146,7 @@ local infoInFile = false
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"1","clientVersion":"1.00000101","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"WEB","clientVersion":"2.20220208.09.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
