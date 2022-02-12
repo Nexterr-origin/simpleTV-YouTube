@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (11/2/22)
+-- видеоскрипт для сайта https://www.youtube.com (12/2/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -2145,8 +2145,8 @@ local infoInFile = false
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com'
-		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"WEB","clientVersion":"1.20220208.09.00","clientScreen":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientScreen, thirdParty, signTs)
+		local headers = GetHeader_Auth() .. 'Accept: */*\nContent-Type: application/json\nOrigin: https://www.youtube.com\nReferer: https://www.youtube.com/'
+		local body = string.format('{"context":{"client":{"hl":"%s","gl":"%s","visitorData":"%s","clientName":"WEB","clientVersion":"1.20220211.01.00","clientScreen":"%s","mainAppWebInfo":{"graftUrl":"/watch?v=%s","webDisplayMode":"WEB_DISPLAY_MODE_BROWSER","isWebNativeShareAvailable":false}},"thirdParty":{"embedUrl":"%s"},"user":{"lockedSafetyMode":false},"request":{"useSsl":true,"internalExperimentFlags":[],"consistencyTokenJars":[]}},"videoId":"%s","playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, visitorData, clientScreen, m_simpleTV.User.YT.vId, thirdParty, m_simpleTV.User.YT.vId, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
