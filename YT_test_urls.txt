@@ -16,17 +16,14 @@ https://www.youtube.com/playlist?list=LL - понравившиеся
 https://www.youtube.com/playlist?list=LM - понравившиеся (музыка)
 https://www.youtube.com/playlist?list=WL - посмотреть позже
 https://www.youtube.com/watch?v=Cr381pDsSsA - age-gate: 18 + non-embed
-https://www.youtube.com/watch?v=0e9JgyzCIBc = RU country not set
-https://www.youtube.com/watch?v=t42-71RpRgI - age-gate: 18 + controversial
----------------------------------------------------
-age-gate bypass
+https://www.youtube.com/watch?v=0e9JgyzCIBc = RU country not need set
 https://youtu.be/1B__8N5d_LA
-https://www.youtube.com/watch?v=6LZM3_wp2ps
 https://www.youtube.com/watch?v=QWlNyzzwgcc
 https://youtube.com/watch?v=K9TRaGNnjEU$OPT:http-referrer=https://ctb.ru/ - use refer
----------------------------------------------------
-controversial video
 https://www.youtube.com/watch?v=SZJvDhaSDnc
+---------------------------------------------------
+age-gate bypass
+https://www.youtube.com/watch?v=6LZM3_wp2ps
 ---------------------------------------------------
 RSS feed:
 https://www.youtube.com/feeds/videos.xml?channel_id=UCba3hpU7EFBSk817y9qZkiA
