@@ -2328,6 +2328,14 @@ local infoInFile = false
 			then
 				m_simpleTV.User.YT.title = tab.videoDetails.title
 			end
+			if not m_simpleTV.User.YT.pic
+				and tab.videoDetails.thumbnail
+				and tab.videoDetails.thumbnail.thumbnails
+				and tab.videoDetails.thumbnail.thumbnails[1]
+				and tab.videoDetails.thumbnail.thumbnails[1].url
+			then
+				m_simpleTV.User.YT.pic = tab.videoDetails.thumbnail.thumbnails[#tab.videoDetails.thumbnail.thumbnails].url
+			end
 		end
 		local title = title_clean(m_simpleTV.User.YT.title)
 		if tab.multicamera and not isIPanel then
