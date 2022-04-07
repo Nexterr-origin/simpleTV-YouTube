@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/3/22)
+-- видеоскрипт для сайта https://www.youtube.com (3/4/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -2009,7 +2009,7 @@ local infoInFile = false
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
 		m_simpleTV.Http.SetTimeout(session_live, 8000)
-		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
+		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls, headers = 'Accept-Encoding: identity'})
 		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
 			 return nil, 'GetStreamsTab live Error 1'
