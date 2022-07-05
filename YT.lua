@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (3/4/22)
+-- видеоскрипт для сайта https://www.youtube.com (5/7/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -367,7 +367,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -2142,7 +2142,7 @@ local infoInFile = false
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		clientName = clientName or 'WEB'
-		clientVersion = clientVersion or '1.20220208.09.00'
+		clientVersion = clientVersion or '2.20220405'
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
