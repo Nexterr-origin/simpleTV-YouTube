@@ -27,7 +27,8 @@
 
 📌 **Авторизация**
 - файл формата **"Netscape HTTP Cookie File"** - _cookies.txt_ поместить в папку _`..\work`_, получить файл можно в расширении браузера Chrome - [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid/ "расширение Get cookies.txt")
-<!--- или Firefox - [cookies.txt](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt")--->
+или Firefox - [cookies.txt](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt")
+(актуален 1 мес.)
 
 📌 **Поиск из окна "Открыть URL" _Ctrl+N_**
 
@@ -38,7 +39,7 @@
 --- | канал
 -+ | трансляция
 
-📌 **Показвть плейлист / выбор качества: _Ctrl+M_**
+📌 **Показвть плейлист / выбор качества: _Ctrl+M_, или пункт в меню**
 <!---
 ---
 
