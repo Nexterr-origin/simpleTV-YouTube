@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/8/22)
+-- видеоскрипт для сайта https://www.youtube.com (16/8/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1539,7 +1539,6 @@ local infoInFile = false
 			if rc ~= 200 then return end
 		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
 		if throttleFunc then
-			throttleFunc = throttleFunc:gsub('\n', '')
 			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
 		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
