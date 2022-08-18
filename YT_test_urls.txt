@@ -17,6 +17,7 @@ https://www.youtube.com/playlist?list=LM - понравившиеся (музы�
 https://www.youtube.com/playlist?list=WL - посмотреть позже
 https://www.youtube.com/watch?v=Cr381pDsSsA - age-gate: 18 + non-embed
 https://www.youtube.com/watch?v=0e9JgyzCIBc = RU country not need set
+https://www.youtube.com/c/JohnnieWalkerARG - channel
 ---------------------------------------------------
 age-gate bypass
 https://youtu.be/1B__8N5d_LA
