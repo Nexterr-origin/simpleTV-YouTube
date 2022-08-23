@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (18/8/22)
+-- видеоскрипт для сайта https://www.youtube.com (23/8/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -367,7 +367,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:104.0) Gecko/20100101 Firefox/104.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -1511,7 +1511,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
 		local sessionJsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not sessionJsPlayer then return end
-		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 18000)
+		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 12000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
 		m_simpleTV.Http.SetCookies(sessionJsPlayer, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
@@ -1537,7 +1537,7 @@ local infoInFile = false
 		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = urlJs})
 		m_simpleTV.Http.Close(sessionJsPlayer)
 			if rc ~= 200 then return end
-		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-};')
+		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-join%(""%)};')
 		if throttleFunc then
 			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
