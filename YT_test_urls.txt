@@ -16,7 +16,7 @@ https://www.youtube.com/playlist?list=LL - понравившиеся
 https://www.youtube.com/playlist?list=LM - понравившиеся (музыка)
 https://www.youtube.com/playlist?list=WL - посмотреть позже
 https://www.youtube.com/watch?v=Cr381pDsSsA - age-gate: 18 + non-embed
-https://www.youtube.com/watch?v=0e9JgyzCIBc = недоступно в РФ
+https://www.youtube.com/watch?v=0e9JgyzCIBc = недоступно при выборе в настройках страны РФ
 https://www.youtube.com/c/JohnnieWalkerARG - channel
 ---------------------------------------------------
 age-gate bypass
@@ -35,7 +35,7 @@ https://www.youtube.com/hashtag/sayso
 в тренде
 https://www.youtube.com/feed/trending
 фильмы - предосмотр
-https://www.youtube.com/feed/storefront?bp=ogUCKAI%3D - недоступно в РФ
+https://www.youtube.com/feed/storefront?bp=ogUCKAI%3D - недоступно в РФ по Ip
 главы
 https://www.youtube.com/watch?v=EwHIH3jIwuM
 главная
@@ -59,7 +59,7 @@ https://youtube.com/watch?v=sJL6WA-aGkQ
 видео недоступно - заглушка
 https://www.youtube.com/watch?v=arlev2tjDtk
 платно - предосмотр
-https://www.youtube.com/watch?v=COWtsRUxFJo - недоступно в РФ
+https://www.youtube.com/watch?v=COWtsRUxFJo - недоступно в РФ по Ip
 встраиваемое видео
 https://www.youtube.com/embed/owsfdh4gxyc
 видео с указаным временем
