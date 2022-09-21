@@ -1527,7 +1527,7 @@ local infoInFile = false
 				m_simpleTV.Http.Close(sessionJsPlayer)
 			 return
 			end
-		m_simpleTV.User.YT.clientVersion = answer:match('"INNERTUBE_CLIENT_VERSION":"([^"]+)') or string.format('2.%s.00.00', tonumber(os.date('%Y%m%d')) - 2)
+		m_simpleTV.User.YT.clientVersion = answer:match('"INNERTUBE_CLIENT_VERSION":"([^"]+)')
 		m_simpleTV.User.YT.verJsPlayer = urlJs
 		m_simpleTV.User.YT.signScr = nil
 		m_simpleTV.User.YT.visitorData = answer:match('visitorData":"([^"]+)')
@@ -1966,7 +1966,7 @@ local infoInFile = false
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 8000)
 		clientName = clientName or 'WEB'
-		clientVersion = clientVersion or m_simpleTV.User.YT.clientVersion
+		clientVersion = clientVersion or m_simpleTV.User.YT.clientVersion or string.format('2.%s.00.00', tonumber(os.date('%Y%m%d')) - 2)
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
