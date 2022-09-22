@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (20/9/22)
+-- видеоскрипт для сайта https://www.youtube.com (22/9/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -367,7 +367,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:104.0) Gecko/20100101 Firefox/104.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -1759,8 +1759,8 @@ local infoInFile = false
 						258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 						327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
 						141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
-						140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
 						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
+						140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
 						}
 	 return video, audio
 	end
