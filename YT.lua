@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/9/22)
+-- видеоскрипт для сайта https://www.youtube.com (28/9/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1940,7 +1940,7 @@ local infoInFile = false
 				if m_simpleTV.User.YT.isLiveContent then
 					extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
 				else
-					extOpt = '$OPT:adaptive-minbuffer=30000$OPT:adaptive-livedelay=60000' .. extOpt
+					extOpt = '' .. extOpt
 				end
 			end
 		end
@@ -1962,8 +1962,8 @@ local infoInFile = false
 	end
 	local function ClientVersion()
 		local date = os.date('%Y%m%d')
-		date = tonumber(date) - 2
-	 return string.format('2.%s.00.00', date)
+		date = tonumber(date) - 1
+	 return string.format('2.%s.01.00', date)
 	end
 	local function GetVideoInfo(clientName, clientVersion)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
@@ -2047,6 +2047,11 @@ local infoInFile = false
 			if tab.streamingData
 				and tab.streamingData.licenseInfos
 			then
+				if not m_simpleTV.User.YT.drm then
+					m_simpleTV.User.YT.drm = true
+					GetStreamsTab(m_simpleTV.User.YT.vId)
+				end
+				m_simpleTV.User.YT.drm = nil
 			 return nil, 'DRM'
 			end
 			if tab.multicamera
