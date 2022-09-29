@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (28/9/22)
+-- видеоскрипт для сайта https://www.youtube.com (29/9/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -52,12 +52,12 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.VersionCheck then
 		local ver = m_simpleTV.Common.GetVersion()
-		if ver < 970 then
+		if ver < 1040 then
 			local msg
 			if m_simpleTV.Interface.GetLanguage() == 'ru' then
-				msg = 'Этв версия simpleTV устаревшая, обновите'
+				msg = 'Этв версия simpleTV устарела, обновите'
 			else
-				msg = 'This versions of simpleTV is out of dates, need update'
+				msg = 'This versions of simpleTV is out of date, need update'
 			end
 			local cpt = 'YouTube'
 			if ver < 870 then
@@ -69,9 +69,6 @@ local infoInFile = false
 		 return
 		end
 		m_simpleTV.User.YT.VersionCheck = true
-		if m_simpleTV.Common.GetVlcVersion() == 2280 then
-			m_simpleTV.User.YT.vlc228 = true
-		end
 	end
 	htmlEntities = require 'htmlEntities'
 	require 'lfs'
@@ -1652,7 +1649,7 @@ local infoInFile = false
 				r = r + 1
 			end
 			if not subtAdr then return end
-	 return subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
+	 return subtAdr:gsub('://', '/webvtt://'), ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
 	local function positionToContinue(p)
 		if m_simpleTV.User.YT.duration then
@@ -1859,13 +1856,11 @@ local infoInFile = false
 			if #t == 0 then
 			 return nil, 'GetStreamsTab live Error 2'
 			end
-		if not m_simpleTV.User.YT.vlc228 then
-			t[#t + 1] = {}
-			t[#t].Id = #t
-			t[#t].qltyLive = 10000
-			t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
-			t[#t].Address = hls
-		end
+		t[#t + 1] = {}
+		t[#t].Id = #t
+		t[#t].qltyLive = 10000
+		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
+		t[#t].Address = hls
 		if m_simpleTV.User.YT.isLive == true and not isIPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
 		end
@@ -1892,13 +1887,11 @@ local infoInFile = false
 					end
 				index = u
 			end
-		if not m_simpleTV.User.YT.vlc228 then
-			if index == 1
-				and m_simpleTV.User.YT.qlty > 100
-			then
-				if #t > 1 then
-					index = 2
-				end
+		if index == 1
+			and m_simpleTV.User.YT.qlty > 100
+		then
+			if #t > 1 then
+				index = 2
 			end
 		end
 	 return index or 1
@@ -1909,15 +1902,7 @@ local infoInFile = false
 			 return url
 			end
 		local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
-		local k = t[index].Name
-		if k then
-			k = k:match('%d+') or 600
-			if infoInFile then
-				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=Debug mode [%%H:%%M:%%S]$OPT:marq-position=10$OPT:marq-opacity=150$OPT:marq-color=16776960$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', 0.05 * k, 0.05 * k, 0.03 * k, extOpt)
-			else
-				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=YouTube$OPT:marq-position=9$OPT:marq-timeout=3500$OPT:marq-opacity=40$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', 0.025 * k, 0.03 * k, 0.03 * k, extOpt)
-			end
-		end
+		local marq_marquee
 		if not m_simpleTV.User.YT.isLive and not m_simpleTV.User.YT.isLiveContent then
 			url = DeCipherThrottleParam(url)
 			url = DeCipherSign(url)
@@ -1934,14 +1919,21 @@ local infoInFile = false
 			end
 			extOpt = '$OPT:http-ext-header=Cookie:' .. m_simpleTV.User.YT.cookies .. extOpt
 		else
-			if m_simpleTV.User.YT.vlc228 then
-				extOpt = '$OPT:no-ts-trust-pcr' .. extOpt
+			if m_simpleTV.User.YT.isLiveContent then
+				extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
 			else
-				if m_simpleTV.User.YT.isLiveContent then
-					extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
-				else
-					extOpt = '' .. extOpt
-				end
+				extOpt = '' .. extOpt
+				marq_marquee = 'YouTube Live'
+			end
+		end
+		marq_marquee = marq_marquee or 'YouTube'
+		local k = t[index].Name
+		if k then
+			k = k:match('%d+') or 600
+			if infoInFile then
+				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=Debug mode [%%H:%%M:%%S]$OPT:marq-position=10$OPT:marq-opacity=150$OPT:marq-color=16776960$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', 0.05 * k, 0.05 * k, 0.03 * k, extOpt)
+			else
+				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=%s$OPT:marq-position=9$OPT:marq-timeout=5500$OPT:marq-opacity=40$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', marq_marquee, 0.025 * k, 0.03 * k, 0.03 * k, extOpt)
 			end
 		end
 		if proxy ~= '' then
@@ -2206,9 +2198,7 @@ local infoInFile = false
 						i = k
 					end
 			end
-			if tab.streamingData.adaptiveFormats
-				and not m_simpleTV.User.YT.vlc228
-			then
+			if tab.streamingData.adaptiveFormats then
 				local k = 1
 					while tab.streamingData.adaptiveFormats[k] do
 						if tab.streamingData.adaptiveFormats[k].contentLength then
@@ -2269,16 +2259,6 @@ local infoInFile = false
 			and subtitle_config == 'true'
 		then
 			captions, captions_title = Subtitle(tab)
-			if captions then
-				local demux
-				if m_simpleTV.User.YT.vlc228 then
-					demux = 'subtitle'
-				else
-					demux = 'webvtt'
-				end
-				demux = string.format('/%s://', demux)
-				captions = captions:gsub('://', demux)
-			end
 		end
 			for _, v in pairs(t) do
 				local qualityLabel = v.qualityLabel
@@ -2381,9 +2361,7 @@ local infoInFile = false
 			aAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		if not m_simpleTV.User.YT.vlc228 then
-			t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = audioItag}
-		end
+		t[#t + 1] = {Name = aAdrName, qlty = audioId, Address = aAdr, aItag = audioItag}
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
 			for i = 1, #t do
 				t[i].Id = i
