@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/9/22)
+-- видеоскрипт для сайта https://www.youtube.com (1/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1954,8 +1954,8 @@ local infoInFile = false
 	end
 	local function ClientVersion()
 		local date = os.date('%Y%m%d')
-		date = tonumber(date) - 1
-	 return string.format('2.%s.01.00', date)
+		date = tonumber(date)
+	 return string.format('1.%s.01.00', date)
 	end
 	local function GetVideoInfo(clientName, clientVersion)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
@@ -1967,7 +1967,7 @@ local infoInFile = false
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"platform":"DESKTOP","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s"},"thirdParty":{"embedUrl":"%s"}},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
