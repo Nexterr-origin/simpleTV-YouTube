@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (2/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1955,7 +1955,7 @@ local infoInFile = false
 	local function ClientVersion()
 		local date = os.date('%Y%m%d')
 		date = tonumber(date)
-	 return string.format('1.%s.01.00', date)
+	 return string.format('2.%s.01.00', date)
 	end
 	local function GetVideoInfo(clientName, clientVersion)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
@@ -2022,6 +2022,7 @@ local infoInFile = false
 				rc = rc_LR
 			end
 		end
+		debug_in_file('0\n')
 		if infoInFile then
 			local player_response_file = m_simpleTV.Common.fromPercentEncoding(player_response)
 			debug_in_file(m_simpleTV.Common.fromPercentEncoding(player_response_file), m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
@@ -2039,10 +2040,10 @@ local infoInFile = false
 			if tab.streamingData
 				and tab.streamingData.licenseInfos
 			then
-				if not m_simpleTV.User.YT.drm then
-					m_simpleTV.User.YT.drm = true
-					GetStreamsTab(m_simpleTV.User.YT.vId)
-				end
+					if not m_simpleTV.User.YT.drm then
+						m_simpleTV.User.YT.drm = true
+					 return GetStreamsTab(m_simpleTV.User.YT.vId)
+					end
 				m_simpleTV.User.YT.drm = nil
 			 return nil, 'DRM'
 			end
