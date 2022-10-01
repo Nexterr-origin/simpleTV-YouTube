@@ -2013,7 +2013,7 @@ local infoInFile = false
 		if not m_simpleTV.User.YT.isAuth
 			and player_response:match('status":%s*"LOGIN')
 		then
-				local player_response_file = m_simpleTV.Common.fromPercentEncoding(player_response)
+			local player_response_file = m_simpleTV.Common.fromPercentEncoding(player_response)
 			local rc_LR, player_response_LR = GetVideoInfo('TVHTML5_SIMPLY_EMBEDDED_PLAYER', '2.0')
 			if player_response_LR
 				and player_response_LR:match('status":%s*"OK')
@@ -2022,7 +2022,6 @@ local infoInFile = false
 				rc = rc_LR
 			end
 		end
-		debug_in_file('0\n')
 		if infoInFile then
 			local player_response_file = m_simpleTV.Common.fromPercentEncoding(player_response)
 			debug_in_file(m_simpleTV.Common.fromPercentEncoding(player_response_file), m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
