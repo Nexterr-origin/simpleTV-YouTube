@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (7/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (10/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -2034,11 +2034,6 @@ local infoInFile = false
 			if tab.streamingData
 				and tab.streamingData.licenseInfos
 			then
-					if not m_simpleTV.User.YT.drm then
-						m_simpleTV.User.YT.drm = true
-					 return GetStreamsTab(m_simpleTV.User.YT.vId)
-					end
-				m_simpleTV.User.YT.drm = nil
 			 return nil, 'DRM'
 			end
 			if tab.multicamera
