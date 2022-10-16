@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (10/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (16/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -370,6 +370,7 @@ local infoInFile = false
 	m_simpleTV.Http.SetTimeout(session, 16000)
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.Chapters = nil
+	m_simpleTV.User.YT.drm = nil
 	local inf0, inf0_qlty, inf0_geo, throttle
 	local isIPanel = infoPanelCheck()
 	local isDescInfoAsWin = m_simpleTV.Config.GetValue('mainOsd/showEpgInfoAsWindow', 'simpleTVConfig')
@@ -1962,7 +1963,7 @@ local infoInFile = false
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Firefox","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
+		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Firefox","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","osName":"Windows","osVersion":"10.0","clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
@@ -2034,6 +2035,11 @@ local infoInFile = false
 			if tab.streamingData
 				and tab.streamingData.licenseInfos
 			then
+					if not m_simpleTV.User.YT.drm then
+						m_simpleTV.User.YT.drm = true
+					 return GetStreamsTab(m_simpleTV.User.YT.vId)
+					end
+				m_simpleTV.User.YT.drm = nil
 			 return nil, 'DRM'
 			end
 			if tab.multicamera
