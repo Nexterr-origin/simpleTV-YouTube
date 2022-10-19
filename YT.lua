@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (16/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (20/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1757,8 +1757,8 @@ local infoInFile = false
 						258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 						327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
 						141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
-						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 						140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
+						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 						}
 	 return video, audio
 	end
