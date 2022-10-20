@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (20/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (21/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1999,7 +1999,12 @@ local infoInFile = false
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
 		player_response = player_response or ''
-		local trailer = player_response:match('trailerVideoId":%s*"([^"]+)')
+		local trailer
+		if player_response:match('unserializedPlayerResponse') then
+			trailer = player_response:match('"videoDetails":%s*{"videoId":"([^"]+)')
+		else
+			trailer = player_response:match('trailerVideoId":%s*"([^"]+)')
+		end
 		if trailer then
 			m_simpleTV.User.YT.vId = trailer
 			m_simpleTV.User.YT.isTrailer = true
