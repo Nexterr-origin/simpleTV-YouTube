@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (22/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1999,13 +1999,14 @@ local infoInFile = false
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
 		player_response = player_response or ''
-		local trailer
+		local trailer, trailerReason
 		if player_response:match('unserializedPlayerResponse') then
 			trailer = player_response:match('"videoDetails":%s*{"videoId":"([^"]+)')
 		else
 			trailer = player_response:match('trailerVideoId":%s*"([^"]+)')
 		end
 		if trailer then
+			trailerReason = player_response:match('"reason":"([^"]+)')
 			m_simpleTV.User.YT.vId = trailer
 			m_simpleTV.User.YT.isTrailer = true
 			rc, player_response = GetVideoInfo()
@@ -2163,7 +2164,7 @@ local infoInFile = false
 				m_simpleTV.User.YT.pic = tab.videoDetails.thumbnail.thumbnails[#tab.videoDetails.thumbnail.thumbnails].url
 			end
 		end
-		local title = title_clean(m_simpleTV.User.YT.title)
+		local title = title_clean(m_simpleTV.User.YT.title) .. '\n' .. (trailerReason or '')
 		if tab.multicamera and not isIPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.camera
 		end
@@ -3541,9 +3542,7 @@ local infoInFile = false
 			if m_simpleTV.User.YT.author
 				and m_simpleTV.User.YT.isTrailer == false
 			then
-				name_header = m_simpleTV.User.YT.Lng.upLoadOnCh
-						.. ': '
-						.. m_simpleTV.User.YT.author
+				name_header = m_simpleTV.User.YT.Lng.upLoadOnCh .. ': ' .. m_simpleTV.User.YT.author
 			elseif m_simpleTV.User.YT.isTrailer == true then
 				name_header = m_simpleTV.User.YT.Lng.preview
 			else
