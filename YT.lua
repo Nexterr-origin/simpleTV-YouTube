@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (24/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (25/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1591,7 +1591,7 @@ local infoInFile = false
 				r = r + 1
 			end
 			if subtAdr then
-			 return subtAdr, ''
+			 return subtAdr:gsub('://', '/webvtt://'), ''
 			end
 			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
 				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
