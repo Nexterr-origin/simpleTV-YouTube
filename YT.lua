@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (24/10/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1907,9 +1907,9 @@ local infoInFile = false
 		if not m_simpleTV.User.YT.isLive and not m_simpleTV.User.YT.isLiveContent then
 			url = DeCipherThrottleParam(url)
 			url = DeCipherSign(url)
-			extOpt = '$OPT:demux=avdemux$OPT:NO-STIMESHIFT' .. extOpt
+			extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
 			if t[index].isAdaptive == true then
-				extOpt = '$OPT:sub-track-id=1' .. extOpt
+				extOpt = '$OPT:sub-track-id=1$OPT:demux=avdemux' .. extOpt
 			elseif t[index].isAdaptive == false then
 				extOpt = '$OPT:sub-track-id=2' .. extOpt
 			end
