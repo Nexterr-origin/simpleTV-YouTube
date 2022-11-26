@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (25/10/22)
+-- видеоскрипт для сайта https://www.youtube.com (26/11/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -4135,6 +4135,7 @@ local infoInFile = false
 		or inAdr:match('youtube%.com/%w+$')
 		or inAdr:match('youtube%.com/[^/]+/playlists')
 		or inAdr:match('/live$')
+		or inAdr:match('youtube%.com/@%a+')
 		or inAdr:match('/embed/live_stream')
 	then
 		PlstsCh(inAdr)
