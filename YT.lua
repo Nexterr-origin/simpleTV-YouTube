@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (26/11/22)
+-- видеоскрипт для сайта https://www.youtube.com (30/11/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -1540,7 +1540,8 @@ local infoInFile = false
 			m_simpleTV.User.YT.throttleFunc = 'nameFunc' .. throttleFunc
 		end
 		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
-		local rules, helper = answer:match('=%a%.split%(""%);(([^%.]+)%.%w+%(%S+)')
+		answer = answer:gsub('%[', '.'):gsub('%]', ''):gsub('"if"', 'if')
+		local rules, helper = answer:match('=%a%.split%(""%);(([^%[%.]+)%.%w+%(%S+)')
 			if not rules or not helper then return end
 		local transformations = answer:match('[; ]' .. helper .. '={.-};')
 			if not transformations then return end
