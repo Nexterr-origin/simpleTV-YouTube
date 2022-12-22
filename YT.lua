@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (1/12/22)
+-- видеоскрипт для сайта https://www.youtube.com (22/12/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -2522,9 +2522,14 @@ local infoInFile = false
 		local embed, matchEnd
 		if str:match('"embeddedPlayerOverlayVideoDetailsRenderer"') then
 			embed = true
-			matchEnd = "trackingParams"
+			matchEnd = '"trackingParams"'
 		else
 			matchEnd = '"thumbnailOverlayNowPlayingRenderer"'
+		end
+		if str:match('"reelItemRenderer"') then
+			render = '"reelItemRenderer"'
+			matchEnd = '"channelThumbnail"'
+			str = str:match('^.-"feedFilterChipBarRenderer"') or str
 		end
 		if typePlst == 'search' then
 			matchEnd = '"maxOneLine"'
@@ -2571,7 +2576,9 @@ local infoInFile = false
 						times = times or livenow or ''
 						count = g:match('"shortViewCountText":%s*{%s*"simpleText":%s*"([^"]+)')
 								or g:match('iewCountText":%s*{%s*"simpleText":%s*"([^"]+)')
+								or g:match('"accessibility":%s*{%s*"accessibilityData":%s*{%s*"label":%s*"([^"]+)')
 						publis = g:match('"publishedTimeText":%s*{%s*"simpleText":%s*"([^"]+)')
+							or g:match('"timestampText":%s*{%s*"simpleText":%s*"([^"]+)')
 						if count and publis then
 							count = publis .. ' ◽ ' .. count
 						else
@@ -2583,6 +2590,7 @@ local infoInFile = false
 							count = ''
 						end
 						channel = g:match('"shortBylineText":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
+							or g:match('"channelTitleText":%s*{%s*"runs":%s*%[%s*{%s*"text":%s*"([^"]+)')
 						if channel then
 							channel = ' | ' .. title_clean(channel)
 						else
@@ -3699,6 +3707,9 @@ local infoInFile = false
 			if m_simpleTV.User.YT.isAuth and inAdr:match('list=LM') then
 				title = title .. ' 🎵'
 			end
+			if inAdr:match('/shorts') then
+				title = title .. ' - Shorts'
+			end
 			if params.User.typePlst ~= 'true'
 				and params.User.typePlst ~= 'panelVideos'
 			then
@@ -4128,6 +4139,7 @@ local infoInFile = false
 		or inAdr:match('list=RD')
 		or inAdr:match('youtube%.com/[^/]+/videos')
 		or inAdr:match('search_query')
+		or inAdr:match('youtube%.com/[^/]+/shorts')
 	then
 		Plst(inAdr)
 	elseif inAdr:match('/user/')
@@ -4137,7 +4149,7 @@ local infoInFile = false
 		or inAdr:match('youtube%.com/%w+$')
 		or inAdr:match('youtube%.com/[^/]+/playlists')
 		or inAdr:match('/live$')
-		or inAdr:match('youtube%.com/@%a+')
+		or inAdr:match('youtube%.com/@%w+')
 		or inAdr:match('/embed/live_stream')
 	then
 		PlstsCh(inAdr)
