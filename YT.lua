@@ -1042,6 +1042,161 @@ local infoInFile = false
 		end
 	 return desc
 	end
+	local function ShowInfo()
+			local function datScr()
+				local f = m_simpleTV.MainScriptDir .. 'user/video/YT.lua'
+				local fhandle = io.open(f, 'r')
+					if not fhandle then
+					 return ''
+					end
+				local dat = fhandle:read(100)
+				fhandle:close()
+				dat = ' [' .. (dat:match('%d+[/.%-]%d+[/.%-]%d+') or '') .. ']'
+			 return decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24') .. dat
+			end
+			local function truncateUtf8(str, n)
+					if m_simpleTV.Common.midUTF8 then
+					 return m_simpleTV.Common.midUTF8(str, 0, n)
+					end
+				str = m_simpleTV.Common.UTF8ToUTF16(str)
+				str = str:sub(1, n)
+				str = m_simpleTV.Common.UTF16ToUTF8(str)
+			 return str
+			end
+			local function elementsRemove()
+				local removeElement = m_simpleTV.OSD.RemoveElement
+				removeElement('YT_TEXT_INFO')
+				removeElement('YT_DIV_CR')
+				if m_simpleTV.Control.GetState() == 0 then
+					m_simpleTV.Control.ExecuteAction(108)
+				end
+			end
+		m_simpleTV.Control.ExecuteAction(37)
+		local codec = ''
+		local title
+		if #m_simpleTV.User.YT.title > 70 then
+			title = truncateUtf8(m_simpleTV.User.YT.title, 55) .. '...'
+		else
+			title = m_simpleTV.User.YT.title
+		end
+		local ti = m_simpleTV.Control.GetCodecInfo()
+		if ti then
+			local codecD, typeD, resD
+			local t, i = {}, 1
+				for w in dumpValue(ti):gmatch('{.-}') do
+					t[#t + 1] = {}
+					codecD = w:match('%["Codec"%] = ([^,}]+)')
+					typeD = w:match('%["Type"%] = ([^,}]+)')
+					if codecD and typeD then
+						typeD = typeD:gsub('Video', m_simpleTV.User.YT.Lng.video .. ': ')
+						typeD = typeD:gsub('Audio', m_simpleTV.User.YT.Lng.audio .. ': ')
+						typeD = typeD:gsub('Subtitle', m_simpleTV.User.YT.Lng.sub .. ': ')
+						codecD = typeD .. codecD
+						codecD = '\n' .. codecD
+					end
+					resD = w:match('%["Video resolution"%] = ([^,}]+)')
+					if resD then
+						resD = m_simpleTV.User.YT.Lng.qlty .. ': ' .. resD
+						resD = '\n' .. resD
+					end
+					t[#t] = (codecD or '') .. (resD or '')
+				end
+			codec = table.concat(t)
+		end
+		local dur, author
+		local publishedAt = ''
+		if m_simpleTV.User.YT.isLive == true then
+			dur = ''
+			author = m_simpleTV.User.YT.Lng.live .. ' | '
+						.. m_simpleTV.User.YT.Lng.channel .. ': '
+						.. m_simpleTV.User.YT.author
+			local timeSt = timeStamp(m_simpleTV.User.YT.actualStartTime)
+			timeSt = os.date('%y %d %m %H %M', tonumber(timeSt))
+			local year, day, month, hour, min = timeSt:match('(%d+) (%d+) (%d+) (%d+) (%d+)')
+			if year and month and day and hour and min then
+				publishedAt = m_simpleTV.User.YT.Lng.started .. ': ' .. string.format('%d:%02d (%d/%d/%02d)', hour, min, day, month, year)
+			end
+		else
+			dur = m_simpleTV.User.YT.Lng.duration .. ': ' .. secondsToClock(m_simpleTV.User.YT.duration)
+			author = m_simpleTV.User.YT.Lng.upLoadOnCh .. ': ' .. m_simpleTV.User.YT.author
+			local year, month, day = m_simpleTV.User.YT.publishedAt:match('(%d+)%-(%d+)%-(%d+)')
+			if year and month and day then
+				year = year:sub(2, 4)
+				publishedAt = m_simpleTV.User.YT.Lng.published .. ': ' .. string.format('%d/%d/%02d', day, month, year)
+			end
+		end
+		local info = title .. '\n'
+					.. author .. '\n'
+					.. publishedAt .. '\n'
+					.. dur .. '\n'
+					.. codec
+		info = info:gsub('[%\n]+', '\n')
+		info = info:gsub('%\n$', '')
+		local addElement = m_simpleTV.OSD.AddElement
+		local q = {}
+		q.once = 1
+		q.zorder = 0
+		q.cx = 0
+		q.cy = 0
+		q.id = 'YT_TEXT_INFO'
+		q.class = 'TEXT'
+		q.align = 0x0202
+		q.top = 0
+		q.color = ARGB(255, 255, 255, 255)
+		q.font_italic = 0
+		q.font_addheight = 6
+		q.padding = 20
+		q.textparam = (1 + 4)
+		q.text = info
+		q.background = 0
+		q.backcolor0 = ARGB(144, 153, 0, 0)
+		q.isInteractive = true
+		q.color_UnderMouse = m_simpleTV.Interface.ColorBrightness(q.color, 50)
+		addElement(q)
+		q = {}
+		q.id = 'YT_DIV_CR'
+		q.cx = 200
+		q.cy = 200
+		q.class = 'DIV'
+		q.minresx = 800
+		q.minresy = 600
+		q.align = 0x0103
+		q.left = 0
+		q.once = 1
+		q.zorder = 1
+		q.background = -1
+		addElement(q)
+		q = {}
+		q.id = 'YT_DIV_CR_TEXT'
+		q.cx = 0
+		q.cy = 0
+		q.class = 'TEXT'
+		q.minresx = 0
+		q.minresy = 0
+		q.align = 0x0103
+		q.text = datScr()
+		q.color = ARGB(64, 250, 250, 250)
+		q.font_height = -15
+		q.font_weight = 700
+		q.font_underline = 0
+		q.font_italic = 0
+		q.font_name = 'Arial'
+		q.textparam = 0
+		q.left = 5
+		q.top = 5
+		q.glow = 1
+		q.glowcolor = ARGB(144, 0, 0, 0)
+		addElement(q, 'YT_DIV_CR')
+			if m_simpleTV.Common.WaitUserInput(5000) == 1 then
+				elementsRemove()
+			 return
+			end
+			if m_simpleTV.Common.WaitUserInput(3000) == 1 then
+				elementsRemove()
+			 return
+			end
+		elementsRemove()
+	end
 	local function ShowDescInfo()
 		local t ={}
 		t.header = m_simpleTV.User.YT.Lng.desc
@@ -3509,7 +3664,11 @@ local infoInFile = false
 		end
 		if ret == 3
 		then
-			ShowDescInfo()
+			if m_simpleTV.User.YT.isVideo and isIPanel then
+				ShowInfo()
+			else
+				ShowDescInfo()
+			end
 		end
 	end
 	function PlstsCh_YT()
