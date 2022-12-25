@@ -2349,6 +2349,7 @@ local infoInFile = false
 		local i = #tab + 1
 		local ret = false
 		local render
+		str = str:match('^.-"feedFilterChipBarRenderer"') or str
 		if typePlst == 'panelVideos' then
 			if str:match('"twoColumnBrowseResultsRenderer"') then
 				render = 'playlistVideoRenderer'
@@ -2374,7 +2375,6 @@ local infoInFile = false
 		if str:match('"reelItemRenderer"') then
 			render = '"reelItemRenderer"'
 			matchEnd = '"channelThumbnail"'
-			str = str:match('^.-"feedFilterChipBarRenderer"') or str
 		end
 		if typePlst == 'search' then
 			matchEnd = '"maxOneLine"'
@@ -2618,6 +2618,9 @@ local infoInFile = false
 			 return
 			end
 		local plstPos = m_simpleTV.User.YT.plstPos or 1
+		if m_simpleTV.User.YT.isPlstsCh and m_simpleTV.Control.GetState() == 0 then
+			plstPos = 1
+		end
 		m_simpleTV.User.YT.Plst = tab
 		m_simpleTV.User.YT.plstHeader = header
 		if m_simpleTV.User.paramScriptForSkin_buttonOptions then
