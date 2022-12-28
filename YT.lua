@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (25/12/22)
+-- видеоскрипт для сайта https://www.youtube.com (28/12/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -365,7 +365,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -2504,7 +2504,6 @@ local infoInFile = false
 		local i = #tab + 1
 		local ret = false
 		local render
-		str = str:match('^.-"feedFilterChipBarRenderer"') or str
 		if typePlst == 'panelVideos' then
 			if str:match('"twoColumnBrowseResultsRenderer"') then
 				render = 'playlistVideoRenderer'
@@ -2530,6 +2529,7 @@ local infoInFile = false
 		if str:match('"reelItemRenderer"') then
 			render = '"reelItemRenderer"'
 			matchEnd = '"channelThumbnail"'
+			str = str:match('^.-"feedFilterChipBarRenderer"') or str
 		end
 		if typePlst == 'search' then
 			matchEnd = '"maxOneLine"'
@@ -2657,16 +2657,22 @@ local infoInFile = false
 		end
 		m_simpleTV.User.YT.is_channel_banner = nil
 		local url = inAdr:gsub('&is%a+=%a+', '')
+		if not url:match('list=RD') then
+			url = url:gsub('/watch%?v=%w+&', '/playlist?')
+		end
 		local params = {}
 		params.Message = '⇩ ' .. m_simpleTV.User.YT.Lng.loading
 		params.Callback = AsynPlsCallb_Plst_YT
-		params.ProgressColor = ARGB(128, 255, 0, 0)
 		params.User = {}
 		params.User.tab = {}
 		params.delayedShow = 2000
 		params.User.Title = ''
 		params.User.First = true
 		params.User.setTitle = true
+		if url:match('list=') then
+			params.ProgressColor = ARGB(128, 255, 0, 0)
+			params.ProgressEnabled = true
+		end
 		if inAdr:match('&isPlstsCh=true')
 		then
 			params.User.setTitle = false
@@ -2709,13 +2715,6 @@ local infoInFile = false
 			logo = 'https://s.ytimg.com/yts/img/favicon_144-vfliLAfaB.png'
 		elseif url:match('youtube%.com$') then
 			logo = 'https://s.ytimg.com/yts/img/favicon_144-vfliLAfaB.png'
-		end
-		if url:match('list=WL')
-			or url:match('list=LL')
-			or url:match('list=LM')
-		then
-			params.ProgressEnabled = true
-			params.ProgressColor = ARGB(128, 255, 0, 0)
 		end
 		local t0 = {}
 		t0.url = url
@@ -3469,9 +3468,7 @@ local infoInFile = false
 				m_simpleTV.Control.SetTitle(m_simpleTV.User.YT.PlstsCh.chTitle or title)
 			end
 			params.User.Title = title
-			if params.ProgressEnabled == true then
-				params.User.plstTotalResults = answer:match('"stats":%[{"runs":%[{"text":"(%d+)')
-			end
+			params.User.plstTotalResults = answer:match('"stats":%[{"runs":%[{"text":"(%d+)')
 			params.User.url = 'https://www.youtube.com/youtubei/v1/%s?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 		end
 			if not AddInPl_Plst_YT(answer, params.User.tab, params.User.typePlst) then
