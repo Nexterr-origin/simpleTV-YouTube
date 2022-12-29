@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (28/12/22)
+-- видеоскрипт для сайта https://www.youtube.com (29/12/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -2644,6 +2644,9 @@ local infoInFile = false
 	 return ret
 	end
 	local function Plst(inAdr)
+		local sessionPlst = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not sessionPlst then return end
+		m_simpleTV.Http.SetTimeout(sessionPlst, 16000)
 		m_simpleTV.Control.ExecuteAction(37)
 		if not m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.User.YT.PlstsCh.chTitle = nil
@@ -2719,8 +2722,9 @@ local infoInFile = false
 		local t0 = {}
 		t0.url = url
 		t0.method = 'get'
-		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
-		asynPlsLoaderHelper.Work(session, t0, params)
+		m_simpleTV.Http.SetCookies(sessionPlst, url, m_simpleTV.User.YT.cookies, '')
+		asynPlsLoaderHelper.Work(sessionPlst, t0, params)
+		m_simpleTV.Http.Close(sessionPlst)
 		local header = params.User.Title
 		local tab = params.User.tab
 		local len = #tab
@@ -3029,7 +3033,7 @@ local infoInFile = false
 		local buttonNext = false
 		local continuation = answer:match('"continuation":%s*"([^"]+)') or answer:match('"continuationCommand":%s*{%s*"token":%s*"([^"]+)')
 		if continuation then
-			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.lang ..'"}},"continuation":"' .. continuation .. '"}')
+			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.lang ..'"}},"continuation":"' .. continuation .. '"}')
 			buttonNext = true
 		end
 		local tab0, i = {}, 1
@@ -3432,7 +3436,7 @@ local infoInFile = false
 				answer = answer:gsub('\\"', '%%22')
 			end
 			params.User.visitorData = answer:match('"visitorData":"([^"]+)') or ''
-			params.User.headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00' .. '\nX-Goog-Visitor-Id: ' .. params.User.visitorData
+			params.User.headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20221220.09.00\nX-Goog-Visitor-Id: ' .. params.User.visitorData
 			params.User.First = false
 			local title
 			if params.User.typePlst == 'rssVideos'	then
@@ -3469,7 +3473,7 @@ local infoInFile = false
 			end
 			params.User.Title = title
 			params.User.plstTotalResults = answer:match('"stats":%[{"runs":%[{"text":"(%d+)')
-			params.User.url = 'https://www.youtube.com/youtubei/v1/%s?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+			params.User.url = 'https://www.youtube.com/youtubei/v1/%s?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false'
 		end
 			if not AddInPl_Plst_YT(answer, params.User.tab, params.User.typePlst) then
 				ret.Done = true
