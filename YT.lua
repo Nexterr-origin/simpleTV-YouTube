@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/12/22)
+-- видеоскрипт для сайта https://www.youtube.com (30/12/22)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2022 Nexterr
@@ -2644,21 +2644,17 @@ local infoInFile = false
 	 return ret
 	end
 	local function Plst(inAdr)
-		local sessionPlst = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not sessionPlst then return end
-		m_simpleTV.Http.SetTimeout(sessionPlst, 16000)
 		m_simpleTV.Control.ExecuteAction(37)
-		if not m_simpleTV.User.YT.isPlstsCh then
+		if m_simpleTV.User.YT.isPlstsCh then
+			m_simpleTV.Http.Close(session)
+			session = m_simpleTV.Http.New(userAgent, proxy, false)
+				if not session then return end
+			m_simpleTV.Http.SetTimeout(session, 16000)
+		else
 			m_simpleTV.User.YT.PlstsCh.chTitle = nil
 		end
 		m_simpleTV.User.YT.isVideo = false
 		m_simpleTV.User.YT.plstPos = nil
-		if m_simpleTV.User.YT.isPlstsCh
-			and not m_simpleTV.User.YT.is_channel_banner
-		then
-			SetBackground((m_simpleTV.User.YT.channel_banner or m_simpleTV.User.YT.logoPicFromDisk), 3)
-		end
-		m_simpleTV.User.YT.is_channel_banner = nil
 		local url = inAdr:gsub('&is%a+=%a+', '')
 		if not url:match('list=RD') then
 			url = url:gsub('/watch%?v=%w+&', '/playlist?')
@@ -2722,9 +2718,8 @@ local infoInFile = false
 		local t0 = {}
 		t0.url = url
 		t0.method = 'get'
-		m_simpleTV.Http.SetCookies(sessionPlst, url, m_simpleTV.User.YT.cookies, '')
-		asynPlsLoaderHelper.Work(sessionPlst, t0, params)
-		m_simpleTV.Http.Close(sessionPlst)
+		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
+		asynPlsLoaderHelper.Work(session, t0, params)
 		local header = params.User.Title
 		local tab = params.User.tab
 		local len = #tab
@@ -2779,6 +2774,11 @@ local infoInFile = false
 		if m_simpleTV.User.YT.isPlstsCh and m_simpleTV.Control.GetState() == 0 then
 			plstPos = 1
 		end
+		if (m_simpleTV.User.YT.isPlstsCh and plstPos > 1) or len == 1 then
+			SetBackground()
+		elseif m_simpleTV.User.YT.isPlstsCh then
+			SetBackground(m_simpleTV.User.YT.channel_banner, 3)
+		end
 		m_simpleTV.User.YT.Plst = tab
 		m_simpleTV.User.YT.plstHeader = header
 		if m_simpleTV.User.paramScriptForSkin_buttonOptions then
@@ -2824,6 +2824,7 @@ local infoInFile = false
 						m_simpleTV.Control.ExecuteAction(37)
 						m_simpleTV.Control.ChangeAddress = 'No'
 						m_simpleTV.Control.CurrentAddress = 'https://www.youtube.com/channel/' .. m_simpleTV.User.YT.chId .. '&isRestart=true'
+						m_simpleTV.User.YT.isChannelBanner = false
 						dofile(m_simpleTV.MainScriptDir .. 'user/video/YT.lua')
 					]]
 			if m_simpleTV.User.paramScriptForSkin_buttonPlst then
@@ -3023,11 +3024,10 @@ local infoInFile = false
 			if channel_banner then
  				channel_banner = channel_banner:gsub('^//', 'https://') .. '=w1280'
 			end
-			m_simpleTV.User.YT.channel_banner = channel_banner
+			m_simpleTV.User.YT.channel_banner = channel_banner or m_simpleTV.User.YT.logoPicFromDisk
 			if not inAdr:match('&isRestart=true') then
-				SetBackground(channel_banner or m_simpleTV.User.YT.logoPicFromDisk)
+				SetBackground(channel_banner, 3)
 				m_simpleTV.Control.SetTitle(chTitle)
-				m_simpleTV.User.YT.is_channel_banner = true
 			end
 		end
 		local buttonNext = false
@@ -3053,7 +3053,7 @@ local infoInFile = false
 								t[1].Name = string.format('🔺 %s (%s)', m_simpleTV.User.YT.Lng.upLoadOnCh, plstTotalResults)
 								t[1].count = plstTotalResults
 								if isIPanel == true then
-									t[1].InfoPanelLogo = channel_avatar or channel_banner or m_simpleTV.User.YT.logoPicFromDisk
+									t[1].InfoPanelLogo = channel_avatar or channel_banner
 									t[1].InfoPanelShowTime = 10000
 									t[1].InfoPanelName = m_simpleTV.User.YT.Lng.channel .. ': ' .. chTitle
 									t[1].InfoPanelDesc = desc_html(nil, t[1].InfoPanelLogo, m_simpleTV.User.YT.Lng.upLoadOnCh .. ' ' .. chTitle, t[1].Address)
@@ -3241,7 +3241,6 @@ local infoInFile = false
 				m_simpleTV.Control.ChangeChannelLogo(m_simpleTV.User.paramScriptForSkin_logoYT
 										or channel_avatar
 										or channel_banner
-										or m_simpleTV.User.YT.logoPicFromDisk
 										, m_simpleTV.Control.ChannelID
 										, 'CHANGE_IF_NOT_EQUAL')
 				m_simpleTV.Control.ChangeChannelName(m_simpleTV.User.YT.PlstsCh.chTitlePage, m_simpleTV.Control.ChannelID, false)
@@ -3758,9 +3757,13 @@ local infoInFile = false
 		end
 	end
 	function OnMultiAddressCancel_YT(Object)
+
+
 		if m_simpleTV.User.YT.DelayedAddress then
 			if m_simpleTV.Control.GetState() == 0 then
 				m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.User.YT.DelayedAddress})
+
+
 				if m_simpleTV.User.YT.qlty < 100 then
 					local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
 					if visual == 'none'
