@@ -106,9 +106,11 @@ audio Surround (5.1); Itag: 258
 https://www.youtube.com/watch?v=WAyN4mQgl-4
 поиск видео
 https://www.youtube.com/results?search_query=Minelli
-уникальный псевдоним
+уникальный псевдоним для канала
 https://www.youtube.com/@TrinityVaastu 
 Shorts плейлист
 https://www.youtube.com/@MabelOfficial/shorts
 Shorts плейлист
 https://www.youtube.com/@Eunjipyo/shorts
+плейлист с рус названиями видео
+https://www.youtube.com/playlist?list=PLPIkwwa_HfJxuYkaAdFZ19qDb11IsDH7D
