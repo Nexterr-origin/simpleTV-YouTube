@@ -32,6 +32,8 @@ https://www.youtube.com/feeds/videos.xml?user=periodicvideos
 ---------------------------------------------------
 hashtag #sayso
 https://www.youtube.com/hashtag/sayso
+hashtag #sayso - shorts
+https://www.youtube.com/hashtag/dojacat/shorts
 в тренде
 https://www.youtube.com/feed/trending
 фильмы - предосмотр
@@ -96,7 +98,7 @@ https://www.youtube.com/channel/UCba3hpU7EFBSk817y9qZkiA/live
 http://y2u.be/hY1tULEr4-4
 8k 60 FPS HDR главы
 https://www.youtube.com/watch?v=linlz7-Pnvw
-Shorts Video
+Shorts видео
 https://youtube.com/shorts/UIDLrsO2tjo
 audio Surround (5.1); Itag: 327
 https://www.youtube.com/watch?v=QrhcfjPFaEk
@@ -104,5 +106,11 @@ audio Surround (5.1); Itag: 258
 https://www.youtube.com/watch?v=WAyN4mQgl-4
 поиск видео
 https://www.youtube.com/results?search_query=Minelli
-уникальный псевдоним
+уникальный псевдоним для канала
 https://www.youtube.com/@TrinityVaastu 
+Shorts плейлист
+https://www.youtube.com/@MabelOfficial/shorts
+Shorts плейлист
+https://www.youtube.com/@Eunjipyo/shorts
+плейлист с рус названиями видео
+https://www.youtube.com/playlist?list=PLPIkwwa_HfJxuYkaAdFZ19qDb11IsDH7D
