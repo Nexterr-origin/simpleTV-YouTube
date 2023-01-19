@@ -70,7 +70,7 @@ local infoInFile = false
 		end
 		m_simpleTV.User.YT.VersionCheck = true
 	end
-	htmlEntities = require 'htmlEntities'
+	local htmlEntities = require 'htmlEntities'
 	require 'lfs'
 	require 'asynPlsLoaderHelper'
 	require 'jsdecode'
@@ -3757,13 +3757,9 @@ local infoInFile = false
 		end
 	end
 	function OnMultiAddressCancel_YT(Object)
-
-
 		if m_simpleTV.User.YT.DelayedAddress then
 			if m_simpleTV.Control.GetState() == 0 then
 				m_simpleTV.Control.SetNewAddressT({address = m_simpleTV.User.YT.DelayedAddress})
-
-
 				if m_simpleTV.User.YT.qlty < 100 then
 					local visual = tostring(m_simpleTV.Config.GetValue('vlc/audio/visual/module', 'simpleTVConfig') or '')
 					if visual == 'none'
