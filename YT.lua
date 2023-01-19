@@ -1,7 +1,7 @@
--- видеоскрипт для сайта https://www.youtube.com (30/12/22)
+-- видеоскрипт для сайта https://www.youtube.com (19/1/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
-	Copyright © 2017-2022 Nexterr
+	Copyright © 2017-2023 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
@@ -70,7 +70,7 @@ local infoInFile = false
 		end
 		m_simpleTV.User.YT.VersionCheck = true
 	end
-	local htmlEntities = require 'htmlEntities'
+	htmlEntities = require 'htmlEntities'
 	require 'lfs'
 	require 'asynPlsLoaderHelper'
 	require 'jsdecode'
