@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/1/23)
+-- видеоскрипт для сайта https://www.youtube.com (7/2/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -157,6 +157,7 @@ local infoInFile = false
 		inAdr = inAdr:gsub('[&?/]+$', '')
 		inAdr = inAdr:gsub('%s+', '')
 		inAdr = inAdr:gsub('/([?=&])', '%1')
+		inAdr = inAdr:gsub('%.com/live/', '.com/watch?v=')
 		if not (inAdr:match('^https://[%a.]*youtu[.combe]')
 			or inAdr:match('^https://y[2out]*u%.be/'))
 			or inAdr:match('//gaming%.')
