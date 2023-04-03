@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (7/2/23)
+-- видеоскрипт для сайта https://www.youtube.com (4/4/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -2529,7 +2529,7 @@ local infoInFile = false
 		end
 		if str:match('"reelItemRenderer"') then
 			render = '"reelItemRenderer"'
-			matchEnd = '"channelThumbnail"'
+			matchEnd = '"WEB_PAGE_TYPE_SHORTS"'
 			str = str:match('^.-"feedFilterChipBarRenderer"') or str
 		end
 		if typePlst == 'search' then
