@@ -12,7 +12,8 @@
 [![Lua][badge-lua]][Lua]
 [![License][badge-license]][License]
 
-### ★ Скрипт YouTube для simpleTV
+### ★ <span id="a1">[Скрипт YouTube для simpleTV](#1 "")</span>
+
 <details>
 
 📌 **Установка**
