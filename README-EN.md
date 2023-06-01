@@ -12,7 +12,8 @@
 [![Lua][badge-lua]][Lua]
 [![License][badge-license]][License]
 
-### ★ YouTube Script for simpleTV
+### ★ <span id="a1">[YouTube Script for simpleTV](#1 "")</span>
+
 <details>
 
 📌 **Installation**
