@@ -12,11 +12,8 @@
 [![Lua][badge-lua]][Lua]
 [![License][badge-license]][License]
 
----
-
 ### ★ YouTube Script for simpleTV
 <details>
----
 
 📌 **Installation**
 - put **`YT.lua`** in _`..\luaScr\user\video`_
