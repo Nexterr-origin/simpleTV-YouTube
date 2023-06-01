@@ -55,8 +55,8 @@ prefix | name
 
 [badge-discussions]: https://img.shields.io/badge/💬-Discussions-%232b2b2b?style=flat-squar&labelColor=%232c68a8 "Discussions"
 [badge-addons]: https://img.shields.io/badge/Addons-%232b2b2b?style=flat-squar&labelColor=%232c68a8 "Addons"
-[badge-simpletvapi]: https://img.shields.io/badge/simpleTV-Lua%20API-%232b2b2b?style=flat-squar&labelColor=%23303f50 "simpleTV Lua API"
-[badge-lua]: https://img.shields.io/badge/Lua-5.2-%232b2b2b?style=flat-square&labelColor=%23303f50 "Lua 5.2"
+[badge-simpletvapi]: https://img.shields.io/badge/simpleTV-API-%232b2b2b?style=flat-squar&labelColor=%23303f50 "simpleTV Lua API"
+[badge-lua]: https://img.shields.io/badge/Lua-5.3-%232b2b2b?style=flat-square&labelColor=%23303f50 "Lua 5.3"
 [badge-license]: https://img.shields.io/badge/License-Apache%202.0-%232b2b2b?style=flat-square&labelColor=%23303f50 "Apache License 2.0"
 [badge-scripts]: https://img.shields.io/badge/Scripts-%232b2b2b?style=flat-squar&labelColor=%232c68a8 "Scripts"
 [badge-simpletvhomepage]: https://img.shields.io/badge/simpleTV-homepage-%232b2b2b?style=flat-square&labelColor=%23303f50 "simpleTV homepage"
