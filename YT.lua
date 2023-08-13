@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/4/23)
+-- видеоскрипт для сайта https://www.youtube.com (12/8/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -291,7 +291,6 @@ local infoInFile = false
 			m_simpleTV.User.YT.Lng.started = 'начало в'
 			m_simpleTV.User.YT.Lng.published = 'опубликовано'
 			m_simpleTV.User.YT.Lng.duration = 'продолжительность'
-			m_simpleTV.User.YT.Lng.relatedVideos = 'похожие видео'
 			m_simpleTV.User.YT.Lng.link = 'открыть в браузере'
 			m_simpleTV.User.YT.Lng.noCookies = 'ТРЕБУЕТСЯ ВХОД: используйте "cookies файл" для авторизации'
 			m_simpleTV.User.YT.Lng.chapter = 'главы'
@@ -325,7 +324,6 @@ local infoInFile = false
 			m_simpleTV.User.YT.Lng.started = 'started'
 			m_simpleTV.User.YT.Lng.published = 'published'
 			m_simpleTV.User.YT.Lng.duration = 'duration'
-			m_simpleTV.User.YT.Lng.relatedVideos = 'related videos'
 			m_simpleTV.User.YT.Lng.link = 'open in browser'
 			m_simpleTV.User.YT.Lng.noCookies = 'LOGIN REQUIRED: use "cookies file" for authorization'
 			m_simpleTV.User.YT.Lng.chapter = 'chapters'
@@ -1291,24 +1289,15 @@ local infoInFile = false
 			types = 'video'
 			header = m_simpleTV.User.YT.Lng.live
 			yt = 'watch?v='
-		elseif url:match('^%-related=') then
-			types = 'related'
-			header = m_simpleTV.User.YT.Lng.relatedVideos
-			yt = 'watch?v='
 		else
 			types = 'video&videoDimension=2d'
 			header = m_simpleTV.User.YT.Lng.video
 			yt = 'watch?v='
 		end
-		if types == 'related' then
-			url = url:gsub('%-related=', '')
-			url = '&items/snippet/title,items/id/videoId,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&type=video&maxResults=100&relatedToVideoId=' .. url .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
-		else
-			url = url:gsub('^[%-%+%s]+(.-)%s*$', '%1')
-				if url == '' then return end
-			url = m_simpleTV.Common.toPercentEncoding(url)
-			url = '&q=' .. url .. '&type=' .. types .. '&items/id,items/snippet/title,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&maxResults=50' .. eventType .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
-		end
+		url = url:gsub('^[%-%+%s]+(.-)%s*$', '%1')
+			if url == '' then return end
+		url = m_simpleTV.Common.toPercentEncoding(url)
+		url = '&q=' .. url .. '&type=' .. types .. '&items/id,items/snippet/title,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&maxResults=50' .. eventType .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.lang
 		local t, i, k = {}, 1, 1
 		url = 'https://www.googleapis.com/youtube/v3/search?part=snippet' .. url
 		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
@@ -3364,18 +3353,12 @@ local infoInFile = false
 			end
 			if m_simpleTV.User.YT.isLive == false
 				and m_simpleTV.User.YT.isTrailer == false
-			then
-				t1[2] = {}
-				t1[2].Id = 2
-				t1[2].Name = '🔎 ' .. m_simpleTV.User.YT.Lng.search .. ': ' .. m_simpleTV.User.YT.Lng.relatedVideos
-				t1[2].Address = '-related=' .. m_simpleTV.User.YT.vId .. '&isLogo=false'
-				if m_simpleTV.User.YT.isMusic == true then
-					t1[3] = {}
-					t1[3].Id = 3
-					t1[3].Name = '🎵🔀 Music-Mix ' .. m_simpleTV.User.YT.Lng.plst
-					t1[3].Address = string.format('https://www.youtube.com/watch?v=%s&list=RD%s&isLogo=false',m_simpleTV.User.YT.vId, m_simpleTV.User.YT.vId)
+				and m_simpleTV.User.YT.isMusic == true then
+					t1[2] = {}
+					t1[2].Id = 2
+					t1[2].Name = '🎵🔀 Music-Mix ' .. m_simpleTV.User.YT.Lng.plst
+					t1[2].Address = string.format('https://www.youtube.com/watch?v=%s&list=RD%s&isLogo=false',m_simpleTV.User.YT.vId, m_simpleTV.User.YT.vId)
 					m_simpleTV.User.YT.PlstsCh.chTitle = nil
-				end
 			end
 			t1.ExtParams = {FilterType = 2, LuaOnCancelFunName = 'OnMultiAddressCancel_YT'}
 			if m_simpleTV.User.paramScriptForSkin_buttonOptions then
@@ -3806,11 +3789,7 @@ local infoInFile = false
 	if inAdr:match('^%-') then
 			if not getApiKey() then return end
 		if m_simpleTV.Control.MainMode == 0 then
-			if not inAdr:match('^%-related=') then
-				m_simpleTV.Control.ChangeChannelLogo('https://s.ytimg.com/yts/img/reporthistory/land-img-vfl_eF5BA.png', m_simpleTV.Control.ChannelID)
-			else
-				m_simpleTV.Control.ExecuteAction(37)
-			end
+			m_simpleTV.Control.ChangeChannelLogo('https://s.ytimg.com/yts/img/reporthistory/land-img-vfl_eF5BA.png', m_simpleTV.Control.ChannelID)
 		end
 		local t, types, header = Search(inAdr)
 		m_simpleTV.Http.Close(session)
@@ -3818,13 +3797,7 @@ local infoInFile = false
 				StopOnErr(5.1, m_simpleTV.User.YT.Lng.notFound)
 			 return
 			end
-		local title
-		if types == 'related' then
-			title = m_simpleTV.User.YT.title
-			title = title_clean(title)
-		else
-			title = inAdr:gsub('^[%-%+%s]+(.-)%s*$', '%1')
-		end
+		local title = inAdr:gsub('^[%-%+%s]+(.-)%s*$', '%1')
 		title = m_simpleTV.User.YT.Lng.search .. ' YouTube (' .. header .. '): ' .. title
 		m_simpleTV.Control.SetTitle(title)
 		local FilterType, AutoNumberFormat
