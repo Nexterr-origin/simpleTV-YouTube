@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/9/23)
+-- видеоскрипт для сайта https://www.youtube.com (16/10/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -207,7 +207,7 @@ local infoInFile = false
 		local cookie_SAPISID
 			for line in fhandle:lines() do
 				local name, val = line:match('%.youtube%.com[^%d+]+%d+%s+(%S+)%s+(%S+)')
-				if name and not name:match('__Secure') and not name:match('ST%-') and val then
+				if name and not name:match('ST%-') and val then
 					t[#t + 1] = string.format('%s=%s', name, val)
 					if not cookie_SAPISID and name == 'SAPISID' then
 						cookie_SAPISID = val
@@ -383,6 +383,11 @@ local infoInFile = false
 				or ''
 	videoId = videoId:sub(1, 11)
 	local function ShowMsg(msg, reason, qlty)
+			if m_simpleTV.User.YT.isLive == true
+				and m_simpleTV.Control.ChannelID ~= 268435455
+			then
+			 return
+			end
 		if reason then
 			msg = msg .. '\n' .. reason
 		end
