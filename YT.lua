@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (16/10/23)
+-- видеоскрипт для сайта https://www.youtube.com (19/10/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -207,9 +207,14 @@ local infoInFile = false
 		local cookie_SAPISID
 			for line in fhandle:lines() do
 				local name, val = line:match('%.youtube%.com[^%d+]+%d+%s+(%S+)%s+(%S+)')
-				if name and not name:match('ST%-') and val then
+				if name
+					and not name:match('ST%-')
+					and val
+				then
 					t[#t + 1] = string.format('%s=%s', name, val)
-					if not cookie_SAPISID and name == 'SAPISID' then
+					if not cookie_SAPISID
+						and name == 'SAPISID'
+					then
 						cookie_SAPISID = val
 					end
 				end
@@ -217,7 +222,7 @@ local infoInFile = false
 		fhandle:close()
 			if #t < 7 or not cookie_SAPISID then return end
 		m_simpleTV.User.YT.isAuth = cookie_SAPISID
-	 return table.concat(t, ';')
+	 return table.concat(t, '; ')
 	end
 	if inAdr:match('https?://')
 		and not inAdr:match('&is%a+=%a+')
@@ -338,9 +343,6 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.cookies then
 		local cookies = cookiesFromFile() or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
-		if not cookies:match('CONSENT=') then
-			cookies = string.format('%s;CONSENT=YES+20210727-07-p1.ru+FX+%s;', cookies, math.random(100, 999))
-		end
 		cookies = cookies:gsub('&amp;', '&')
 		m_simpleTV.User.YT.cookies = cookies
 		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&;]+)') or m_simpleTV.User.YT.Lng.lang
@@ -1515,7 +1517,6 @@ local infoInFile = false
 			if not sessionJsPlayer then return end
 		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 12000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		m_simpleTV.Http.SetCookies(sessionJsPlayer, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
 			if rc ~= 200 then
 				m_simpleTV.Http.Close(sessionJsPlayer)
@@ -2082,7 +2083,9 @@ local infoInFile = false
 			if tab.videoDetails.isLive == true then
 				m_simpleTV.User.YT.isLive = true
 			end
-			if tab.videoDetails.lengthSeconds then
+			if tab.videoDetails.lengthSeconds
+				and tab.videoDetails.lengthSeconds ~= 0
+			then
 				m_simpleTV.User.YT.duration = tonumber(tab.videoDetails.lengthSeconds)
 			end
 			if tab.videoDetails.isLiveContent == true
