@@ -19,9 +19,9 @@
 📌 **Установка**
 - поместить **`YT.lua`** в папку _`..\luaScr\user\video`_
 
-📌 **Авторизация**
-- файл формата **"Netscape HTTP Cookie File"** - _*cookies.txt_ поместить в папку _`..\work`_, получить файл можно в расширении браузера Chrome - [Get cookies.txt LOCALLY](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc)
-или Firefox - [cookies.txt](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt")
+📌  **~~Авторизация~~** 
+- ~~файл формата **"Netscape HTTP Cookie File"** - _*cookies.txt_ поместить в папку _`..\work`_, получить файл можно в расширении браузера Chrome~~ - [Get cookies.txt LOCALLY](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc)
+~~или Firefox~~ - [cookies.txt](https://addons.mozilla.org/ru/firefox/addon/cookies-txt/ "расширение cookies.txt") 
 
 📌 **Поиск из окна "Открыть URL" _Ctrl+N_**
 
