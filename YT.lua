@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (24/10/23)
+-- видеоскрипт для сайта https://www.youtube.com (25/10/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -1827,8 +1827,9 @@ local infoInFile = false
 	local function Stream_Live(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
-		m_simpleTV.Http.SetTimeout(session_live, 12000)
-		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls, method = 'post'})
+		m_simpleTV.Http.SetTimeout(session_live, 16000)
+		hls = hls:gsub('/keepalive/yes/', '/keepalive/no/')
+		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
 		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
 			 return nil, 'stream live Error'
