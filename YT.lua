@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/10/23)
+-- видеоскрипт для сайта https://www.youtube.com (24/10/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -222,7 +222,7 @@ local infoInFile = false
 		fhandle:close()
 			if #t < 7 or not cookie_SAPISID then return end
 		m_simpleTV.User.YT.isAuth = cookie_SAPISID
-	 return table.concat(t, '; ')
+	 return table.concat(t, ';')
 	end
 	if inAdr:match('https?://')
 		and not inAdr:match('&is%a+=%a+')
@@ -366,7 +366,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:115.0) Gecko/20100101 Firefox/115.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -1827,11 +1827,11 @@ local infoInFile = false
 	local function Stream_Live(hls, title)
 		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_live then return end
-		m_simpleTV.Http.SetTimeout(session_live, 8000)
-		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls, headers = 'Accept-Encoding: identity'})
+		m_simpleTV.Http.SetTimeout(session_live, 12000)
+		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls, method = 'post'})
 		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
-			 return nil, 'GetStreamsTab live Error 1'
+			 return nil, 'stream live Error'
 			end
 		local t = {}
 			for name, fps, adr in answer:gmatch('RESOLUTION=(.-),.-RATE=(%d+).-\n(.-)\n') do
@@ -1852,17 +1852,17 @@ local infoInFile = false
 					t[#t].qltyLive = qlty
 				end
 			end
+		if m_simpleTV.User.YT.isLive == true and not isIPanel then
+			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
+		end
 			if #t == 0 then
-			 return nil, 'GetStreamsTab live Error 2'
+			 return hls, title
 			end
 		t[#t + 1] = {}
 		t[#t].Id = #t
 		t[#t].qltyLive = 10000
 		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
 		t[#t].Address = hls
-		if m_simpleTV.User.YT.isLive == true and not isIPanel then
-			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
-		end
 	 return t, title
 	end
 	local function GetQltyIndex(t)
