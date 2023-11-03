@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (25/10/23)
+-- видеоскрипт для сайта https://www.youtube.com (3/11/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -1955,7 +1955,7 @@ local infoInFile = false
 	local function GetVideoInfo(clientName, clientVersion)
 		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
 			if not session_videoInfo then return end
-		m_simpleTV.Http.SetTimeout(session_videoInfo, 10000)
+		m_simpleTV.Http.SetTimeout(session_videoInfo, 16000)
 		clientName = clientName or 'WEB'
 		clientVersion = clientVersion or string.format('2.%s.01.00', os.date('%Y%m%d'))
 		local signTs = m_simpleTV.User.YT.signTs or 0
