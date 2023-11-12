@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (11/11/23)
+-- видеоскрипт для сайта https://www.youtube.com (12/11/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -3035,7 +3035,13 @@ local infoInFile = false
 		local continuation = answer:match('"continuation":%s*"([^"]+)') or answer:match('"continuationCommand":%s*{%s*"token":%s*"([^"]+)')
 		if continuation then
 			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.lang ..'"}},"continuation":"' .. continuation .. '"}')
-			-- buttonNext = true
+			local countn = 0
+				for w in answer:gmatch(continuation) do
+					countn = countn + 1
+				end
+			if countn == 0 then
+				buttonNext = true
+			end
 		end
 		local tab0, i = {}, 1
 		local j = 1 + tonumber(num)
