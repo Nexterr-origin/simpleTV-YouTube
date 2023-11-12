@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/11/23)
+-- видеоскрипт для сайта https://www.youtube.com (13/11/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -2951,19 +2951,20 @@ local infoInFile = false
 		local youtubei = url:match('/youtubei/')
 		url = url:gsub('&is%a+=%a+', '') .. '&isRestart=true'
 		if not youtubei then
+			isPlstCh = true
 			m_simpleTV.User.YT.PlstsCh.visitorData = nil
 			if not url:match('/playlists') then
 				url = url .. '/playlists'
-				isPlstCh = true
+				-- isPlstCh = true
 			end
 			if not url:match('sort=') then
-				if isPlstCh then
+				-- if isPlstCh then
 					url = url:gsub('&is%a+=%a+', '') .. '?view=1&sort=lad&shelf_id=0&isRestart=true'
-				end
+				-- end
 			end
-			if isPlstCh then
+			-- if isPlstCh then
 				url = url .. '&isPlstCh=true'
-			end
+			-- end
 		end
 		if not m_simpleTV.User.YT.PlstsCh.MainUrl then
 			m_simpleTV.User.YT.PlstsCh.MainUrl = url
@@ -3001,6 +3002,7 @@ local infoInFile = false
 			body = decode64(body)
 		end
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
+		debug_in_file(url .. '\n')
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&is%a+=%a+', ''), headers = headers})
 			if rc ~= 200 then
@@ -3036,6 +3038,7 @@ local infoInFile = false
 		if continuation then
 			url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false&body=' .. encode64('{"context":{"client":{"clientName":"WEB","clientVersion":"2.20210729.00.00","hl":"' .. m_simpleTV.User.YT.Lng.lang ..'"}},"continuation":"' .. continuation .. '"}')
 			local countn = 0
+			continuation = m_simpleTV.Common.fromPercentEncoding(continuation)
 				for w in answer:gmatch(continuation) do
 					countn = countn + 1
 				end
