@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (13/11/23)
+-- видеоскрипт для сайта https://www.youtube.com (19/11/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -366,7 +366,7 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:115.0) Gecko/20100101 Firefox/115.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -2951,20 +2951,16 @@ local infoInFile = false
 		local youtubei = url:match('/youtubei/')
 		url = url:gsub('&is%a+=%a+', '') .. '&isRestart=true'
 		if not youtubei then
-			isPlstCh = true
 			m_simpleTV.User.YT.PlstsCh.visitorData = nil
-			if not url:match('/playlists') then
-				url = url .. '/playlists'
-				-- isPlstCh = true
+			url = url:gsub('&is%a+=%a+', '')
+			if not url:match('/playlists') or url:match('/playlists$') then
+				if not url:match('/playlists$') then
+					isPlstCh = true
+				end
+				url = url:gsub('/playlists', '') .. '/playlists'
+				url = url .. '?view=1&sort=dd'
 			end
-			if not url:match('sort=') then
-				-- if isPlstCh then
-					url = url:gsub('&is%a+=%a+', '') .. '?view=1&sort=lad&shelf_id=0&isRestart=true'
-				-- end
-			end
-			-- if isPlstCh then
-				url = url .. '&isPlstCh=true'
-			-- end
+			url = url .. '&shelf_id=0&isRestart=true&isPlstCh=true'
 		end
 		if not m_simpleTV.User.YT.PlstsCh.MainUrl then
 			m_simpleTV.User.YT.PlstsCh.MainUrl = url
