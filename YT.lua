@@ -366,6 +366,9 @@ local infoInFile = false
 	if m_simpleTV.User.YT.isPlstsCh then
 		m_simpleTV.User.YT.isPlstsCh = nil
 	end
+	if not m_simpleTV.User.YT.contin then
+		m_simpleTV.User.YT.contin = ''
+	end
 	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
@@ -2820,7 +2823,10 @@ local infoInFile = false
 			else
 				tab.ExtButton1 = {ButtonEnable = true, ButtonName = '📋', ButtonScript = 'PlstsCh_YT()'}
 			end
-		elseif not inAdr:match('&isPlstsCh=true') then
+		elseif not inAdr:match('&isPlstsCh=true')
+			and m_simpleTV.User.YT.chId
+			and not inAdr:match('/videos')
+		then
 			local ButtonScript1 = [[
 						m_simpleTV.Control.ExecuteAction(37)
 						m_simpleTV.Control.ChangeAddress = 'No'
@@ -2958,7 +2964,7 @@ local infoInFile = false
 					isPlstCh = true
 				end
 				url = url:gsub('/playlists', '') .. '/playlists'
-				url = url .. '?view=1&sort=dd'
+				url = url .. '?view=1&sort=lad'
 			end
 			url = url .. '&shelf_id=0&isRestart=true&isPlstCh=true'
 		end
@@ -3478,10 +3484,11 @@ local infoInFile = false
 			 return ret
 			end
 		local continuation = answer:match('"continuation":%s*"([^"]+)') or answer:match('"continuationCommand":%s*{%s*"token":%s*"([^"]+)')
-			if not continuation then
+			if not continuation or (continuation and m_simpleTV.User.YT.contin == m_simpleTV.Common.fromPercentEncoding(continuation)) then
 				ret.Done = true
 			 return ret
 			end
+		m_simpleTV.User.YT.contin = m_simpleTV.Common.fromPercentEncoding(continuation)
 		ret.request = {}
 		if params.User.typePlst == 'search' then
 			ret.request.url = string.format(params.User.url, 'search')
