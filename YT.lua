@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (19/11/23)
+-- видеоскрипт для сайта https://www.youtube.com (20/11/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -2826,6 +2826,7 @@ local infoInFile = false
 		elseif not inAdr:match('&isPlstsCh=true')
 			and m_simpleTV.User.YT.chId
 			and not inAdr:match('/videos')
+			and not inAdr:match('list=')
 		then
 			local ButtonScript1 = [[
 						m_simpleTV.Control.ExecuteAction(37)
@@ -3196,6 +3197,9 @@ local infoInFile = false
 				Plst(inAdr)
 			 return
 			end
+		if #tab < 30 then
+			buttonNext = false
+		end
 		m_simpleTV.User.YT.PlstsChTab = tab
 		m_simpleTV.User.YT.isPlstsCh = true
 		local buttonPrev = false
