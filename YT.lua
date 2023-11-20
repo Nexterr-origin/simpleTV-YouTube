@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (20/11/23)
+-- видеоскрипт для сайта https://www.youtube.com (21/11/23)
 -- https://github.com/Nexterr-origin/simpleTV-YouTube
 --[[
 	Copyright © 2017-2023 Nexterr
@@ -369,7 +369,7 @@ local infoInFile = false
 	if not m_simpleTV.User.YT.contin then
 		m_simpleTV.User.YT.contin = ''
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
 	local session = m_simpleTV.Http.New(userAgent, proxy, false)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
