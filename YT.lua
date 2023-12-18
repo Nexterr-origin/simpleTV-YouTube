@@ -1,28 +1,7 @@
--- видеоскрипт для сайта https://www.youtube.com (21/11/23)
--- https://github.com/Nexterr-origin/simpleTV-YouTube
---[[
-	Copyright © 2017-2023 Nexterr
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
-		http://www.apache.org/licenses/LICENSE-2.0
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
-]]
--- UTF-8 without BOM
--- поиск из окна "Открыть URL" (Ctrl+N), префиксы: - (видео), -- (плейлисты), --- (каналы), -+ (прямые трансляции)
--- авторизаця: файл формата "Netscape HTTP Cookie File" - *cookies.txt поместить в папку 'work'
--- показать на OSD плейлист / выбор качества: Ctrl+M
--- Прокси ---------------------------------------------------------
-local proxy = ''
--- '' - нет
--- 'http://127.0.0.1:12345' (пример)
---------------------------------------------------------------------
+-- видеоскрипт для сайта https://www.youtube.com (18/12/23)
+-- Copyright © 2017-2023 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
+-- ## поиск из окна "Открыть URL" (Ctrl+N) ##
 local infoInFile = false
---------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
 			and not m_simpleTV.Control.CurrentAddress:match('^https?://[%w.]*hooktube%.com')
@@ -208,7 +187,9 @@ local infoInFile = false
 			for line in fhandle:lines() do
 				local name, val = line:match('%.youtube%.com[^%d+]+%d+%s+(%S+)%s+(%S+)')
 				if name
-					and not name:match('ST%-')
+					and not name:match('^ST%-')
+					and not name:match('^__Secure.-C$')
+					and not name:match('^__Secure.-D$')
 					and val
 				then
 					t[#t + 1] = string.format('%s=%s', name, val)
@@ -342,7 +323,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.OpenUrlHelpCheck = true
 	end
 	if not m_simpleTV.User.YT.cookies then
-		local cookies = cookiesFromFile() or 'VISITOR_INFO1_LIVE=;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
+		local cookies = cookiesFromFile() or 'VISITOR_INFO1_LIVE=;SOCS=CAI;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
 		cookies = cookies:gsub('&amp;', '&')
 		m_simpleTV.User.YT.cookies = cookies
 		m_simpleTV.User.YT.Lng.lang = cookies:match('hl=([^&;]+)') or m_simpleTV.User.YT.Lng.lang
@@ -370,7 +351,7 @@ local infoInFile = false
 		m_simpleTV.User.YT.contin = ''
 	end
 	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
-	local session = m_simpleTV.Http.New(userAgent, proxy, false)
+	local session = m_simpleTV.Http.New(userAgent)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
 	m_simpleTV.User.YT.DelayedAddress = nil
@@ -1368,16 +1349,17 @@ local infoInFile = false
 			local ostime = os.time()
 			local toHash = string.format('%s %s %s', ostime, m_simpleTV.User.YT.isAuth, origin)
 			local hash = m_simpleTV.Common.CryptographicHash(toHash, 'Sha1', true)
-			m_simpleTV.User.YT.headerAuth = string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0\nX-Origin: %s\n', ostime, hash, origin)
+			m_simpleTV.User.YT.headerAuth = string.format('Authorization: SAPISIDHASH %s_%s\nX-Goog-AuthUser: 0\nX-Youtube-Bootstrap-Logged-In: true\nX-Origin: %s\n', ostime, hash, origin)
 		end
 	 return m_simpleTV.User.YT.headerAuth or ''
 	end
 	local function GetUrlWatchVideos(url)
-		local session_watchVideos = m_simpleTV.Http.New(userAgent, proxy, true)
+		local session_watchVideos = m_simpleTV.Http.New(userAgent, false, true)
 			if not session_watchVideos then return end
 		m_simpleTV.Http.SetTimeout(session_watchVideos, 8000)
 		m_simpleTV.Http.SetRedirectAllow(session_watchVideos, false)
 		m_simpleTV.Http.SetCookies(session_watchVideos, url, m_simpleTV.User.YT.cookies, '')
+		m_simpleTV.Http.Request(session_watchVideos, {url = 'https://www.youtube.com/'})
 		m_simpleTV.Http.Request(session_watchVideos, {url = url})
 		local raw = m_simpleTV.Http.GetRawHeader(session_watchVideos)
 		m_simpleTV.Http.Close(session_watchVideos)
@@ -1499,7 +1481,7 @@ local infoInFile = false
 	end
 	local function MarkWatch_YT()
 		if m_simpleTV.User.YT.videostats and not inAdr:match('&isPlst=history') then
-			local session_markWatch = m_simpleTV.Http.New(userAgent, proxy, false)
+			local session_markWatch = m_simpleTV.Http.New(userAgent)
 				if not session_markWatch then return end
 			m_simpleTV.Http.SetTimeout(session_markWatch, 8000)
 			local alphabet = split_str('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_')
@@ -1511,18 +1493,16 @@ local infoInFile = false
 				end
 			local url = string.format('%s&ver=2&fs=0&volume=100&muted=0&cpn=%s', m_simpleTV.User.YT.videostats, table.concat(t))
 			m_simpleTV.Http.SetCookies(session_markWatch, url, m_simpleTV.User.YT.cookies, '')
+			m_simpleTV.Http.Request(session_markWatch, {url = 'https://www.youtube.com/'})
 			local _ = m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
 	local function GetJsPlayer()
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
-		local sessionJsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
-			if not sessionJsPlayer then return end
-		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 12000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
+		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then
-				m_simpleTV.Http.Close(sessionJsPlayer)
+				m_simpleTV.Http.Close(session)
 			 return
 			end
 		local urlJs = answer:match('[^"\']+base%.js')
@@ -1530,7 +1510,7 @@ local infoInFile = false
 				or (m_simpleTV.User.YT.signScr
 				and tostring(m_simpleTV.User.YT.verJsPlayer) == urlJs)
 			then
-				m_simpleTV.Http.Close(sessionJsPlayer)
+				m_simpleTV.Http.Close(session)
 			 return
 			end
 		m_simpleTV.User.YT.verJsPlayer = urlJs
@@ -1540,8 +1520,7 @@ local infoInFile = false
 		if infoInFile then
 			debug_in_file(urlJs .. '\n', m_simpleTV.Common.GetMainPath(2) .. 'YT_JsPlayer.txt', true)
 		end
-		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = urlJs})
-		m_simpleTV.Http.Close(sessionJsPlayer)
+		rc, answer = m_simpleTV.Http.Request(session, {url = urlJs})
 			if rc ~= 200 then return end
 		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-join%(""%)};')
 		if throttleFunc then
@@ -1828,7 +1807,7 @@ local infoInFile = false
 	 return adr
 	end
 	local function Stream_Live(hls, title)
-		local session_live = m_simpleTV.Http.New(userAgent, proxy, false)
+		local session_live = m_simpleTV.Http.New(userAgent)
 			if not session_live then return end
 		m_simpleTV.Http.SetTimeout(session_live, 16000)
 		hls = hls:gsub('/keepalive/yes/', '/keepalive/no/')
@@ -1939,9 +1918,6 @@ local infoInFile = false
 				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=%s$OPT:marq-position=9$OPT:marq-timeout=5500$OPT:marq-opacity=40$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', marq_marquee, 0.025 * k, 0.03 * k, 0.03 * k, extOpt)
 			end
 		end
-		if proxy ~= '' then
-			extOpt = '$OPT:http-proxy=' .. proxy .. extOpt
-		end
 	 return url .. extOpt
 	end
 	local function Stream_Adr(t, aAdr, aItag, captions)
@@ -1956,19 +1932,20 @@ local infoInFile = false
 	 return t
 	end
 	local function GetVideoInfo(clientName, clientVersion)
-		local session_videoInfo = m_simpleTV.Http.New(userAgent, proxy, false)
+		local session_videoInfo = m_simpleTV.Http.New(userAgent)
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 16000)
 		clientName = clientName or 'WEB'
-		clientVersion = clientVersion or string.format('2.%s.01.00', os.date('%Y%m%d'))
+		clientVersion = clientVersion or '2.20231214.06.00'
 		local signTs = m_simpleTV.User.YT.signTs or 0
 		local visitorData = m_simpleTV.User.YT.visitorData or ''
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Firefox","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","osName":"Windows","osVersion":"10.0","clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
+		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Chrome","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","osName":"Windows","osVersion":"10.0","clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
-		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.Request(session_videoInfo, {url = 'https://www.youtube.com/'})
+		rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
 	end
@@ -2649,7 +2626,7 @@ local infoInFile = false
 		m_simpleTV.Control.ExecuteAction(37)
 		if m_simpleTV.User.YT.isPlstsCh then
 			m_simpleTV.Http.Close(session)
-			session = m_simpleTV.Http.New(userAgent, proxy, false)
+			session = m_simpleTV.Http.New(userAgent)
 				if not session then return end
 			m_simpleTV.Http.SetTimeout(session, 16000)
 		else
@@ -2723,6 +2700,7 @@ local infoInFile = false
 		t0.url = url
 		t0.method = 'get'
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
+		m_simpleTV.Http.Request(session, {url = 'https://www.youtube.com/'})
 		asynPlsLoaderHelper.Work(session, t0, params)
 		local header = params.User.Title
 		local tab = params.User.tab
@@ -2827,6 +2805,8 @@ local infoInFile = false
 			and m_simpleTV.User.YT.chId
 			and not inAdr:match('/videos')
 			and not inAdr:match('list=')
+			and not inAdr:match('/hashtag/')
+			and not inAdr:match('/feed/')
 		then
 			local ButtonScript1 = [[
 						m_simpleTV.Control.ExecuteAction(37)
@@ -3006,6 +2986,7 @@ local infoInFile = false
 		end
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
+		m_simpleTV.Http.Request(session, {url = 'https://www.youtube.com/'})
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&is%a+=%a+', ''), headers = headers})
 			if rc ~= 200 then
 				StopOnErr(4, 'cant load channal page')
@@ -3450,7 +3431,8 @@ local infoInFile = false
 			if params.User.typePlst == 'rssVideos'	then
 				title = (answer:match('<title>([^<]+)') or '')
 			else
-				title = answer:match('MetadataRenderer":{"title":"([^"]+)')
+				title = answer:match('"pageTitle":"([^"]+)')
+								or answer:match('MetadataRenderer":{"title":"([^"]+)')
 								or answer:match('"playlist":{"playlist":{"title":"([^"]+)')
 								or answer:match('"hashtagHeaderRenderer":{"hashtag":{"simpleText":"([^"]+)')
 								or answer:match('"subFeedOptionRenderer":{"name":{"runs":%[{"text":"([^"]+)')
