@@ -1,6 +1,7 @@
--- видеоскрипт для сайта https://www.youtube.com (18/12/23)
+-- видеоскрипт для сайта https://www.youtube.com (19/12/23)
 -- Copyright © 2017-2023 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
--- ## поиск из окна "Открыть URL" (Ctrl+N) ##
+-- поиск из окна "Открыть URL": [Ctrl+N]
+-- показать на OSD плейлист / выбор качества: [Ctrl+M]
 local infoInFile = false
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -1359,7 +1360,6 @@ local infoInFile = false
 		m_simpleTV.Http.SetTimeout(session_watchVideos, 8000)
 		m_simpleTV.Http.SetRedirectAllow(session_watchVideos, false)
 		m_simpleTV.Http.SetCookies(session_watchVideos, url, m_simpleTV.User.YT.cookies, '')
-		m_simpleTV.Http.Request(session_watchVideos, {url = 'https://www.youtube.com/'})
 		m_simpleTV.Http.Request(session_watchVideos, {url = url})
 		local raw = m_simpleTV.Http.GetRawHeader(session_watchVideos)
 		m_simpleTV.Http.Close(session_watchVideos)
@@ -1493,16 +1493,18 @@ local infoInFile = false
 				end
 			local url = string.format('%s&ver=2&fs=0&volume=100&muted=0&cpn=%s', m_simpleTV.User.YT.videostats, table.concat(t))
 			m_simpleTV.Http.SetCookies(session_markWatch, url, m_simpleTV.User.YT.cookies, '')
-			m_simpleTV.Http.Request(session_markWatch, {url = 'https://www.youtube.com/'})
 			local _ = m_simpleTV.Http.RequestA(session_markWatch, {callback = 'MarkWatched_YT', url = url})
 		end
 	end
 	local function GetJsPlayer()
 		m_simpleTV.User.YT.checkJsPlayer = os.time()
+		local sessionJsPlayer = m_simpleTV.Http.New(userAgent, proxy, false)
+			if not sessionJsPlayer then return end
+		m_simpleTV.Http.SetTimeout(sessionJsPlayer, 12000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
+		local rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = url})
 			if rc ~= 200 then
-				m_simpleTV.Http.Close(session)
+				m_simpleTV.Http.Close(sessionJsPlayer)
 			 return
 			end
 		local urlJs = answer:match('[^"\']+base%.js')
@@ -1510,7 +1512,7 @@ local infoInFile = false
 				or (m_simpleTV.User.YT.signScr
 				and tostring(m_simpleTV.User.YT.verJsPlayer) == urlJs)
 			then
-				m_simpleTV.Http.Close(session)
+				m_simpleTV.Http.Close(sessionJsPlayer)
 			 return
 			end
 		m_simpleTV.User.YT.verJsPlayer = urlJs
@@ -1520,7 +1522,8 @@ local infoInFile = false
 		if infoInFile then
 			debug_in_file(urlJs .. '\n', m_simpleTV.Common.GetMainPath(2) .. 'YT_JsPlayer.txt', true)
 		end
-		rc, answer = m_simpleTV.Http.Request(session, {url = urlJs})
+		rc, answer = m_simpleTV.Http.Request(sessionJsPlayer, {url = urlJs})
+		m_simpleTV.Http.Close(sessionJsPlayer)
 			if rc ~= 200 then return end
 		local throttleFunc = answer:match('=function%(a%){var b=a%.split.-join%(""%)};')
 		if throttleFunc then
@@ -1944,7 +1947,6 @@ local infoInFile = false
 		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Chrome","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","osName":"Windows","osVersion":"10.0","clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
-		m_simpleTV.Http.Request(session_videoInfo, {url = 'https://www.youtube.com/'})
 		rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
@@ -2700,7 +2702,6 @@ local infoInFile = false
 		t0.url = url
 		t0.method = 'get'
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
-		m_simpleTV.Http.Request(session, {url = 'https://www.youtube.com/'})
 		asynPlsLoaderHelper.Work(session, t0, params)
 		local header = params.User.Title
 		local tab = params.User.tab
@@ -2986,7 +2987,6 @@ local infoInFile = false
 		end
 		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Youtube-Client-Name: 1\nX-YouTube-Client-Version: 2.20210729.00.00\nX-Goog-Visitor-Id: ' .. (m_simpleTV.User.YT.PlstsCh.visitorData or '')
 		m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
-		m_simpleTV.Http.Request(session, {url = 'https://www.youtube.com/'})
 		local rc, answer = m_simpleTV.Http.Request(session, {body = body, method = method, url = url:gsub('&is%a+=%a+', ''), headers = headers})
 			if rc ~= 200 then
 				StopOnErr(4, 'cant load channal page')
