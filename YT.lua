@@ -1,7 +1,10 @@
--- видеоскрипт для сайта https://www.youtube.com (19/12/23)
--- Copyright © 2017-2023 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
+-- видеоскрипт для сайта https://www.youtube.com (11/1/24)
+-- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
+-- приоритет улучшеных видео кодеков
+local hiCodecs = false
+-- отладка
 local infoInFile = false
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
@@ -1731,7 +1734,21 @@ local infoInFile = false
 	 return stream_tab_err, title_err
 	end
 	local function ItagTab()
-		local video = {
+		local video
+		if hiCodecs then
+			video = {
+						694, 394, 330, 278, 160, -- 144
+						695, 395, 331, 242, 133, -- 240
+						696, 396, 332, 243, 134, 18, -- 360
+						697, 397, 333, 244, 135, -- 480
+						698, 398, 334, 302, 247, 298, 136, 22, -- 720
+						699, 399, 335, 303, -- 1080
+						700, 400, 336, 308, -- 1440
+						701, 401, 337, 315, 701, -- 2160
+						402, 571, 272 -- 4320
+					}
+		else
+			video = {
 						394, 160, 278, -- 144 - height (qlty)
 						395, 133, 242, -- 240
 						18, 134, 243, -- 360
@@ -1745,6 +1762,7 @@ local infoInFile = false
 						313, 315, 337, 401, 701, -- 2160 (60 fps, HDR)
 						272, 571, 703 -- 4320 (60 fps, HDR)
 					}
+			end
 		local audio = {
 						258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 						327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
