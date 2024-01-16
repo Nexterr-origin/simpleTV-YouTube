@@ -1,9 +1,12 @@
--- видеоскрипт для сайта https://www.youtube.com (12/1/24)
+-- видеоскрипт для сайта https://www.youtube.com (17/1/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
--- приоритет улучшеных видео кодеков
-local hiCodecs = false
+-- параметры (true | false)
+local video60 = false
+local videoVP9 = false
+local videoAV1 = false
+local videoHDR = false
 -- отладка
 local infoInFile = false
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
@@ -1734,9 +1737,7 @@ local infoInFile = false
 	 return stream_tab_err, title_err
 	end
 	local function ItagTab()
-		local video
-		if hiCodecs then
-			video = {
+		local video = {
 						694, 394, 330, 278, 160, 17, -- 144
 						695, 395, 331, 242, 133, -- 240
 						696, 396, 332, 243, 134, 167, 18, -- 360
@@ -1747,22 +1748,6 @@ local infoInFile = false
 						701, 401, 337, 315, 313, 305, 266, -- 2160
 						702, 402, 571, 272, 138, -- 4320
 					}
-		else
-			video = {
-						394, 160, 278, 17, -- 144 - height (qlty)
-						395, 133, 242, -- 240
-						18, 134, 243, -- 360
-						135, 244, -- 480
-						136, 247, 22, -- 720
-						298, -- 720 (50|60 fps)
-						302, 334, -- 720 (60 fps, HDR)
-						137, 248, -- 1080
-						299, 335, -- 1080 (60 fps, HDR)
-						271, 308, 336, -- 1440 (60 fps, HDR)
-						313, 315, 337, 401, 701, -- 2160 (60 fps, HDR)
-						272, 571, 703, -- 4320 (60 fps, HDR)
-					}
-			end
 		local audio = {
 						258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 						327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
@@ -2207,6 +2192,7 @@ local infoInFile = false
 						if tab.streamingData.adaptiveFormats[k].contentLength then
 							t[i] = {}
 							t[i].itag = tab.streamingData.adaptiveFormats[k].itag
+							t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
 							t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
 							t[i].height = tab.streamingData.adaptiveFormats[k].height
 							t[i].Address = tab.streamingData.adaptiveFormats[k].url or tab.streamingData.adaptiveFormats[k].signatureCipher
@@ -2239,6 +2225,26 @@ local infoInFile = false
 					title = title .. '\nno parameters to decrypt'
 				end
 			 return Stream_Error(tab, title)
+			end
+			for i = #t, 1, -1 do
+				if t[i].qualityLabel and t[i].qualityLabel:match('HDR') and not videoHDR then
+					table.remove(t, i)
+				end
+			end
+			for i = #t, 1, -1 do
+				if t[i].qualityLabel and t[i].qualityLabel:match('60') and not video60 then
+					table.remove(t, i)
+				end
+			end
+			for i = #t, 1, -1 do
+				if t[i].mimeType and t[i].mimeType:match('vp9') and not videoVP9 then
+					table.remove(t, i)
+				end
+			end
+			for i = #t, 1, -1 do
+				if t[i].mimeType and t[i].mimeType:match('av01') and not videoAV1 then
+					table.remove(t, i)
+				end
 			end
 		local qlty2D
 			for i = #t, 1, -1 do
