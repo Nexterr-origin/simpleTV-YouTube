@@ -1,14 +1,15 @@
--- видеоскрипт для сайта https://www.youtube.com (17/1/24)
+-- видеоскрипт для сайта https://www.youtube.com (3/4/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
-local video60 = false
-local videoVP9 = false
-local videoAV1 = false
+local videoHFR = true
+local videoVP9 = true
+local videoAV1 = true
 local videoHDR = false
 -- отладка
 local infoInFile = false
+--
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a.]*youtu[.combe]')
 			and not m_simpleTV.Control.CurrentAddress:match('^https?://[%w.]*hooktube%.com')
@@ -357,7 +358,7 @@ local infoInFile = false
 	if not m_simpleTV.User.YT.contin then
 		m_simpleTV.User.YT.contin = ''
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
 	local session = m_simpleTV.Http.New(userAgent)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -2232,7 +2233,7 @@ local infoInFile = false
 				end
 			end
 			for i = #t, 1, -1 do
-				if t[i].qualityLabel and t[i].qualityLabel:match('60') and not video60 then
+				if t[i].qualityLabel and t[i].qualityLabel:match('60') and not videoHFR then
 					table.remove(t, i)
 				end
 			end
