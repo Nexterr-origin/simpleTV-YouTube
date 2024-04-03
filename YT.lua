@@ -3,9 +3,9 @@
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
-local videoHFR = true
-local videoVP9 = true
-local videoAV1 = true
+local videoHFR = false
+local videoVP9 = false
+local videoAV1 = false
 local videoHDR = false
 -- отладка
 local infoInFile = false
