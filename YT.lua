@@ -1,11 +1,11 @@
--- видеоскрипт для сайта https://www.youtube.com (3/4/24)
+-- видеоскрипт для сайта https://www.youtube.com (22/4/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
-local videoHFR = false
-local videoVP9 = false
-local videoAV1 = false
+local videoHFR = true
+local videoVP9 = true
+local videoAV1 = true
 local videoHDR = false
 -- отладка
 local infoInFile = false
@@ -1752,9 +1752,9 @@ local infoInFile = false
 		local audio = {
 						258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 						327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
+						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 						141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
 						140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
-						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 						}
 	 return video, audio
 	end
