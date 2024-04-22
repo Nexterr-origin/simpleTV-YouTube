@@ -1752,8 +1752,8 @@ local infoInFile = false
 		local audio = {
 						258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
 						327, -- MP4 AAC (LC) 256 Kbps Surround (5.1)
-						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 						141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
+						251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 						140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
 						}
 	 return video, audio
