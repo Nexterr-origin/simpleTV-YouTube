@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/4/24)
+-- видеоскрипт для сайта https://www.youtube.com (29/4/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -6,7 +6,7 @@
 local videoHFR = true
 local videoVP9 = true
 local videoAV1 = true
-local videoHDR = false
+local videoHDR = true
 -- отладка
 local infoInFile = false
 --
@@ -1481,8 +1481,12 @@ local infoInFile = false
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.chapter
 		end
 		local fps = name:match('^%d+p(%d+)')
+		local hdr = name:match('^%d+p%d+%s*(HDR)')
 		if fps then
 			title = title .. '\n☑ FPS ' .. fps
+			if hdr then
+				title = title .. ' HDR'
+			end
 		end
 	 return title
 	end
@@ -1897,7 +1901,7 @@ local infoInFile = false
 			url = DeCipherSign(url)
 			extOpt = '$OPT:NO-STIMESHIFT' .. extOpt
 			if t[index].isAdaptive == true then
-				extOpt = '$OPT:sub-track-id=1$OPT:demux=avdemux' .. extOpt
+				extOpt = '$OPT:sub-track-id=1' .. extOpt
 			elseif t[index].isAdaptive == false then
 				extOpt = '$OPT:sub-track-id=2' .. extOpt
 			end
@@ -1935,6 +1939,9 @@ local infoInFile = false
 			if captions then
 				t.Address = t.Address .. '$OPT:input-slave=' .. captions
 			end
+		end
+		if not t.Name:match(' HDR') then
+			t.Address = t.Address .. '$OPT:demux=avdemux'
 		end
 	 return t
 	end
