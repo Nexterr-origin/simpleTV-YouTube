@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/4/24)
+-- видеоскрипт для сайта https://www.youtube.com (5/5/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1481,12 +1481,12 @@ local infoInFile = false
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.chapter
 		end
 		local fps = name:match('^%d+p(%d+)')
-		local hdr = name:match('^%d+p%d+%s*(HDR)')
+		local hdr = name:match('HDR')
 		if fps then
 			title = title .. '\n☑ FPS ' .. fps
-			if hdr then
-				title = title .. ' HDR'
-			end
+		end
+		if hdr then
+			title = title .. '\n☑ HDR'
 		end
 	 return title
 	end
