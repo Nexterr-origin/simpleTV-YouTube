@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (5/5/24)
+-- видеоскрипт для сайта https://www.youtube.com (10/7/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1962,6 +1962,23 @@ local infoInFile = false
 		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
 	end
+	local function GetVideoInfoAndroid(clientName, clientVersion)
+		local session_videoInfo = m_simpleTV.Http.New('com.google.android.apps.youtube.creator/22.30.100 (Linux; U; Android 11) gzip')
+			if not session_videoInfo then return end
+		m_simpleTV.Http.SetTimeout(session_videoInfo, 16000)
+		clientName = 'ANDROID_TESTSUITE'
+		clientVersion = '1.9'
+		local signTs = m_simpleTV.User.YT.signTs or 0
+		local visitorData = m_simpleTV.User.YT.visitorData or ''
+		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
+		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
+		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Chrome","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","osName":"Windows","osVersion":"10.0","clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
+		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyD_qjV8zaaUMehtLkrKFgVeSX_Iqbtyws8'
+		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
+		rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.Close(session_videoInfo)
+	 return rc, answer
+	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.User.YT.ThumbsInfo = nil
 		m_simpleTV.User.YT.vId = vId
@@ -1977,16 +1994,17 @@ local infoInFile = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-		if not m_simpleTV.User.YT.signScr
-			or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
-		then
-			pcall(GetJsPlayer)
-		end
+		-- if not m_simpleTV.User.YT.signScr
+			-- or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
+		-- then
+			-- pcall(GetJsPlayer)
+		-- end
 		m_simpleTV.Http.Close(session)
 		if infoInFile then
 			inf0 = os.clock()
 		end
-		local rc, player_response = GetVideoInfo()
+		-- local rc, player_response = GetVideoInfo()
+		local rc, player_response = GetVideoInfoAndroid()
 		if infoInFile then
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
