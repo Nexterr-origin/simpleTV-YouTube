@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (10/7/24)
+-- видеоскрипт для сайта https://www.youtube.com (11/7/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1958,24 +1958,21 @@ local infoInFile = false
 		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Chrome","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","osName":"Windows","osVersion":"10.0","clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
 		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false'
 		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
-		rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
+		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
 	end
-	local function GetVideoInfoAndroid(clientName, clientVersion)
-		local session_videoInfo = m_simpleTV.Http.New('com.google.android.apps.youtube.creator/22.30.100 (Linux; U; Android 11) gzip')
+	local function GetVideoInfoAndroid()
+		local session_videoInfo = m_simpleTV.Http.New('com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip')
 			if not session_videoInfo then return end
 		m_simpleTV.Http.SetTimeout(session_videoInfo, 16000)
-		clientName = 'ANDROID_TESTSUITE'
-		clientVersion = '1.9'
-		local signTs = m_simpleTV.User.YT.signTs or 0
-		local visitorData = m_simpleTV.User.YT.visitorData or ''
+		local clientName = 'ANDROID'
+		local clientVersion = '19.09.37'
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
-		local headers = GetHeader_Auth() .. 'Content-Type: application/json\nX-Goog-Visitor-Id: ' .. visitorData
-		local body = string.format('{"videoId":"%s","context":{"client":{"browserName":"Chrome","platform":"DESKTOP","clientFormFactor":"UNKNOWN_FORM_FACTOR","hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","osName":"Windows","osVersion":"10.0","clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"user":{"lockedSafetyMode":false},"request":{"useSsl":true},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS","signatureTimestamp":%s}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty, signTs)
-		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyD_qjV8zaaUMehtLkrKFgVeSX_Iqbtyws8'
-		m_simpleTV.Http.SetCookies(session_videoInfo, url, m_simpleTV.User.YT.cookies, '')
-		rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
+		local headers = 'Content-Type:application/json'
+		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","androidSdkVersion":30,"clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty)
+		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w'
+		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
 	end
