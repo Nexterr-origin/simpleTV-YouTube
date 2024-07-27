@@ -5,8 +5,8 @@
 -- параметры (true | false)
 local videoHFR = true
 local videoVP9 = true
-local videoAV1 = false
-local videoHDR = false
+local videoAV1 = true
+local videoHDR = true
 -- отладка
 local infoInFile = false
 --
