@@ -1,12 +1,12 @@
--- видеоскрипт для сайта https://www.youtube.com (11/7/24)
+-- видеоскрипт для сайта https://www.youtube.com (27/7/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
 local videoHFR = true
 local videoVP9 = true
-local videoAV1 = true
-local videoHDR = true
+local videoAV1 = false
+local videoHDR = false
 -- отладка
 local infoInFile = false
 --
@@ -1969,9 +1969,9 @@ local infoInFile = false
 		local clientName = 'ANDROID'
 		local clientVersion = '19.09.37'
 		local thirdParty = urlAdr:match('$OPT:http%-referrer=([^%$]+)') or 'https://www.youtube.com/'
-		local headers = 'Content-Type:application/json'
+		local headers = 'Priority: u=0\nContent-Type:application/json'
 		local body = string.format('{"videoId":"%s","context":{"client":{"hl":"%s","gl":"%s","clientName":"%s","clientVersion":"%s","androidSdkVersion":30,"clientScreen":"WATCH"},"thirdParty":{"embedUrl":"%s"}},"racyCheckOk":true,"contentCheckOk":true}', m_simpleTV.User.YT.vId, m_simpleTV.User.YT.Lng.lang, m_simpleTV.User.YT.Lng.country, clientName, clientVersion, thirdParty)
-		local url = 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w'
+		local url = 'https://youtubei.googleapis.com/youtubei/v1/player?key=AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w'
 		local rc, answer = m_simpleTV.Http.Request(session_videoInfo, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
