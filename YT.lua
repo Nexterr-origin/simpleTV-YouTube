@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (28/7/24)
+-- видеоскрипт для сайта https://www.youtube.com (20/9/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -358,7 +358,7 @@ local infoInFile = false
 	if not m_simpleTV.User.YT.contin then
 		m_simpleTV.User.YT.contin = ''
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
 	local session = m_simpleTV.Http.New(userAgent)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -827,9 +827,10 @@ local infoInFile = false
 		local url = decode64('aHR0cHM6Ly93d3cueW91dHViZS5jb20vcy9fL2thYnVraS9fL2pzL2s9a2FidWtpLmJhc2Vfc3MuZW5fVVMuUDE3NWtKdlZFa1EuZXM1Lk8vYW09UkFBQlJBQVEvZD0xL3JzPUFOalJoVm51QU1SUTVQS2FzSUJ1MVQ3X0NlZkVtZnc3M2cvbT1iYXNl')
 		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
-		local key = answer:match('ze%("INNERTUBE_API_KEY","([^"]+)')
-			if key and not checkApiKey(key) then return end
-	 return key
+			for key in answer:gmatch('ze%("INNERTUBE_API_KEY","([^"]+)') do
+				if checkApiKey(key) then return key end
+			end
+	 return
 	end
 	local function getApiKey()
 		local key = m_simpleTV.User.YT.apiKey
