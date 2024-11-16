@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (20/9/24)
+-- видеоскрипт для сайта https://www.youtube.com (16/11/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -39,7 +39,7 @@ local infoInFile = false
 	end
 	if not m_simpleTV.User.YT.VersionCheck then
 		local ver = m_simpleTV.Common.GetVersion()
-		if ver < 1040 then
+		if ver < 1150 then
 			local msg
 			if m_simpleTV.Interface.GetLanguage() == 'ru' then
 				msg = 'Этв версия simpleTV устарела, обновите'
@@ -1823,6 +1823,7 @@ local infoInFile = false
 			if not session_live then return end
 		m_simpleTV.Http.SetTimeout(session_live, 16000)
 		hls = hls:gsub('/keepalive/yes/', '/keepalive/no/')
+		m_simpleTV.Http.SetTLSProtocol(session_live, 'TLS_allAvailables')
 		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
 		m_simpleTV.Http.Close(session_live)
 			if rc ~= 200 then
