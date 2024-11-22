@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/11/24)
+-- видеоскрипт для сайта https://www.youtube.com (23/11/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1943,8 +1943,11 @@ local infoInFile = false
 				t.Address = t.Address .. '$OPT:input-slave=' .. captions
 			end
 		end
-		if not t.Name:match(' HDR') then
+		if not t.Name:match(' HDR') and not t.mimeType:match('codecs="av01') then
 			t.Address = t.Address .. '$OPT:demux=avdemux'
+		end
+		if t.Name:match(' HDR') then
+			t.Address = t.Address .. '$OPT:d3d11-upscale-mode=linear'
 		end
 	 return t
 	end
