@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (16/11/24)
+-- видеоскрипт для сайта https://www.youtube.com (22/11/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -828,7 +828,7 @@ local infoInFile = false
 		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
 			for key in answer:gmatch('ze%("INNERTUBE_API_KEY","([^"]+)') do
-				if checkApiKey(key) then return key end
+				if key then return key end
 			end
 	 return
 	end
