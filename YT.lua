@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/11/24)
+-- видеоскрипт для сайта https://www.youtube.com (24/11/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -358,7 +358,7 @@ local infoInFile = false
 	if not m_simpleTV.User.YT.contin then
 		m_simpleTV.User.YT.contin = ''
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.85 Safari/537.36'
 	local session = m_simpleTV.Http.New(userAgent)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -828,6 +828,7 @@ local infoInFile = false
 		local rc, answer = m_simpleTV.Http.Request(session, {url = url})
 			if rc ~= 200 then return end
 			for key in answer:gmatch('ze%("INNERTUBE_API_KEY","([^"]+)') do
+				-- if checkApiKey(key) then return key end
 				if key then return key end
 			end
 	 return
@@ -2204,6 +2205,7 @@ local infoInFile = false
 						t[i].itag = tab.streamingData.formats[k].itag
 						t[i].qualityLabel = tab.streamingData.formats[k].qualityLabel
 						t[i].height = tab.streamingData.formats[k].height
+						t[i].mimeType = tab.streamingData.formats[k].mimeType
 						t[i].Address = tab.streamingData.formats[k].url or tab.streamingData.formats[k].signatureCipher
 						t[i].isAdaptive = false
 						t[i].Address = m_simpleTV.Common.fromPercentEncoding(t[i].Address)
