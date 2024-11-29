@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/11/24)
+-- видеоскрипт для сайта https://www.youtube.com (29/11/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1588,7 +1588,7 @@ local infoInFile = false
 							and (not kind or kind ~= 'asr')
 							and languageCode == subt[r]
 						then
-							subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].baseUrl .. '&fmt=vtt'
+							subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].baseUrl
 						 break
 						end
 					q = q + 1
@@ -1649,7 +1649,7 @@ local infoInFile = false
 						and (not kind or kind ~= 'asr')
 						and languageCode ~= 'na'
 					then
-						subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl .. '&tlang=' .. lngCodeTr .. '&fmt=vtt'
+						subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl .. '&tlang=' .. lngCodeTr
 					 break
 					end
 				r = r + 1
@@ -1909,7 +1909,6 @@ local infoInFile = false
 			elseif t[index].isAdaptive == false then
 				extOpt = '$OPT:sub-track-id=2' .. extOpt
 			end
-			url = url:gsub('#https', '#http')
 			local adrStart = inAdr:match('[?&]t=[^&]+')
 			if adrStart and videoId == m_simpleTV.User.YT.vId then
 				extOpt = Stream_Start(adrStart) .. extOpt
@@ -2299,6 +2298,8 @@ local infoInFile = false
 			and subtitle_config == 'true'
 		then
 			captions, captions_title = Subtitle(tab)
+			captions = captions:gsub('&fmt=[^&]+', '&fmt=vtt')
+			captions = captions:gsub('#https', '#http')
 		end
 			for _, v in pairs(t) do
 				local qualityLabel = v.qualityLabel
