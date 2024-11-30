@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/11/24)
+-- видеоскрипт для сайта https://www.youtube.com (30/11/24)
 -- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1596,7 +1596,7 @@ local infoInFile = false
 				r = r + 1
 			end
 			if subtAdr then
-			 return subtAdr:gsub('://', '/webvtt://'), ''
+			 return subtAdr:gsub('://', '/webvtt://'):gsub('&fmt=[^&]+', '&fmt=vtt'):gsub('#https', '#http'), ''
 			end
 			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
 				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
@@ -1655,7 +1655,7 @@ local infoInFile = false
 				r = r + 1
 			end
 			if not subtAdr then return end
-	 return subtAdr:gsub('://', '/webvtt://'), ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
+	 return subtAdr:gsub('://', '/webvtt://'):gsub('&fmt=[^&]+', '&fmt=vtt'):gsub('#https', '#http'), ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
 	local function positionToContinue(p)
 		if m_simpleTV.User.YT.duration then
@@ -2298,8 +2298,6 @@ local infoInFile = false
 			and subtitle_config == 'true'
 		then
 			captions, captions_title = Subtitle(tab)
-			captions = captions:gsub('&fmt=[^&]+', '&fmt=vtt')
-			captions = captions:gsub('#https', '#http')
 		end
 			for _, v in pairs(t) do
 				local qualityLabel = v.qualityLabel
