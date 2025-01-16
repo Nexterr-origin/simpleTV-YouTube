@@ -1,5 +1,5 @@
--- видеоскрипт для сайта https://www.youtube.com (3/12/24)
--- Copyright © 2017-2024 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
+-- видеоскрипт для сайта https://www.youtube.com (16/1/25)
+-- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- поиск из окна "Открыть URL": [Ctrl+N]
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
@@ -1943,12 +1943,7 @@ local infoInFile = false
 				t.Address = t.Address .. '$OPT:input-slave=' .. captions
 			end
 		end
-		if not t.Name:match(' HDR') and not t.mimeType:match('codecs="av01') then
-			t.Address = t.Address .. '$OPT:demux=avdemux'
-		end
-		if t.Name:match(' HDR') then
-			t.Address = t.Address .. '$OPT:d3d11-upscale-mode=linear'
-		end
+		t.Address = t.Address .. '$OPT:demux=avdemux'
 	 return t
 	end
 	local function GetVideoInfo(clientName, clientVersion)
