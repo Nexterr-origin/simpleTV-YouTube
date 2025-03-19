@@ -1,6 +1,6 @@
--- видеоскрипт для сайта https://www.youtube.com (16/1/25)
+-- видеоскрипт для сайта https://www.youtube.com (20/3/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
--- поиск из окна "Открыть URL": [Ctrl+N]
+-- // поиск из окна "Открыть URL": [Ctrl+N] == //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
 local videoHFR = true
@@ -323,13 +323,13 @@ local infoInFile = false
 			m_simpleTV.User.YT.Lng.chapter = 'chapters'
 		end
 	end
-	if not m_simpleTV.User.YT.OpenUrlHelpCheck then
-		if m_simpleTV.PlayList.GetOpenUrlHelp() == '' then
-			local help_text = '<html><body><h3>🔎 ' .. m_simpleTV.User.YT.Lng.search .. '</h3><p></p><p><strong>YouTube</strong></p><table border="1"><tbody><tr><td>&nbsp;<strong>- ' .. m_simpleTV.User.YT.Lng.video .. '</strong>&nbsp;</td><td>&nbsp;<strong>-- ' .. m_simpleTV.User.YT.Lng.plst .. '</strong>&nbsp;</td></tr><tr><td>&nbsp;<strong>--- ' .. m_simpleTV.User.YT.Lng.channel .. '</strong>&nbsp;</td><td>&nbsp;<strong>-+ ' .. m_simpleTV.User.YT.Lng.live .. '</strong>&nbsp;</td></tr></tbody></table></body></html>'
-			m_simpleTV.PlayList.SetOpenUrlHelp(help_text)
-		end
-		m_simpleTV.User.YT.OpenUrlHelpCheck = true
-	end
+	-- if not m_simpleTV.User.YT.OpenUrlHelpCheck then
+		-- if m_simpleTV.PlayList.GetOpenUrlHelp() == '' then
+			-- local help_text = '<html><body><h3>🔎 ' .. m_simpleTV.User.YT.Lng.search .. '</h3><p></p><p><strong>YouTube</strong></p><table border="1"><tbody><tr><td>&nbsp;<strong>- ' .. m_simpleTV.User.YT.Lng.video .. '</strong>&nbsp;</td><td>&nbsp;<strong>-- ' .. m_simpleTV.User.YT.Lng.plst .. '</strong>&nbsp;</td></tr><tr><td>&nbsp;<strong>--- ' .. m_simpleTV.User.YT.Lng.channel .. '</strong>&nbsp;</td><td>&nbsp;<strong>-+ ' .. m_simpleTV.User.YT.Lng.live .. '</strong>&nbsp;</td></tr></tbody></table></body></html>'
+			-- m_simpleTV.PlayList.SetOpenUrlHelp(help_text)
+		-- end
+		-- m_simpleTV.User.YT.OpenUrlHelpCheck = true
+	-- end
 	if not m_simpleTV.User.YT.cookies then
 		local cookies = cookiesFromFile() or 'VISITOR_INFO1_LIVE=;SOCS=CAI;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
 		cookies = cookies:gsub('&amp;', '&')
@@ -1545,10 +1545,10 @@ local infoInFile = false
 		m_simpleTV.User.YT.signTs = answer:match('signatureTimestamp[=:](%d+)') or answer:match('[.,]sts[:="](%d+)')
 		local rules, helper = answer:match('{%w+=%a%.split%(""%);(([^%.%[]+)[%.%[%]%w"]+%(%S+)')
 			if not rules or not helper then return end
-		local transformations = answer:match('[; ]' .. helper .. '={.-};')
+		local transformations = answer:match('[; ]' .. helper .. '=({.-});')
 			if not transformations then return end
 		rules = rules:gsub('%[', '.'):gsub('%]', ''):gsub('"', '')
-		transformations = transformations:gsub('"', '')
+		transformations = transformations:gsub('"', ''):gsub('%c', ''):gsub(',', '{'):gsub('{var.-}', '{h.swap()')
 		local signScr = {}
 			for param in rules:gmatch(helper .. '[^)]+') do
 				local func, p = param:match('([^%.]+)%(%a,(%d+)')
@@ -1820,48 +1820,49 @@ local infoInFile = false
 	 return adr
 	end
 	local function Stream_Live(hls, title)
-		local session_live = m_simpleTV.Http.New(userAgent)
-			if not session_live then return end
-		m_simpleTV.Http.SetTimeout(session_live, 16000)
-		hls = hls:gsub('/keepalive/yes/', '/keepalive/no/')
-		m_simpleTV.Http.SetTLSProtocol(session_live, 'TLS_allAvailables')
-		local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
-		m_simpleTV.Http.Close(session_live)
-			if rc ~= 200 then
-			 return nil, 'stream live Error'
-			end
-		local t = {}
-			for name, fps, adr in answer:gmatch('RESOLUTION=(.-),.-RATE=(%d+).-\n(.-)\n') do
-				name = tonumber(name:match('x(%d+)') or '0')
-				local qlty
-				if name > 240 then
-					if tonumber(fps) > 30 then
-						qlty = name + 6
-						fps = ' ' .. fps .. ' FPS'
-					else
-						qlty = name
-						fps = ''
-					end
-					t[#t + 1] = {}
-					t[#t].Id = #t
-					t[#t].Name = name .. 'p' .. fps
-					t[#t].Address = adr
-					t[#t].qltyLive = qlty
-				end
-			end
-		if m_simpleTV.User.YT.isLive == true and not isIPanel then
-			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
+		 return hls, title
 		end
-			if #t == 0 then
-			 return hls, title
-			end
-		t[#t + 1] = {}
-		t[#t].Id = #t
-		t[#t].qltyLive = 10000
-		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
-		t[#t].Address = hls
-	 return t, title
-	end
+		-- local session_live = m_simpleTV.Http.New(userAgent)
+			-- if not session_live then return end
+		-- m_simpleTV.Http.SetTimeout(session_live, 8000)
+		-- m_simpleTV.Http.SetTLSProtocol(session_live, 'TLS_allAvailables')
+		-- local rc, answer = m_simpleTV.Http.Request(session_live, {url = hls})
+		-- m_simpleTV.Http.Close(session_live)
+			-- if rc ~= 200 then
+			 -- return nil, 'stream live Error'
+			-- end
+		-- local t = {}
+			-- for name, fps, adr in answer:gmatch('RESOLUTION=(.-),.-RATE=(%d+).-\n(.-)\n') do
+				-- name = tonumber(name:match('x(%d+)') or '0')
+				-- local qlty
+				-- if name > 240 then
+					-- if tonumber(fps) > 30 then
+						-- qlty = name + 6
+						-- fps = ' ' .. fps .. ' FPS'
+					-- else
+						-- qlty = name
+						-- fps = ''
+					-- end
+					-- t[#t + 1] = {}
+					-- t[#t].Id = #t
+					-- t[#t].Name = name .. 'p' .. fps
+					-- t[#t].Address = adr
+					-- t[#t].qltyLive = qlty
+				-- end
+			-- end
+		-- if m_simpleTV.User.YT.isLive == true and not isIPanel then
+			-- title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
+		-- end
+			-- if #t == 0 then
+			 -- return hls, title
+			-- end
+		-- t[#t + 1] = {}
+		-- t[#t].Id = #t
+		-- t[#t].qltyLive = 10000
+		-- t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
+		-- t[#t].Address = hls
+	 -- return t, title
+	-- end
 	local function GetQltyIndex(t)
 		if (m_simpleTV.User.YT.qlty < 300
 			and m_simpleTV.User.YT.qlty > 100)
@@ -1977,6 +1978,25 @@ local infoInFile = false
 		m_simpleTV.Http.Close(session_videoInfo)
 	 return rc, answer
 	end
+	local function GetVideoInfoIOS()
+		local sessionWeb = m_simpleTV.Http.New('com.google.ios.youtube/20.03.02 (iPhone16,2; U; CPU iOS 18_2_1 like Mac OS X;)')
+			if not sessionWeb then return end
+		m_simpleTV.Http.SetTimeout(sessionWeb, 8000)
+		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
+		local rc, answer = m_simpleTV.Http.Request(sessionWeb, {url = url})
+			if rc ~= 200 then
+				m_simpleTV.Http.Close(sessionWeb)
+			 return
+			end
+		local visitorData = answer:match('"visitorData":"([^"]+)')
+			if not visitorData then return end
+		local headers = 'Content-Type:application/json\nX-YouTube-Client-Name: 5\nX-YouTube-Client-Version:20.03.02\nOrigin:https://www.youtube.com\nX-Goog-Visitor-Id:' .. visitorData
+		local body ='{"contentCheckOk":true,"context":{"client":{"clientName":"IOS","clientVersion":"20.03.02","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"en","osName":"iPhone","osVersion":"18.2.1.22C161","timeZone":"UTC","utcOffsetMinutes":0}},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS"}},"racyCheckOk":true,"videoId":"' ..m_simpleTV.User.YT.vId ..'"}'
+		local url = 'https://www.youtube.com/youtubei/v1/player'
+		local rc, answer = m_simpleTV.Http.Request(sessionWeb, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.Close(sessionWeb)
+	 return rc, answer
+	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.User.YT.ThumbsInfo = nil
 		m_simpleTV.User.YT.vId = vId
@@ -2002,7 +2022,8 @@ local infoInFile = false
 			inf0 = os.clock()
 		end
 		-- local rc, player_response = GetVideoInfo()
-		local rc, player_response = GetVideoInfoAndroid()
+		-- local rc, player_response = GetVideoInfoAndroid()
+		local rc, player_response = GetVideoInfoIOS()
 		if infoInFile then
 			inf0 = string.format('%.3f', (os.clock() - inf0))
 		end
