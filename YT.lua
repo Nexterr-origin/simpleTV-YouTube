@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/3/25)
+-- видеоскрипт для сайта https://www.youtube.com (22/3/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1820,8 +1820,16 @@ local infoInFile = false
 	 return adr
 	end
 	local function Stream_Live(hls, title)
-		 return hls, title
+		local t ={}
+		t[1] = {}
+		t[1].Name = ''
+		t[1].Address = hls
+		t[1].qltyLive = 10000
+		if m_simpleTV.User.YT.isLive == true and not isIPanel then
+			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
 		end
+	 return t, title
+	end
 		-- local session_live = m_simpleTV.Http.New(userAgent)
 			-- if not session_live then return end
 		-- m_simpleTV.Http.SetTimeout(session_live, 8000)
