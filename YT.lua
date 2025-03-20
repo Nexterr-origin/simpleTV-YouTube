@@ -1,6 +1,6 @@
--- видеоскрипт для сайта https://www.youtube.com (20/3/25)
+-- видеоскрипт для сайта https://www.youtube.com (21/3/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
--- // поиск из окна "Открыть URL": [Ctrl+N] == //
+-- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
 local videoHFR = true
@@ -1979,11 +1979,13 @@ local infoInFile = false
 	 return rc, answer
 	end
 	local function GetVideoInfoIOS()
-		local sessionWeb = m_simpleTV.Http.New('com.google.ios.youtube/20.03.02 (iPhone16,2; U; CPU iOS 18_2_1 like Mac OS X;)')
-			if not sessionWeb then return end
-		m_simpleTV.Http.SetTimeout(sessionWeb, 8000)
+		local sessionIOS = m_simpleTV.Http.New('com.google.ios.youtube/20.03.02 (iPhone16,2; U; CPU iOS 18_2_1 like Mac OS X;)')
+			if not sessionIOS then return end
+		m_simpleTV.Http.SetTimeout(sessionIOS, 8000)
 		local url = 'https://www.youtube.com/embed/' .. m_simpleTV.User.YT.vId
-		local rc, answer = m_simpleTV.Http.Request(sessionWeb, {url = url})
+		local cookies = 'VISITOR_INFO1_LIVE=;SOCS=CAI;PREF=&hl=' .. m_simpleTV.User.YT.Lng.lang
+		m_simpleTV.Http.SetCookies(sessionIOS, url, cookies, '')
+		local rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url})
 			if rc ~= 200 then
 				m_simpleTV.Http.Close(sessionWeb)
 			 return
@@ -1993,8 +1995,8 @@ local infoInFile = false
 		local headers = 'Content-Type:application/json\nX-YouTube-Client-Name: 5\nX-YouTube-Client-Version:20.03.02\nOrigin:https://www.youtube.com\nX-Goog-Visitor-Id:' .. visitorData
 		local body ='{"contentCheckOk":true,"context":{"client":{"clientName":"IOS","clientVersion":"20.03.02","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"en","osName":"iPhone","osVersion":"18.2.1.22C161","timeZone":"UTC","utcOffsetMinutes":0}},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS"}},"racyCheckOk":true,"videoId":"' ..m_simpleTV.User.YT.vId ..'"}'
 		local url = 'https://www.youtube.com/youtubei/v1/player'
-		local rc, answer = m_simpleTV.Http.Request(sessionWeb, {url = url, method = 'post', body = body, headers = headers})
-		m_simpleTV.Http.Close(sessionWeb)
+		local rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url, method = 'post', body = body, headers = headers})
+		m_simpleTV.Http.Close(sessionIOS)
 	 return rc, answer
 	end
 	local function GetStreamsTab(vId)
