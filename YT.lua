@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (26/3/25)
+-- видеоскрипт для сайта https://www.youtube.com (27/3/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -358,7 +358,7 @@ local infoInFile = false
 	if not m_simpleTV.User.YT.contin then
 		m_simpleTV.User.YT.contin = ''
 	end
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.85 Safari/537.36'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
 	local session = m_simpleTV.Http.New(userAgent)
 		if not session then return end
 	m_simpleTV.Http.SetTimeout(session, 16000)
@@ -1989,8 +1989,8 @@ local infoInFile = false
 			end
 		local visitorData = answer:match('"visitorData":"([^"]+)')
 			if not visitorData then return end
-		local headers = 'Content-Type:application/json\nX-YouTube-Client-Name: 5\nX-YouTube-Client-Version:20.10.4\nOrigin:https://www.youtube.com\nX-Goog-Visitor-Id:' .. visitorData
-		local body ='{"contentCheckOk":true,"context":{"client":{"clientName":"5","clientVersion":"20.10.4","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"' .. m_simpleTV.User.YT.Lng.lang .. '","osName":"iPhone","osVersion":"18.3.2.22D82","timeZone":"UTC","utcOffsetMinutes":0}},"playbackContext":{"contentPlaybackContext":{"html5Preference":"HTML5_PREF_WANTS"}},"racyCheckOk":true,"videoId":"' ..m_simpleTV.User.YT.vId ..'"}'
+		local headers = 'Content-Type:application/json\nX-YouTube-Client-Name: 5\nX-YouTube-Client-Version:20.10.4\nReferer: https://www.youtube.com/\nOrigin:https://www.youtube.com\nX-Goog-Visitor-Id:' .. visitorData
+		local body ='{"contentCheckOk":true,"context":{"client":{"clientName":"5","clientVersion":"20.10.4","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"' .. m_simpleTV.User.YT.Lng.lang .. '","osName":"iPhone","osVersion":"18.3.2.22D82"}},"racyCheckOk":true,"videoId":"' ..m_simpleTV.User.YT.vId ..'"}'
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		local rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(sessionIOS)
