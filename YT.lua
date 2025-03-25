@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/3/25)
+-- видеоскрипт для сайта https://www.youtube.com (28/3/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1984,7 +1984,7 @@ local infoInFile = false
 		m_simpleTV.Http.SetCookies(sessionIOS, url, cookies, '')
 		local rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url})
 			if rc ~= 200 then
-				m_simpleTV.Http.Close(sessionWeb)
+				m_simpleTV.Http.Close(sessionIOS)
 			 return
 			end
 		local visitorData = answer:match('"visitorData":"([^"]+)')
