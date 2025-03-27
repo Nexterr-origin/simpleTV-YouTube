@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (29/3/25)
+-- видеоскрипт для сайта https://www.youtube.com (30/3/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1596,17 +1596,16 @@ local infoInFile = false
 				r = r + 1
 			end
 			if subtAdr then
-			 return subtAdr:gsub('://', '/webvtt://'):gsub('#https', '#http').. '&fmt=vtt', ''
+			 return subtAdr:gsub('://', '/webvtt://'):gsub('&fmt=[^&]+', ''):gsub('#https', '#http') .. '&fmt=vtt', ''
 			end
-			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
-				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
+			if not tab.captions.playerCaptionsTracklistRenderer
 			then
 			 return
 			end
 		r = 1
 		local lngCodeTr
 			while true do
-					if not subt[r] or lngCodeTr then break end
+					if not subt[r] or lngCodeTr or tab.captions.playerCaptionsTracklistRenderer.captionTracks then break end
 				q = 1
 				while true do
 						if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q] then break end
@@ -1624,11 +1623,30 @@ local infoInFile = false
 		if not lngCodeTr then
 			lngCodeTr = m_simpleTV.User.YT.Lng.lang
 			while true do
-					if not subt[r] or lngCodeTr then break end
+					if not subt[r] or lngCodeTr or tab.captions.playerCaptionsTracklistRenderer.captionTracks then break end
 				q = 1
 				while true do
 						if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q] then break end
 					languageCode = tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q].languageCode
+						if languageCode
+							and languageCode == subt[r]
+						then
+							lngCodeTr = languageCode
+						 break
+						end
+					q = q + 1
+				end
+				r = r + 1
+			end
+		end
+		if not lngCodeTr then
+			lngCodeTr = m_simpleTV.User.YT.Lng.lang
+			while true do
+					if not subt[r] or lngCodeTr or tab.captions.playerCaptionsTracklistRenderer.captionTracks then break end
+				q = 1
+				while true do
+						if not tab.captions.playerCaptionsTracklistRenderer.captionTracks[q] then break end
+					languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].languageCode
 						if languageCode
 							and languageCode == subt[r]
 						then
@@ -1649,13 +1667,13 @@ local infoInFile = false
 						and (not kind or kind ~= 'asr')
 						and languageCode ~= 'na'
 					then
-						subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl .. '&tlang=' .. lngCodeTr
+						subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl ..'&tlang=' .. lngCodeTr
 					 break
 					end
 				r = r + 1
 			end
 			if not subtAdr then return end
-	 return subtAdr:gsub('://', '/webvtt://'):gsub('#https', '#http').. '&fmt=vtt', ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
+	 return subtAdr:gsub('://', '/webvtt://'):gsub('&fmt=[^&]+', ''):gsub('#https', '#http') .. '&fmt=vtt', ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
 	local function positionToContinue(p)
 		if m_simpleTV.User.YT.duration then
