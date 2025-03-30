@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (30/3/25)
+-- видеоскрипт для сайта https://www.youtube.com (31/3/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -1868,6 +1868,7 @@ local infoInFile = false
 					t[#t].Name = name .. 'p' .. fps
 					t[#t].Address = string.format('%s$OPT:adaptive-logic=highest$OPT:adaptive-max-bw=%s', hls, bw)
 					t[#t].qltyLive = qlty
+
 				end
 			end
 		if m_simpleTV.User.YT.isLive == true and not isIPanel then
@@ -1876,6 +1877,11 @@ local infoInFile = false
 			if #t == 0 then
 			 return hls, title
 			end
+		t[#t + 1] = {}
+		t[#t].Id = #t
+		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
+		t[#t].Address = hls
+		t[#t].qltyLive = 100000
 	 return t, title
 	end
 	local function GetQltyIndex(t)
