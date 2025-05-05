@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (31/3/25)
+-- видеоскрипт для сайта https://www.youtube.com (5/5/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -2013,7 +2013,7 @@ local infoInFile = false
 			end
 		local visitorData = answer:match('"visitorData":"([^"]+)')
 			if not visitorData then return end
-		local headers = 'Content-Type:application/json\nX-YouTube-Client-Name: 5\nX-YouTube-Client-Version:20.10.4\nReferer: https://www.youtube.com/\nOrigin:https://www.youtube.com\nX-Goog-Visitor-Id:' .. visitorData
+		local headers = 'Content-Type:application/json\nX-YouTube-Client-Name: 5\nX-YouTube-Client-Version:20.10.4\nX-Goog-AuthUser:0\nReferer: https://www.youtube.com/\nOrigin:https://www.youtube.com\nX-Goog-Visitor-Id:' .. visitorData
 		local body ='{"contentCheckOk":true,"context":{"client":{"clientName":"5","clientVersion":"20.10.4","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"' .. m_simpleTV.User.YT.Lng.lang .. '","osName":"iPhone","osVersion":"18.3.2.22D82"}},"racyCheckOk":true,"videoId":"' ..m_simpleTV.User.YT.vId ..'"}'
 		local url = 'https://www.youtube.com/youtubei/v1/player'
 		local rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url, method = 'post', body = body, headers = headers})
