@@ -1,12 +1,12 @@
--- видеоскрипт для сайта https://www.youtube.com (8/6/25)
+-- видеоскрипт для сайта https://www.youtube.com (9/6/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
 local videoHFR = true
-local videoVP9 = true
-local videoAV1 = false
-local videoHDR = false
+-- local videoVP9 = true
+-- local videoAV1 = false
+local videoHDR = true
 -- отладка
 local infoInFile = false
 --
@@ -1482,8 +1482,8 @@ local infoInFile = false
 		if m_simpleTV.User.YT.Chapters then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.chapter
 		end
-		local fps = name:match('^%d+p(%d+)')
-		local hdr = name:match('HDR')
+		local fps = name:match('^%d+p(%d+)') or name:match('(%d+) FPS')
+		local hdr = name:match(' HDR')
 		if fps then
 			title = title .. '\n☑ FPS ' .. fps
 		end
@@ -1854,6 +1854,8 @@ local infoInFile = false
 				local bw = w:match('BANDWIDTH=(%d+)')
 				local qlty
 				if bw and name > 300 then
+					local hdr = w:match('RANGE=PQ')
+					local fps = tonumber(w:match('RATE=(%d+)') or '0')
 					bw = tonumber(bw)
 					bw = math.ceil(bw / 10000) * 10
 					if fps > 30 then
@@ -1863,9 +1865,15 @@ local infoInFile = false
 						qlty = name
 						fps = ''
 					end
+					if hdr then
+						qlty = name + 10
+						hdr = ' HDR'
+					else
+						qlty = name
+						hdr = ''
+					end
 					t[#t + 1] = {}
-					t[#t].Id = #t
-					t[#t].Name = name .. 'p' .. fps
+					t[#t].Name = name .. 'p' .. fps .. hdr
 					t[#t].Address = string.format('%s$OPT:adaptive-logic=highest$OPT:adaptive-max-bw=%s', hls, bw)
 					t[#t].qltyLive = qlty
 				end
@@ -1877,11 +1885,31 @@ local infoInFile = false
 			 return hls, title
 			end
 		t[#t + 1] = {}
-		t[#t].Id = #t
 		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
 		t[#t].Address = hls
 		t[#t].qltyLive = 100000
-	 return t, title
+			for i = #t, 1, -1 do
+				if t[i].Name:match('HDR') and not videoHDR then
+					table.remove(t, i)
+				end
+			end
+			for i = #t, 1, -1 do
+				if t[i].Name:match('FPS') and not videoHFR then
+					table.remove(t, i)
+				end
+			end
+		local hash, noDuplicate = {}, {}
+			for i = 1, #t do
+				if not hash[t[i].Name] then
+					noDuplicate[#noDuplicate + 1] = t[i]
+					hash[t[i].Name] = true
+				end
+			end
+		table.sort(noDuplicate, function(a, b) return a.qltyLive < b.qltyLive end)
+		for i = 1, #noDuplicate do
+			noDuplicate[i].Id = i
+		end
+	 return noDuplicate, title
 	end
 	local function GetQltyIndex(t)
 		if (m_simpleTV.User.YT.qlty < 300
@@ -1918,7 +1946,6 @@ local infoInFile = false
 			if url:match('$OPT:image') then
 			 return url
 			end
-		-- local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), userAgent)
 		local extOpt = string.format('$OPT:http-referrer=https://www.youtube.com/$OPT:meta-description=%s$OPT:http-user-agent=%s', decode64('WW91VHViZSBieSBOZXh0ZXJyIGVkaXRpb24'), 'com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip')
 		local marq_marquee
 		if not m_simpleTV.User.YT.isLive and not m_simpleTV.User.YT.isLiveContent then
@@ -1952,6 +1979,9 @@ local infoInFile = false
 			else
 				extOpt = string.format('$OPT:sub-source=marq$OPT:marq-marquee=%s$OPT:marq-position=9$OPT:marq-timeout=5500$OPT:marq-opacity=40$OPT:marq-size=%s$OPT:marq-x=%s$OPT:marq-y=%s%s', marq_marquee, 0.025 * k, 0.03 * k, 0.03 * k, extOpt)
 			end
+		end
+		if t[index].Name:match(' HDR$') then
+			extOpt = extOpt .. '$OPT:d3d11-upscale-mode=linear'
 		end
 	 return url .. extOpt
 	end
@@ -2009,7 +2039,7 @@ local infoInFile = false
 			if not visitorData then return end
 		local headers = 'Content-Type:application/json'
 		local body ='{"context":{"client":{"clientName":"5","clientVersion":"20.10.4","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"' .. m_simpleTV.User.YT.Lng.lang .. '","osName":"iPhone","osVersion":"18.3.2.22D82","visitorData":"' .. visitorData .. '"}},"racyCheckOk":true,"contentCheckOk":true,"videoId":"' .. m_simpleTV.User.YT.vId ..'"}'
-		url = 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false'
+		url = 'https://m.youtube.com/youtubei/v1/player'
 		rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(sessionIOS)
 	 return rc, answer
