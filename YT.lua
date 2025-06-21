@@ -1,12 +1,13 @@
--- видеоскрипт для сайта https://www.youtube.com (9/6/25)
+-- видеоскрипт для сайта https://www.youtube.com (21/6/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
 local videoHFR = true
--- local videoVP9 = true
--- local videoAV1 = false
+local videoVP9 = true
+local videoAV1 = false
 local videoHDR = true
+local outHLS = false
 -- отладка
 local infoInFile = false
 --
@@ -1878,12 +1879,12 @@ local infoInFile = false
 					t[#t].qltyLive = qlty
 				end
 			end
+			if #t == 0 then
+			 return
+			end
 		if m_simpleTV.User.YT.isLive == true and not isIPanel then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
 		end
-			if #t == 0 then
-			 return hls, title
-			end
 		t[#t + 1] = {}
 		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
 		t[#t].Address = hls
@@ -2055,10 +2056,13 @@ local infoInFile = false
 		m_simpleTV.User.YT.pic = nil
 		m_simpleTV.User.YT.videostats = nil
 		m_simpleTV.User.YT.isLive = false
-		m_simpleTV.User.YT.isLiveContent = true
+		m_simpleTV.User.YT.isLiveContent = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
+		if outHLS then
+			m_simpleTV.User.YT.isLiveContent = true
+		end
 		-- if not m_simpleTV.User.YT.signScr
 			-- or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		-- then
