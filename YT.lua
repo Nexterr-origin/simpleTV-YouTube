@@ -1,13 +1,12 @@
--- видеоскрипт для сайта https://www.youtube.com (21/6/25)
+-- видеоскрипт для сайта https://www.youtube.com (23/6/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
 -- параметры (true | false)
 local videoHFR = true
 local videoVP9 = true
-local videoAV1 = false
+local videoAV1 = true
 local videoHDR = true
-local outHLS = false
 -- отладка
 local infoInFile = false
 --
@@ -2040,7 +2039,7 @@ local infoInFile = false
 			if not visitorData then return end
 		local headers = 'Content-Type:application/json'
 		local body ='{"context":{"client":{"clientName":"5","clientVersion":"20.10.4","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"' .. m_simpleTV.User.YT.Lng.lang .. '","osName":"iPhone","osVersion":"18.3.2.22D82","visitorData":"' .. visitorData .. '"}},"racyCheckOk":true,"contentCheckOk":true,"videoId":"' .. m_simpleTV.User.YT.vId ..'"}'
-		url = 'https://m.youtube.com/youtubei/v1/player'
+		url = 'https://release-youtubei.sandbox.googleapis.com/youtubei/v1/player'
 		rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(sessionIOS)
 	 return rc, answer
@@ -2060,9 +2059,6 @@ local infoInFile = false
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-		if outHLS then
-			m_simpleTV.User.YT.isLiveContent = true
-		end
 		-- if not m_simpleTV.User.YT.signScr
 			-- or os.time() - m_simpleTV.User.YT.checkJsPlayer > 1800
 		-- then
