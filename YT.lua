@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/6/25)
+-- видеоскрипт для сайта https://www.youtube.com (10/8/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -2284,6 +2284,10 @@ local infoInFile = false
 					while tab.streamingData.adaptiveFormats[k] do
 						if tab.streamingData.adaptiveFormats[k].contentLength then
 							t[i] = {}
+							if tab.streamingData.adaptiveFormats[k].colorInfo and
+							tab.streamingData.adaptiveFormats[k].colorInfo.transferCharacteristics then
+								t[i].transferCharacteristics = tab.streamingData.adaptiveFormats[k].colorInfo.transferCharacteristics
+							end
 							t[i].itag = tab.streamingData.adaptiveFormats[k].itag
 							t[i].mimeType = tab.streamingData.adaptiveFormats[k].mimeType
 							t[i].qualityLabel = tab.streamingData.adaptiveFormats[k].qualityLabel
@@ -2318,6 +2322,13 @@ local infoInFile = false
 					title = title .. '\nno parameters to decrypt'
 				end
 			 return Stream_Error(tab, title)
+			end
+			for i = #t, 1, -1 do
+				if t[i].qualityLabel and t[i].qualityLabel:match('HDR') then
+					if t[i].transferCharacteristics and not t[i].transferCharacteristics:match('SMPTEST2084') then
+						table.remove(t, i)
+					end
+				end
 			end
 			for i = #t, 1, -1 do
 				if t[i].qualityLabel and t[i].qualityLabel:match('HDR') and not videoHDR then
