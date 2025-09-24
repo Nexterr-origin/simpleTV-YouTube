@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (10/8/25)
+-- видеоскрипт для сайта https://www.youtube.com (24/9/25)
 -- Copyright © 2017-2025 Nexterr | https://github.com/Nexterr-origin/simpleTV-YouTube
 -- // поиск из окна "Открыть URL": [Ctrl+N] -- //
 -- показать на OSD плейлист / выбор качества: [Ctrl+M]
@@ -2029,7 +2029,7 @@ local infoInFile = false
 	 return rc, answer
 	end
 	local function GetVideoInfoIOS()
-		local sessionIOS = m_simpleTV.Http.New('com.google.ios.youtube/20.10.4 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)')
+		local sessionIOS = m_simpleTV.Http.New('com.google.ios.youtube/19.45.4 (iPhone16,2; U; CPU iOS 18_1_0 like Mac OS X; US)')
 			if not sessionIOS then return end
 		m_simpleTV.Http.SetTimeout(sessionIOS, 8000)
 		local url = 'https://www.youtube.com/sw.js_data'
@@ -2038,8 +2038,8 @@ local infoInFile = false
 		local visitorData = answer:match('"iPhone","([^"]+)')
 			if not visitorData then return end
 		local headers = 'Content-Type:application/json'
-		local body ='{"context":{"client":{"clientName":"5","clientVersion":"20.10.4","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"' .. m_simpleTV.User.YT.Lng.lang .. '","osName":"iPhone","osVersion":"18.3.2.22D82","visitorData":"' .. visitorData .. '"}},"racyCheckOk":true,"contentCheckOk":true,"videoId":"' .. m_simpleTV.User.YT.vId ..'"}'
-		url = 'https://release-youtubei.sandbox.googleapis.com/youtubei/v1/player'
+		local body ='{"context":{"client":{"clientName":"5","clientVersion":"19.45.4","deviceMake":"Apple","deviceModel":"iPhone16,2","hl":"' .. m_simpleTV.User.YT.Lng.lang .. '","osName":"iPhone","osVersion":"18.1.0.22B83","visitorData":"' .. visitorData .. '"}},"racyCheckOk":true,"contentCheckOk":true,"videoId":"' .. m_simpleTV.User.YT.vId ..'"}'
+		url = 'https://www.youtube.com/youtubei/v1/player'
 		rc, answer = m_simpleTV.Http.Request(sessionIOS, {url = url, method = 'post', body = body, headers = headers})
 		m_simpleTV.Http.Close(sessionIOS)
 	 return rc, answer
